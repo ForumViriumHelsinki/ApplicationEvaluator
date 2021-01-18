@@ -1,8 +1,8 @@
 [run]
 omit =
-    $PROJECT_SLUG/asgi.py
-    $PROJECT_SLUG/wsgi.py
-    $PROJECT_SLUG/settings.py
+    application_evaluator/asgi.py
+    application_evaluator/wsgi.py
+    application_evaluator/settings.py
     */migrations/*
     # Measure coverage of application code, not the tests themselves:
     */*tests.py

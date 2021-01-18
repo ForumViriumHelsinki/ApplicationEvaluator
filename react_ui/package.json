@@ -1,8 +1,8 @@
 {
-  "name": "$PROJECT_SLUG",
+  "name": "application_evaluator",
   "version": "0.1.0",
   "private": true,
-  "description": "UI for the $PROJECT_NAME application",
+  "description": "UI for the FVH Application Evaluator application",
   "scripts": {
     "start": "react-scripts start --no-cache",
     "build": "react-scripts build",

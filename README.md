@@ -1,24 +1,12 @@
-# DjangoReactApp
+# $PROJECT_NAME
+To start UI development:
 
-Boilerplate code to set up a Django / React web app with:
- * Django >=3.0
- * Postgres db
- * Django Rest Framework
- * Swagger ReST documentation at /swagger-ui/
- * Django-rest-auth for authentication over ReST
-   * react_ui/src/sessionRequest.js for UI-side integration to that
- * Github Action for running as CI:
-   * Django tests with coverage
-   * Flake8 code style verification
- * Create React App-generated React app boilerplate
- * Bootstrap 4 with FVH color theme
- * Docker scripts
- 
-To use this boilerplate in a new project:
- * Go to https://github.com/ForumViriumHelsinki/DjangoReactApp
- * Click "Use this template"
- * Name your new project
- * Click Create repository
- * When done, clone the new repo and run `sh name_project.sh`
- * The script will ask for a slug & full name for the new project and configure the boilerplate files with the project-specific names.
- 
+* Install node.js
+* Run:
+```
+npm install -g yarn
+cd react_ui
+yarn
+yarn start
+```
+This should install all dependencies in react_ui/node_modules and start a react dev environment serving the UI app at localhost:3000 or a nearby available port.

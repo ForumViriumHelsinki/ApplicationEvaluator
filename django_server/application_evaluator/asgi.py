@@ -1,5 +1,5 @@
 """
-ASGI config for $PROJECT_SLUG project.
+ASGI config for application_evaluator project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', '$PROJECT_SLUG.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'application_evaluator.settings')
 
 application = get_asgi_application()

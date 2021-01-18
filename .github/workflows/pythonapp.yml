@@ -1,4 +1,4 @@
-name: $PROJECT_NAME tests CI
+name: FVH Application Evaluator tests CI
 
 on: [push]
 
@@ -11,9 +11,9 @@ jobs:
       postgres:
         image: postgres:12
         env:
-          POSTGRES_DB: $PROJECT_SLUG
-          POSTGRES_USER: $PROJECT_SLUG
-          POSTGRES_PASSWORD: $PROJECT_SLUG
+          POSTGRES_DB: application_evaluator
+          POSTGRES_USER: application_evaluator
+          POSTGRES_PASSWORD: application_evaluator
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
