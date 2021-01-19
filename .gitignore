@@ -13,3 +13,4 @@ __pycache__
 /docker-compose.yml
 /react_ui/src/settings.json
 /.env.prod
+/postgres_data/
