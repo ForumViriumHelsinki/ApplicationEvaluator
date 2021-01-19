@@ -1,8 +1,8 @@
 [run]
 omit =
-    application_evaluator/asgi.py
-    application_evaluator/wsgi.py
-    application_evaluator/settings.py
+    application_evaluator_config/asgi.py
+    application_evaluator_config/wsgi.py
+    application_evaluator_config/settings.py
     */migrations/*
     # Measure coverage of application code, not the tests themselves:
     */*tests.py

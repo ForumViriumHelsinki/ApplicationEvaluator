@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,12 +35,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
-    'application_evaluator.apps.AdminConfig',
+    'application_evaluator_config.apps.AdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'application_evaluator'
 ]
 
 if os.environ.get('ELASTIC_SERVICE', False):
@@ -57,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'application_evaluator.urls'
+ROOT_URLCONF = 'application_evaluator_config.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'application_evaluator.wsgi.application'
+WSGI_APPLICATION = 'application_evaluator_config.wsgi.application'
 
 
 # Database

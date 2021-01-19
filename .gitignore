@@ -5,7 +5,7 @@
 __pycache__
 /react_ui/yarn-error.log
 /react_ui/build/
-/django_server/application_evaluator/local_settings.py
+/django_server/application_evaluator_config/local_settings.py
 /Pipfile
 /Pipfile.lock
 /django_server/staticfiles/

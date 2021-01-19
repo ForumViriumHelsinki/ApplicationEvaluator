@@ -1,1 +1,0 @@
-Docker will mount this folder to store the data for the db running in its own docker container.

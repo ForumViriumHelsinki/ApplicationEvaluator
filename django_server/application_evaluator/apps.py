@@ -1,5 +1,5 @@
-from django.contrib.admin.apps import AdminConfig
+from django.apps import AppConfig
 
 
-class AdminConfig(AdminConfig):
-    default_site = 'application_evaluator.admin_site.AdminSite'
+class ApplicationEvaluatorConfig(AppConfig):
+    name = 'application_evaluator'

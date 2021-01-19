@@ -1,4 +1,4 @@
-# $PROJECT_NAME
+# FVH Application Evaluator
 To start UI development:
 
 * Install node.js
