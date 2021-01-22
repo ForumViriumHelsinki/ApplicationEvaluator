@@ -166,6 +166,9 @@ if LOG_DB_QUERIES:
         }
     }
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 ADMINS = [['FVH Django admins', 'django-admins@forumvirium.fi']]
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
