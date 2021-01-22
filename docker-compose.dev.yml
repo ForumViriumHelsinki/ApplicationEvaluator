@@ -22,7 +22,7 @@ services:
     ports:
       - 5432:5432
 
-  frontend:
+  react:
       build: ./react_ui
       command: yarn start
       stdin_open: true

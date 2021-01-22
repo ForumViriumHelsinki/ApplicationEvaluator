@@ -12,6 +12,5 @@ FROM node:13
 WORKDIR /app
 # add the node_modules folder to $PATH
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json /app/
-COPY yarn.lock /app/
+COPY package.json tsconfig.json yarn.lock /app/
 RUN yarn install --network-timeout=30000
