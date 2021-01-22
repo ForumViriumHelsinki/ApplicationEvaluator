@@ -40,6 +40,12 @@ class ApplicationRound(NamedModel):
         """
         return sum(c.weight for c in self.criteria.all())
 
+    @classmethod
+    def rounds_for_evaluator(cls, user):
+        return cls.objects.filter(applications__evaluating_organizations__users=user).distinct()
+
+    def applications_for_evaluator(self, user):
+        return self.applications.filter(evaluating_organizations__users=user).distinct()
 
 
 class CriterionGroup(NamedModel):
@@ -63,7 +69,7 @@ class Criterion(NamedModel):
 
 
 class Organization(NamedModel):
-    users = models.ManyToManyField(User, blank=True)
+    users = models.ManyToManyField(User, blank=True, related_name='organizations')
 
 
 class Application(NamedModel):
@@ -82,6 +88,12 @@ class Application(NamedModel):
     def can_be_evaluated_by(self, user):
         return self.evaluating_organizations.filter(users=user).exists()
 
+    def scores_for_evaluator(self, user):
+        return self.scores.filter(evaluator__organizations__users=user).distinct()
+
+    @classmethod
+    def applications_for_evaluator(cls, user):
+        return cls.objects.filter(evaluating_organizations__users=user).distinct()
 
 class Score(TimestampedModel):
     application = models.ForeignKey(Application, related_name='scores', on_delete=models.CASCADE)

@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APITestCase
 
 from application_evaluator import models
 
@@ -41,3 +43,56 @@ class ModelTests(TestCase):
         # When the total score is requested
         # Then the scores for each separate criterion is averaged before the total weighed average is computed
         self.assertEqual(app.score(), (2*3.5 + 5) / 3)
+
+
+class RestTests(APITestCase):
+    def test_application_rounds(self):
+        # Given no logged in user
+        # When requesting the application round list
+        url = reverse('application_round-list')
+        response = self.client.get(url)
+
+        # Then a 401 Unauthorized response is received
+        self.assertEqual(response.status_code, 401)
+
+        # Given a logged in user that does not belong to any organization with allocated applications
+        evaluator = User.objects.create(username="evaluator")
+        self.client.force_login(evaluator)
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+        app = app_round.applications.create(name='SkyNet')
+        criterion1 = app_round.criteria.create(name='Goodness', weight=1)
+
+        # When requesting the application round list
+        response = self.client.get(url)
+        # Then an empty list is received
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
+        # Given a logged in user that belongs to an organization with allocated applications
+        organization = evaluator.organizations.create(name='Helsinki')
+        app.evaluating_organizations.add(organization)
+
+        # And given that applications have received scores from both within and outside of the user's organization
+        evaluator2 = User.objects.create(username="evaluator2")
+        score1 = app.scores.create(evaluator=evaluator, score=5, criterion=criterion1)
+        score2 = app.scores.create(evaluator=evaluator2, score=5, criterion=criterion1)
+
+        # When requesting the application round list
+        response = self.client.get(url)
+
+        # Then the application rounds of the allocated applications are received, along with scores given
+        # by the user's organization
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [{
+            'id': app_round.id,
+            'applications': [{'id': app.id, 'name': 'SkyNet', 'scores': [{
+                'id': score1.id,
+                'application': app.id,
+                'score': 5,
+                'criterion': criterion1.id,
+                'evaluator': {'id': evaluator.id, 'first_name': '', 'last_name': '', 'username': 'evaluator'}
+            }]}],
+            'criteria': [{'name': 'Goodness', 'group': None, 'id': criterion1.id}],
+            'criterion_groups': [],
+            'name': 'AI4Cities'
+        }])
