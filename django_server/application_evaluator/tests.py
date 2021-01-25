@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
+from django.core import mail
 
 from application_evaluator import models
 
@@ -96,3 +97,11 @@ class RestTests(APITestCase):
             'criterion_groups': [],
             'name': 'AI4Cities'
         }])
+
+
+class RestAuthTests(APITestCase):
+    def test_reset_password(self):
+        user = User.objects.create(username='user', email='some@user.com')
+        response = self.client.post('/rest-auth/password/reset/', {'email': user.email})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
