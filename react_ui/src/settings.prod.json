@@ -1,3 +1,4 @@
 {
-  "serverRoot": ""
+  "serverRoot": "",
+  "sentryDsn": "https://b726ac41de7e4f99acefc86f42bcb5e5@sentry.fvh.io/10"
 }
