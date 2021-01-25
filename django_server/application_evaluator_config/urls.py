@@ -27,9 +27,14 @@ schema_view = get_schema_view(
     version="1.0.0", public=True)
 
 
+def error_view(request):
+    raise Exception('This is a test error to verify error reporting.')
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest-auth/', include('rest_auth.urls')),
+    path('rest/error_test/', error_view, name='error-view'),
     path('rest/', include(rest.router.urls)),
     path('openapi/', schema_view, name='openapi-schema'),
     path('swagger-ui/', TemplateView.as_view(
