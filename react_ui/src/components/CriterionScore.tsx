@@ -64,7 +64,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const {application, criterion} = this.props;
     const {reloadApplication} = this.context;
     const value = Number(e.target.value);
-    if (!value || value > 10 || value < 0) return;
+    if (!e.target.value || value > 10 || value < 0) return;
     const data = {application: application.id, criterion: criterion.id, score: value};
     sessionRequest(scoresUrl, {method: 'POST', data}).then(response => {
       if (response.status < 300) {
