@@ -29,6 +29,7 @@ class ScoreInline(admin.TabularInline):
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [ScoreInline]
     list_display = ['name', 'score']
+    filter_horizontal = ['evaluating_organizations']
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('scores', 'application_round__criteria')
@@ -54,4 +55,6 @@ class CriterionAdmin(admin.ModelAdmin):
         models.Score.objects.filter(evaluator=request.user, criterion__in=queryset).delete()
 
 
-admin.site.register(models.Organization)
+@admin.register(models.Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    filter_horizontal = ['users']
