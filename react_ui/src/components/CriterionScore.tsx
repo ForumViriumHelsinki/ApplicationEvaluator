@@ -35,7 +35,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
     return <div className="ml-2 mb-2">
       {criterion.name}:
-      {score && (score.evaluator.pk != user.id) ?
+      {(score && (score.evaluator.id != user.id)) ?
         <div><strong>{score.score}</strong> (by {username(score.evaluator)})</div>
       : score ?
         <div>

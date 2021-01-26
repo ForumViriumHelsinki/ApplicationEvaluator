@@ -16,7 +16,7 @@ class CriterionGroupSerializer(serializers.ModelSerializer):
         fields = ['name', 'parent', 'id']
 
 
-class EvaluatorSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username']
@@ -29,7 +29,7 @@ class BaseScoreSerializer(serializers.ModelSerializer):
 
 
 class ScoreSerializer(BaseScoreSerializer):
-    evaluator = EvaluatorSerializer(read_only=True)
+    evaluator = UserSerializer(read_only=True)
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
