@@ -41,6 +41,7 @@ class CriterionScoreInline(ScoreInline):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('application', 'evaluator')
 
+
 @admin.register(models.Criterion)
 class CriterionAdmin(admin.ModelAdmin):
     inlines = [CriterionScoreInline]
