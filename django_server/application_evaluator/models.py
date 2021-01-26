@@ -64,6 +64,7 @@ class Criterion(NamedModel):
     """
     application_round = models.ForeignKey(ApplicationRound, related_name='criteria', on_delete=models.CASCADE)
     group = models.ForeignKey(CriterionGroup, related_name='criteria', on_delete=models.CASCADE, null=True, blank=True)
+    public = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     weight = models.FloatField(default=0)
 
@@ -89,11 +90,12 @@ class Application(NamedModel):
         return self.evaluating_organizations.filter(users=user).exists()
 
     def scores_for_evaluator(self, user):
-        return self.scores.filter(evaluator__organizations__users=user).distinct()
+        return self.scores.filter(evaluator__organizations__users=user, criterion__public=True).distinct()
 
     @classmethod
     def applications_for_evaluator(cls, user):
         return cls.objects.filter(evaluating_organizations__users=user).distinct()
+
 
 class Score(TimestampedModel):
     application = models.ForeignKey(Application, related_name='scores', on_delete=models.CASCADE)

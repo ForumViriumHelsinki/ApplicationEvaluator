@@ -30,5 +30,28 @@ class ApplicationAdmin(admin.ModelAdmin):
     inlines = [ScoreInline]
     list_display = ['name', 'score']
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('scores', 'application_round__criteria')
+
+
+class CriterionScoreInline(ScoreInline):
+    readonly_fields = ['evaluator', 'application']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('application', 'evaluator')
+
+@admin.register(models.Criterion)
+class CriterionAdmin(admin.ModelAdmin):
+    inlines = [CriterionScoreInline]
+    actions = ['initialize_scores', 'delete_my_scores']
+
+    def initialize_scores(self, request, queryset):
+        for criterion in queryset:
+            for app in criterion.application_round.applications.exclude(scores__criterion=criterion).order_by('name'):
+                app.scores.create(criterion=criterion, evaluator=request.user)
+
+    def delete_my_scores(self, request, queryset):
+        models.Score.objects.filter(evaluator=request.user, criterion__in=queryset).delete()
+
 
 admin.site.register(models.Organization)

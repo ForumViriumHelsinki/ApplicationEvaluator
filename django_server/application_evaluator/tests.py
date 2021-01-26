@@ -78,10 +78,14 @@ class RestTests(APITestCase):
         score1 = app.scores.create(evaluator=evaluator, score=5, criterion=criterion1)
         score2 = app.scores.create(evaluator=evaluator2, score=5, criterion=criterion1)
 
+        # And some scores for non-public criteria
+        criterion2 = app_round.criteria.create(name='Wellness', weight=1, public=False)
+        score3 = app.scores.create(evaluator=evaluator, score=5, criterion=criterion2)
+
         # When requesting the application round list
         response = self.client.get(url)
 
-        # Then the application rounds of the allocated applications are received, along with scores given
+        # Then the application rounds of the allocated applications are received, along with public scores given
         # by the user's organization
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [{

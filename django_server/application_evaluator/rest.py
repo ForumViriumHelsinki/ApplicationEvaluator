@@ -48,7 +48,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
 class ApplicationRoundSerializer(serializers.ModelSerializer):
     applications = serializers.SerializerMethodField()
-    criteria = CriterionSerializer(many=True, read_only=True)
+    criteria = serializers.SerializerMethodField()
     criterion_groups = CriterionGroupSerializer(many=True, read_only=True)
 
     class Meta:
@@ -56,10 +56,12 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_applications(self, application_round):
-        return ApplicationSerializer(
-            application_round.applications_for_evaluator(self.context['request'].user).order_by('name'),
-            many=True, context=self.context
-        ).data
+        applications = application_round.applications_for_evaluator(self.context['request'].user).order_by('name')
+        return ApplicationSerializer(applications, many=True, context=self.context).data
+
+    def get_criteria(self, application_round):
+        criteria = application_round.criteria.filter(public=True)
+        return CriterionSerializer(criteria, many=True, context=self.context).data
 
 
 class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
@@ -68,7 +70,7 @@ class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return models.ApplicationRound.rounds_for_evaluator(self.request.user) \
-            .prefetch_related('criteria', 'criterion_groups')
+            .prefetch_related('criterion_groups')
 
 
 class ScoreViewSet(viewsets.ModelViewSet):
