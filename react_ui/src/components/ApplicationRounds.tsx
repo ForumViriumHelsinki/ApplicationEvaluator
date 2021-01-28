@@ -10,10 +10,12 @@ type ApplicationRoundsProps = {
   user: User
 }
 
+type AppOrder = 'name' | 'score' | 'unevaluated';
+
 type ApplicationRoundsState = {
   applicationRounds?: ApplicationRound[],
   error?: boolean,
-  order: 'name' | 'score'
+  order: AppOrder
 }
 
 const initialState: ApplicationRoundsState = {
@@ -65,16 +67,21 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     const {user} = this.props;
     if (!applicationRounds?.length) return null;
 
+    const OrderBtn = ({order, label}: { order: AppOrder, label: string }) =>
+      <>{' '}
+        <button className="btn btn-sm btn-outline-secondary rounded-pill"
+                onClick={() => this.setState({order})}>{label}</button>
+      </>;
+
     return <AppContext.Provider value={{user, reloadApplication: this.reloadApplication}}>
       {applicationRounds.map(appRound =>
         <div className="mb-2" key={appRound.name}>
           <h3>{appRound.name}</h3>
           {this.scoredApps(appRound).length}/{appRound.applications.length} applications evaluated<br/>
-          Order by:{' '}
-          <button className="btn btn-sm btn-outline-secondary rounded-pill"
-                  onClick={() => this.setState({order: 'name'})}>Name</button>{' '}
-          <button className="btn btn-sm btn-outline-secondary rounded-pill"
-                  onClick={() => this.setState({order: 'score'})}>Score</button>{' '}
+          Order by:
+          <OrderBtn label="Name" order="name"/>
+          <OrderBtn label="Score" order="score"/>
+          <OrderBtn label="Unevaluated" order="unevaluated"/>
           {this.getApplications(appRound).map(app =>
             <ApplicationScores application={app} applicationRound={appRound} key={app.name}/>
           )}
@@ -88,7 +95,11 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     if (order == 'name') return appRound.applications;
 
     const apps = [...appRound.applications];
-    apps.sort((a, b) =>
+
+    if (order == 'unevaluated') apps.sort((a, b) =>
+      a.scores.length - b.scores.length);
+
+    else if (order == 'score') apps.sort((a, b) =>
       (averageScore(b, appRound) || 0) - (averageScore(a, appRound) || 0));
     return apps;
   }
