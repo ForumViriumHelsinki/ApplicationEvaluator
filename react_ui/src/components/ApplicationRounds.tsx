@@ -1,10 +1,9 @@
 import React from 'react';
 import sessionRequest from "sessionRequest";
 import {applicationRoundsUrl, applicationUrl} from "urls";
-import {AppContext, ApplicationRound, CriterionGroup, User} from "components/types";
-import CriterionGroupComponent from "components/CriterionGroup";
+import {AppContext, ApplicationRound, User} from "components/types";
 import ApplicationScores from "components/ApplicationScores";
-import {averageScore} from "components/utils";
+import {addScores} from "components/utils";
 
 type ApplicationRoundsProps = {
   user: User
@@ -31,7 +30,9 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
 
   loadRounds() {
     sessionRequest(applicationRoundsUrl).then(response => {
-      if (response.status == 200) response.json().then(applicationRounds => this.setState({applicationRounds}));
+      if (response.status == 200)
+        response.json().then(applicationRounds =>
+          this.setState({applicationRounds: addScores(applicationRounds)}));
       else this.setState({error: true});
     })
   }
@@ -44,7 +45,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
           const i = r.applications.findIndex(a => a.id == appId);
           if (i > -1) r.applications.splice(i, 1, application);
         });
-        this.setState({applicationRounds})
+        this.setState({applicationRounds: addScores(applicationRounds)})
       });
       else this.setState({error: true});
     })
@@ -100,7 +101,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
       a.scores.length - b.scores.length);
 
     else if (order == 'score') apps.sort((a, b) =>
-      (averageScore(b, appRound) || 0) - (averageScore(a, appRound) || 0));
+      (b.score || 0) - (a.score || 0));
     return apps;
   }
 

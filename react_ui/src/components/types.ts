@@ -22,7 +22,9 @@ export type Score = {
 export type Application = {
     id: number,
     name: string,
-    scores: Score[]
+    scores: Score[],
+    score: number,
+    groupScores: any
 }
 
 export type Criterion = {

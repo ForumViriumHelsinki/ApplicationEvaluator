@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Application, ApplicationRound, Criterion, CriterionGroup} from "components/types";
+import {ApplicationRound, Criterion, CriterionGroup, Score, User} from "components/types";
 
 const sum = (lst: number[]) => lst.reduce((a, b) => a + b, 0);
 
@@ -19,20 +19,32 @@ const allCriteria = (applicationRound: ApplicationRound, criterionGroup: Criteri
   ]);
 };
 
-export function averageScore(application: Application,
-                             applicationRound: ApplicationRound,
-                             criterionGroup?: CriterionGroup) {
-  const weightIndex = Object.fromEntries(applicationRound.criteria.map(c => [c.id, c.weight]));
-  let scores;
+export const addScores = (rounds: ApplicationRound[]) => {
+  rounds.forEach(round => {
+    const thresholdGroups = round.criterion_groups.filter(g => g.threshold);
+    const criteriaByGroup = Object.fromEntries(round.criterion_groups.map(g => [g.id, allCriteria(round, g)]))
+    const weightIndex = Object.fromEntries(round.criteria.map(c => [c.id, c.weight]));
 
-  if (criterionGroup) {
-    const criterionIndex = Object.fromEntries(allCriteria(applicationRound, criterionGroup).map(c => [c.id, c]));
-    scores = application.scores.filter(s => criterionIndex[s.criterion]);
-  } else scores = application.scores;
+    const weightedAvg = (scores: Score[]) => {
+      const weightedScores = scores.map(s => s.score * weightIndex[s.criterion]);
+      const weights = scores.map(s => weightIndex[s.criterion]);
+      return sum(weightedScores) / sum(weights);
+    };
 
-  if (!scores.length) return null;
+    round.applications.forEach(app => {
+      app.groupScores = {};
+      if (!app.scores.length) return;
+      app.score = weightedAvg(app.scores);
+      thresholdGroups.forEach(group => {
+        const criterionIndex = Object.fromEntries(criteriaByGroup[group.id].map(c => [c.id, c]));
+        const scores = app.scores.filter(s => criterionIndex[s.criterion]);
+        if (scores.length) app.groupScores[group.id] = weightedAvg(scores);
+      })
+    })
+  });
+  return rounds;
+};
 
-  const weightedScores = scores.map(s => s.score * weightIndex[s.criterion]);
-  const weights = scores.map(s => weightIndex[s.criterion]);
-  return sum(weightedScores) / sum(weights);
-}
+export const username = (user: User) => {
+  return (user.first_name && user.last_name) ? `${user.first_name} ${user.last_name}` : user.username
+};

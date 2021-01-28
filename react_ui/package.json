@@ -22,6 +22,7 @@
     "react-jsonschema-form": "^1.8.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.1",
+    "react-svg-radar-chart": "^1.2.0",
     "reactstrap": "^8.9.0",
     "sass": "^1.23.7",
     "typescript": "^3.7.4"

@@ -1,11 +1,10 @@
-import React from 'react';
-import {FocusEvent} from 'react';
-import {AppContext, Application, Criterion, User} from "components/types";
+import React, {FocusEvent} from 'react';
+import {AppContext, Application, Criterion} from "components/types";
 import Icon from "util_components/bootstrap/Icon";
-import Confirm from "util_components/bootstrap/Confirm";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import sessionRequest from "sessionRequest";
 import {scoresUrl, scoreUrl} from "urls";
+import {username} from "components/utils";
 
 type CriterionScoreProps = {
   criterion: Criterion,
@@ -17,10 +16,6 @@ type CriterionScoreState = {
 }
 
 const initialState: CriterionScoreState = {};
-
-const username = (user: User) => {
-  return (user.first_name && user.last_name) ? `${user.first_name} ${user.last_name}` : user.username
-};
 
 export default class CriterionScore extends React.Component<CriterionScoreProps, CriterionScoreState> {
   state = initialState;

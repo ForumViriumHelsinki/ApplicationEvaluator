@@ -8957,6 +8957,11 @@ react-scripts@^3.4.1:
   optionalDependencies:
     fsevents "2.1.2"
 
+react-svg-radar-chart@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-svg-radar-chart/-/react-svg-radar-chart-1.2.0.tgz#ed6b5e97896723eda28b9e34180b0c8d6ad13c72"
+  integrity sha512-C1t9rSIohx6vNBJ1GrZZ+XXq+I9Yshojdb8VTqwx5qmiwWY2PNL8fg1hS3naGUTZxw16kQLcvAVlUo07QaD+AQ==
+
 react-transition-group@^2.3.1:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"

@@ -96,3 +96,20 @@ body {
 .trans-bg {
   background: linear-gradient(rgba(255, 255, 255, .95), rgba(255, 255, 255, .95));
 }
+
+.fill-secondary {
+  fill: $secondary;
+}
+
+.fill-danger {
+  fill: $danger;
+}
+
+.stroke-secondary {
+  stroke: $secondary;
+  stroke-width: 3;
+}
+
+.chart-caption {
+  font-size: 28px;
+}
