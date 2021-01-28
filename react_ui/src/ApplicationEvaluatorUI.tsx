@@ -78,11 +78,16 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
               iconText={user?.username || ''}>
         <h5 className="m-2">FVH Application Evaluator</h5>
       </NavBar>
-      <div className="container mt-4"><ApplicationRounds user={user as User} /></div>
+      <div className="container mt-4 mb-5 p-4 rounded trans-bg">
+        <ApplicationRounds user={user as User}/>
+      </div>
+      <p className="text-white text-center">
+        Background: Selkämerenpuisto park, Helsinki. (c) City of Helsinki, photo by Jussi Hellsten
+      </p>
       {showLogout &&
-        <Confirm title="Log out?"
-                 onClose={() => this.setState({showLogout: false})}
-                 onConfirm={this.logout}/>
+      <Confirm title="Log out?"
+               onClose={() => this.setState({showLogout: false})}
+               onConfirm={this.logout}/>
       }
     </>;
   }

@@ -86,3 +86,13 @@ button.nav-link:focus {
 .clickable {
   cursor: pointer;
 }
+
+body {
+  background-image: url("/images/Blue_road_Jussi_Hellsten.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.trans-bg {
+  background: linear-gradient(rgba(255, 255, 255, .95), rgba(255, 255, 255, .95));
+}

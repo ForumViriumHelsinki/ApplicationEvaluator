@@ -18,7 +18,7 @@ export default class ResetPasswordScreen extends React.Component<ResetPasswordSc
   render() {
     const {uid, token} = this.props;
     return (
-      <div className="container">
+      <div className="container mt-5 p-4 rounded trans-bg">
         <div className="text-center">
           <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
           <h3>FVH Application Evaluator</h3>
