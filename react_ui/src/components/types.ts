@@ -28,13 +28,15 @@ export type Application = {
 export type Criterion = {
     id: number,
     name: string,
-    group: number
+    group: number,
+    weight: number
 }
 
 export type CriterionGroup = {
     name: string,
     id: number,
-    parent?: number
+    parent?: number,
+    threshold: number
 }
 
 export type ApplicationRound = {

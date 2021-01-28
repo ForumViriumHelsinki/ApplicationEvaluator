@@ -88,7 +88,8 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     if (order == 'name') return appRound.applications;
 
     const apps = [...appRound.applications];
-    apps.sort((a, b) => averageScore(b) - averageScore(a));
+    apps.sort((a, b) =>
+      (averageScore(b, appRound) || 0) - (averageScore(a, appRound) || 0));
     return apps;
   }
 
