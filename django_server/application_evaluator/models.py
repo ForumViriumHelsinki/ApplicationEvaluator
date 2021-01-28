@@ -56,6 +56,7 @@ class CriterionGroup(NamedModel):
     parent = models.ForeignKey('CriterionGroup', related_name='child_groups',
                                on_delete=models.CASCADE, null=True, blank=True)
     order = models.IntegerField(default=0)
+    threshold = models.FloatField(blank=True, null=True)
 
 
 class Criterion(NamedModel):

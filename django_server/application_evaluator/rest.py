@@ -7,13 +7,13 @@ from application_evaluator import models
 class CriterionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Criterion
-        fields = ['name', 'group', 'id']
+        fields = ['name', 'group', 'id', 'weight']
 
 
 class CriterionGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CriterionGroup
-        fields = ['name', 'parent', 'id']
+        fields = ['name', 'parent', 'id', 'threshold']
 
 
 class UserSerializer(serializers.ModelSerializer):
