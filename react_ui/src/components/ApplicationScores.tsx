@@ -111,7 +111,11 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
         // Anchor captions on the right side of the plot to the start & on the left
         // to the end so they are rendered symmetrically around the outer circle:
-        const textAnchor = groupIndex < thresholdGroups.length / 2 ? 'start' : 'end';
+        const middle = thresholdGroups.length / 2;
+        const textAnchor =
+          groupIndex == 0 || groupIndex == middle ? 'middle'
+            : groupIndex < middle ? 'start'
+            : 'end';
 
         return score == null ?
           {textAnchor, fill: '#ccc', class: 'chart-caption'}
