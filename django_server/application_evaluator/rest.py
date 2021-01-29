@@ -17,9 +17,16 @@ class CriterionGroupSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    organization = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username']
+        fields = ['id', 'first_name', 'last_name', 'username', 'organization']
+
+    def get_organization(self, user):
+        orgs = user.organizations.all()
+        if len(orgs):
+            return orgs[0].name
 
 
 class BaseScoreSerializer(serializers.ModelSerializer):
@@ -34,14 +41,16 @@ class ScoreSerializer(BaseScoreSerializer):
 
 class ApplicationSerializer(serializers.ModelSerializer):
     scores = serializers.SerializerMethodField()
+    evaluating_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
 
     class Meta:
         model = models.Application
-        fields = ['name', 'scores', 'id']
+        fields = ['name', 'scores', 'id', 'evaluating_organizations']
 
     def get_scores(self, application):
         return ScoreSerializer(
-            application.scores_for_evaluator(self.context['request'].user).select_related('evaluator'),
+            application.scores_for_evaluator(self.context['request'].user) \
+                .prefetch_related('evaluator__organizations'),
             many=True
         ).data
 
@@ -56,7 +65,10 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_applications(self, application_round):
-        applications = application_round.applications_for_evaluator(self.context['request'].user).order_by('name')
+        applications = application_round \
+            .applications_for_evaluator(self.context['request'].user) \
+            .prefetch_related('evaluating_organizations') \
+            .order_by('name')
         return ApplicationSerializer(applications, many=True, context=self.context).data
 
     def get_criteria(self, application_round):

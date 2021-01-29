@@ -5,7 +5,7 @@ import RadarChart from 'react-svg-radar-chart';
 import 'react-svg-radar-chart/build/css/index.css'
 
 import CriterionGroupComponent from "components/CriterionGroup";
-import {Application, ApplicationRound, CriterionGroup} from "components/types";
+import {AppContext, Application, ApplicationRound} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
 import {username} from "components/utils";
 
@@ -22,10 +22,12 @@ const initialState: ApplicationScoresState = {};
 
 export default class ApplicationScores extends React.Component<ApplicationScoresProps, ApplicationScoresState> {
   state = initialState;
+  static contextType = AppContext;
 
   render() {
     const {application, applicationRound} = this.props;
     const {expanded} = this.state;
+    const {user} = this.context;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
@@ -42,6 +44,12 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       <div className="flex-grow-1 flex-shrink-1">
         <a onClick={() => this.setState({expanded: !this.state.expanded})}>
           <h5 className="text-primary mb-1">{application.name}</h5>
+          <div className="mb-1">
+            {application.evaluating_organizations.map(o =>
+              <span className={`mr-2 small ${user.organization == o ? 'text-secondary' : 'disabled'}`}
+                    key={o}>{o}</span>
+            )}
+          </div>
           {application.scores.length}/{applicationRound.criteria.length} scores
           {application.score && <>
             ,{' '}

@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from application_evaluator import models
 
 
@@ -25,14 +26,32 @@ class ScoreInline(admin.TabularInline):
     extra = 0
 
 
+def add_evaluating_organization_action(organization):
+    def action(modeladmin, request, queryset):
+        for app in queryset.all():
+            app.evaluating_organizations.add(organization)
+
+    action.__name__ = f'Allocate to {organization.name}'
+    return action
+
+
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [ScoreInline]
-    list_display = ['name', 'score']
-    filter_horizontal = ['evaluating_organizations']
+    list_display = ['name', 'organizations', 'score', 'scores_']
+    list_filter = ['application_round', 'evaluating_organizations']
+    actions = [add_evaluating_organization_action(o)
+               for o in models.Organization.objects.order_by('name')]
+
+    def scores_(self, app):
+        return len(app.scores.all())
+
+    def organizations(self, app):
+        return ', '.join(o.name for o in app.evaluating_organizations.all())
 
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related('scores', 'application_round__criteria')
+        return super().get_queryset(request) \
+            .prefetch_related('scores', 'application_round__criteria', 'evaluating_organizations')
 
 
 class CriterionScoreInline(ScoreInline):

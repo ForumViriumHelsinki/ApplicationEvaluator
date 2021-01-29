@@ -24,7 +24,8 @@ export type Application = {
     name: string,
     scores: Score[],
     score: number,
-    groupScores: any
+    groupScores: any,
+    evaluating_organizations: string[]
 }
 
 export type Criterion = {

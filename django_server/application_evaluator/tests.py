@@ -90,13 +90,23 @@ class RestTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [{
             'id': app_round.id,
-            'applications': [{'id': app.id, 'name': 'SkyNet', 'scores': [{
-                'id': score1.id,
-                'application': app.id,
-                'score': 5,
-                'criterion': criterion1.id,
-                'evaluator': {'id': evaluator.id, 'first_name': '', 'last_name': '', 'username': 'evaluator'}
-            }]}],
+            'applications': [{
+                'id': app.id,
+                'name': 'SkyNet',
+                'evaluating_organizations': ['Helsinki'],
+                'scores': [{
+                    'id': score1.id,
+                    'application': app.id,
+                    'score': 5,
+                    'criterion': criterion1.id,
+                    'evaluator': {
+                        'id': evaluator.id,
+                        'first_name': '',
+                        'last_name': '',
+                        'organization': 'Helsinki',
+                        'username': 'evaluator'}
+                }]
+            }],
             'criteria': [{'name': 'Goodness', 'group': None, 'id': criterion1.id, 'weight': 1}],
             'criterion_groups': [],
             'name': 'AI4Cities'
