@@ -36,6 +36,7 @@ export type Criterion = {
 
 export type CriterionGroup = {
     name: string,
+    abbr: string,
     id: number,
     parent?: number,
     threshold: number

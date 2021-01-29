@@ -30,8 +30,8 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
 
-    return <div className="d-flex" key={application.name}>
-      <div style={{width: 200, marginBottom: -64}}>
+    return <div className="d-flex mt-4" key={application.name}>
+      <div style={{width: 200, marginBottom: -38, marginTop: -38}} className="flex-shrink-0">
         {application.scores.length > 0 &&
         <RadarChart data={this.plotData()} size={200}
                     captions={this.plotCaptions()}
@@ -39,7 +39,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
         }
       </div>
 
-      <div className="flex-grow-1 flex-shrink-1 pt-5">
+      <div className="flex-grow-1 flex-shrink-1">
         <a onClick={() => this.setState({expanded: !this.state.expanded})}>
           <h5 className="text-primary mb-1">{application.name}</h5>
           {application.scores.length}/{applicationRound.criteria.length} scores
@@ -48,8 +48,8 @@ export default class ApplicationScores extends React.Component<ApplicationScores
             <strong>{application.score.toPrecision(2)}</strong> overall.<br/>
             {thresholdGroups.map(group => {
               const score = application.groupScores[group.id];
-              return (score != null) && <span className="mr-2" key={group.name}>
-                {group.name.split(' ')[0]}{' '}
+              return (score != null) && <span className="mr-2 d-inline-block" style={{minWidth: 64}} key={group.name}>
+                {group.abbr}{' '}
                 <span className={score < group.threshold ? 'text-danger font-weight-bold' : ''}>
                   {score.toPrecision(2)}
                 </span>
@@ -77,10 +77,6 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     </div>;
   }
 
-  private shortName(group: CriterionGroup) {
-    return (group.name.match(/^[\w\.]+/) || '')[0];
-  }
-
   plotData() {
     const {applicationRound, application} = this.props;
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
@@ -97,7 +93,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     if (!application.groupScores) return {};
 
-    return Object.fromEntries(thresholdGroups.map(g => [g.id, this.shortName(g)]));
+    return Object.fromEntries(thresholdGroups.map(g => [g.id, g.abbr]));
   }
 
   plotOptions() {
@@ -106,8 +102,9 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const thresholds = Object.fromEntries(thresholdGroups.map(g => [g.id, g.threshold]));
 
     return {
-      captionMargin: 128,
+      captionMargin: 96,
       scales: 5,
+      zoomDistance: 1.1,
       captionProps: ({key}: any) => {
         const score = application.groupScores[key];
         const groupIndex = thresholdGroups.findIndex(g => g.id == key);

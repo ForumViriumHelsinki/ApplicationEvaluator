@@ -52,6 +52,7 @@ class CriterionGroup(NamedModel):
     """
     Grouping element for the evaluation criteria. Can be used to create a hierarchy of any depth.
     """
+    abbr = models.CharField(max_length=8, blank=True)
     application_round = models.ForeignKey(ApplicationRound, related_name='criterion_groups', on_delete=models.CASCADE)
     parent = models.ForeignKey('CriterionGroup', related_name='child_groups',
                                on_delete=models.CASCADE, null=True, blank=True)

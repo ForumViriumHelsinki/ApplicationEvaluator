@@ -13,7 +13,7 @@ class CriterionSerializer(serializers.ModelSerializer):
 class CriterionGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CriterionGroup
-        fields = ['name', 'parent', 'id', 'threshold']
+        fields = ['name', 'abbr', 'parent', 'id', 'threshold']
 
 
 class UserSerializer(serializers.ModelSerializer):
