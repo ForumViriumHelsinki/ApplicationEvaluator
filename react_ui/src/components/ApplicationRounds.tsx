@@ -77,7 +77,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     return <AppContext.Provider value={{user, reloadApplication: this.reloadApplication}}>
       {applicationRounds.map(appRound =>
         <div className="mb-2 pt-3 pb-5" key={appRound.name}>
-          <div className="pl-4 pr-4">
+          <div className="pl-4 pr-4 z-1">
             <h3>{appRound.name}</h3>
             {this.scoredApps(appRound).length}/{appRound.applications.length} applications evaluated<br/>
             Order by:
