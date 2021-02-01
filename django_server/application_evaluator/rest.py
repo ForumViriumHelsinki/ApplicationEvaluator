@@ -72,7 +72,9 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return ApplicationSerializer(applications, many=True, context=self.context).data
 
     def get_criteria(self, application_round):
-        criteria = application_round.criteria.filter(public=True)
+        criteria = application_round.criteria.all()
+        if not self.context['request'].user.is_staff:
+            criteria = criteria.filter(public=True)
         return CriterionSerializer(criteria, many=True, context=self.context).data
 
 

@@ -42,9 +42,13 @@ class ApplicationRound(NamedModel):
 
     @classmethod
     def rounds_for_evaluator(cls, user):
+        if user.is_staff:
+            return cls.objects.all()
         return cls.objects.filter(applications__evaluating_organizations__users=user).distinct()
 
     def applications_for_evaluator(self, user):
+        if user.is_staff:
+            return self.applications.all()
         return self.applications.filter(evaluating_organizations__users=user).distinct()
 
 
@@ -92,10 +96,14 @@ class Application(NamedModel):
         return self.evaluating_organizations.filter(users=user).exists()
 
     def scores_for_evaluator(self, user):
+        if user.is_staff:
+            return self.scores.all()
         return self.scores.filter(evaluator__organizations__users=user, criterion__public=True).distinct()
 
     @classmethod
     def applications_for_evaluator(cls, user):
+        if user.is_staff:
+            return cls.objects.all()
         return cls.objects.filter(evaluating_organizations__users=user).distinct()
 
 
