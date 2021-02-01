@@ -7,7 +7,9 @@ import 'react-svg-radar-chart/build/css/index.css'
 import CriterionGroupComponent from "components/CriterionGroup";
 import {AppContext, Application, ApplicationRound} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
-import {username} from "components/utils";
+import {organizationColor, username} from "components/utils";
+import ApplicationScoresTable from "components/ApplicationScoresTable";
+
 
 type ApplicationScoresProps = {
   application: Application,
@@ -30,44 +32,42 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const {user} = this.context;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
-    const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
 
-    return <div className="d-flex mt-4" key={application.name}>
-      <div style={{width: 200, marginBottom: -38, marginTop: -38}} className="flex-shrink-0">
-        {application.scores.length > 0 &&
-        <RadarChart data={this.plotData()} size={200}
-                    captions={this.plotCaptions()}
-                    options={this.plotOptions()}/>
-        }
-      </div>
+    return <div className="mt-4 pb-4">
+      <div className="d-flex">
+        <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
+          {application.scores.length > 0 &&
+          <RadarChart data={this.plotData()} size={200}
+                      captions={this.plotCaptions()}
+                      options={this.plotOptions()}/>
+          }
+        </div>
 
-      <div className="flex-grow-1 flex-shrink-1">
-        <a onClick={() => this.setState({expanded: !this.state.expanded})}>
-          <h5 className="text-primary mb-1">{application.name}</h5>
+        <div className="flex-grow-1 flex-shrink-1">
+          <a onClick={() => this.setState({expanded: !this.state.expanded})}>
+            <h5 className="text-primary mb-1">{application.name}</h5>
+          </a>
           <div className="mb-1">
             {application.evaluating_organizations.map(o =>
-              <span className={`mr-2 small ${user.organization == o ? 'text-secondary' : 'disabled'}`}
+              <span className={`mr-2 small`} style={{color: this.organizationColor(o)}}
                     key={o}>{o}</span>
             )}
           </div>
-          {application.scores.length}/{applicationRound.criteria.length} scores
-          {application.score && <>
-            ,{' '}
-            <strong>{application.score.toPrecision(2)}</strong> overall.<br/>
-            {thresholdGroups.map(group => {
-              const score = application.groupScores[group.id];
-              return (score != null) && <span className="mr-2 d-inline-block" style={{minWidth: 64}} key={group.name}>
-                {group.abbr}{' '}
-                <span className={score < group.threshold ? 'text-danger font-weight-bold' : ''}>
-                  {score.toPrecision(2)}
-                </span>
-              </span>
-            })}
+          {application.score != null &&
+          <><strong>{application.score.toPrecision(2)}</strong> overall from </>}
+          {application.scores.length}/{applicationRound.criteria.length} scores.
+          {application.score != null && <>
             <br/>
-            Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}
+            Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
           </>}
-        </a>
+        </div>
       </div>
+
+      {application.score != null &&
+      <div className="pl-4 pr-4">
+        <ApplicationScoresTable application={application} applicationRound={applicationRound}/>
+      </div>
+      }
 
       {expanded &&
       <Modal onClose={() => this.setState({expanded: false})} title={application.name}>
@@ -90,10 +90,15 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     if (!application.groupScores) return [];
 
-    const data = Object.fromEntries(thresholdGroups.map(g =>
-      [g.id, (application.groupScores[g.id] || 1) / 10]));
+    const data = (groupScores: any) => Object.fromEntries(thresholdGroups.map(g =>
+      [g.id, (groupScores[g.id] || 1) / 10]));
+    const total = {data: data(application.groupScores), meta: {color: organizationColor('total')}};
 
-    return [{data: data, meta: {class: 'fill-secondary stroke-secondary'}}];
+    if (Object.keys(application.scoresByOrganization).length < 2)
+      return [total];
+    else return Object.entries(application.scoresByOrganization).map(([org, {groupScores}]) =>
+      ({data: data(groupScores), meta: {color: organizationColor(org)}})
+    ).concat([total]);
   }
 
   plotCaptions() {
@@ -113,6 +118,9 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       captionMargin: 96,
       scales: 5,
       zoomDistance: 1.1,
+      shapeProps: () => ({
+        fillOpacity: 0.1, strokeWidth: 2
+      }),
       captionProps: ({key}: any) => {
         const score = application.groupScores[key];
         const groupIndex = thresholdGroups.findIndex(g => g.id == key);
@@ -132,5 +140,10 @@ export default class ApplicationScores extends React.Component<ApplicationScores
             : {textAnchor, class: 'chart-caption'};
       },
     };
+  }
+
+  organizationColor(o: string) {
+    const {application} = this.props;
+    return application.scoresByOrganization[o] ? 'black' : '#aaa';
   }
 }

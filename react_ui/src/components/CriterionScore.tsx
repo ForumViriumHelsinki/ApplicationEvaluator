@@ -1,5 +1,5 @@
 import React, {FocusEvent} from 'react';
-import {AppContext, Application, Criterion} from "components/types";
+import {AppContext, Application, Criterion, Score} from "components/types";
 import Icon from "util_components/bootstrap/Icon";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import sessionRequest from "sessionRequest";
@@ -26,33 +26,31 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const {changed} = this.state;
     const {user} = this.context;
 
-    const score = this.getScore();
+    const scores = application.scores.filter(s => s.criterion == criterion.id);
 
     return <div className="ml-2 mb-2">
       {criterion.name}:
-      {(score && (score.evaluator.id != user.id)) ?
-        <div><strong>{score.score}</strong> (by {username(score.evaluator)})</div>
-      : score ?
-        <div>
+      {!scores.length &&
+      <div className="form-inline">
+        <input type="number" min="0" max="10" className="form-control form-control-sm"
+               onBlur={this.saveScore}
+               onChange={() => this.setState({changed: true})}/>{' '}
+        {changed && <button className="btn btn-sm btn-outline-primary ml-2">Save</button>}
+      </div>
+      }
+
+      {scores.map((score: Score) =>
+        <div key={score.id}>
           <strong>{score.score}</strong> (by {username(score.evaluator)})
+          {score.evaluator.id == user.id &&
           <ConfirmButton className="btn-light btn-sm text-danger p-1" confirm="Delete score?"
                          onClick={this.deleteScore}>
             <Icon icon="clear"/>
           </ConfirmButton>
+          }
         </div>
-      : <div className="form-inline">
-          <input type="number" min="0" max="10" className="form-control form-control-sm"
-                 onBlur={this.saveScore}
-                 onChange={() => this.setState({changed: true})}/>{' '}
-            {changed && <button className="btn btn-sm btn-outline-primary ml-2">Save</button>}
-        </div>
-      }
+      )}
     </div>;
-  }
-
-  getScore() {
-    const {criterion, application} = this.props;
-    return application.scores.find(s => s.criterion == criterion.id);
   }
 
   saveScore = (e: FocusEvent<HTMLInputElement>) => {
@@ -70,9 +68,9 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
   };
 
   deleteScore = () => {
-    const {application} = this.props;
+    const {application, criterion} = this.props;
     const {reloadApplication} = this.context;
-    const score = this.getScore();
+    const score = application.scores.find(s => s.criterion == criterion.id);
     if (!score) return;
     sessionRequest(scoreUrl(score.id), {method: 'DELETE'}).then(response => {
       if (response.status < 300) reloadApplication(application.id);

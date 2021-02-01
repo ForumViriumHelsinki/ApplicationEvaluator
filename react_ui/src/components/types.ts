@@ -5,6 +5,7 @@ export type User = {
     username: string,
     first_name: string,
     last_name: string,
+    organization: string
 };
 
 export type AppContextType = {
@@ -25,6 +26,12 @@ export type Application = {
     scores: Score[],
     score: number,
     groupScores: any,
+    scoresByOrganization: {
+        [organization: string]: {
+            score: number,
+            groupScores: any,
+        }
+    }
     evaluating_organizations: string[]
 }
 
