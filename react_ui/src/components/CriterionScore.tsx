@@ -27,10 +27,12 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const {user} = this.context;
 
     const scores = application.scores.filter(s => s.criterion == criterion.id);
+    const myOrgScore = application.scores.find(s =>
+      s.criterion == criterion.id && s.evaluator.organization == user.organization);
 
     return <div className="ml-2 mb-2">
       {criterion.name}:
-      {!scores.length &&
+      {!myOrgScore &&
       <div className="form-inline">
         <input type="number" min="0" max="10" className="form-control form-control-sm"
                onBlur={this.saveScore}
