@@ -40,8 +40,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     inlines = [ScoreInline]
     list_display = ['name', 'organizations', 'score', 'scores_']
     list_filter = ['application_round', 'evaluating_organizations']
-    actions = [add_evaluating_organization_action(o)
-               for o in models.Organization.objects.order_by('name')]
+
+    def get_actions(self, request):
+        self.actions = [add_evaluating_organization_action(o)
+                        for o in models.Organization.objects.order_by('name')]
+        return super().get_actions(request)
 
     def scores_(self, app):
         return len(app.scores.all())
