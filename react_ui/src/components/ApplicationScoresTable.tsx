@@ -51,7 +51,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
       )}
       <tr>
         {organizations.length > 1 && <>
-          <td><LegendPill org="total"/> Total</td>
+          <td style={{paddingLeft: 29}}>Total</td>
           <td className="font-weight-bold">{application.score?.toPrecision(2)}</td>
         </>}
         {thresholdGroups.map(group =>

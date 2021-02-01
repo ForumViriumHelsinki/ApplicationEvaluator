@@ -92,13 +92,12 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
     const data = (groupScores: any) => Object.fromEntries(thresholdGroups.map(g =>
       [g.id, (groupScores[g.id] || 1) / 10]));
-    const total = {data: data(application.groupScores), meta: {color: organizationColor('total')}};
 
     if (Object.keys(application.scoresByOrganization).length < 2)
-      return [total];
+      return [{data: data(application.groupScores), meta: {color: organizationColor('total')}}];
     else return Object.entries(application.scoresByOrganization).map(([org, {groupScores}]) =>
       ({data: data(groupScores), meta: {color: organizationColor(org)}})
-    ).concat([total]);
+    );
   }
 
   plotCaptions() {

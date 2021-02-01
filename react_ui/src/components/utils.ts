@@ -69,9 +69,9 @@ export const username = (user: User) => {
 const colors = [
   '#009E92',
   '#FF5000',
+  '#6610f2',
   '#007bff',
   '#28a745',
-  '#6610f2',
   '#d70074',
 ];
 
