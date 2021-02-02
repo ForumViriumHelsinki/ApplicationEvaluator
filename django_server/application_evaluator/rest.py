@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import serializers, routers, viewsets, permissions
 
 from application_evaluator import models
@@ -55,6 +57,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ).data
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class ApplicationRoundSerializer(serializers.ModelSerializer):
     applications = serializers.SerializerMethodField()
     criteria = serializers.SerializerMethodField()
