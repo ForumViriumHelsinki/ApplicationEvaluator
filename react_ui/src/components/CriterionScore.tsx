@@ -70,8 +70,8 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
   deleteScore = () => {
     const {application, criterion} = this.props;
-    const {reloadApplication, request} = this.context;
-    const score = application.scores.find(s => s.criterion == criterion.id);
+    const {reloadApplication, request, user} = this.context;
+    const score = application.scores.find(s => s.criterion == criterion.id && s.evaluator.id == user.id);
     if (!score) return;
     request(scoreUrl(score.id), {method: 'DELETE'}).then((response: Response) => {
       if (response.status < 300) reloadApplication(application.id);
