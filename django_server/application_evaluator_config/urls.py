@@ -15,11 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+from rest_auth.views import LogoutView
 from rest_framework.schemas import get_schema_view
 
 from application_evaluator import rest
-
 
 schema_view = get_schema_view(
     title="FVH Application Evaluator API",
@@ -30,6 +32,9 @@ schema_view = get_schema_view(
 def error_view(request):
     raise Exception('This is a test error to verify error reporting.')
 
+
+# Allow logging out when faced with the mysterious CSRF cookie corruption problem:
+method_decorator(csrf_exempt, 'dispatch')(LogoutView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
