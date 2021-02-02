@@ -2,7 +2,6 @@ import React, {FocusEvent} from 'react';
 import {AppContext, Application, Criterion, Score} from "components/types";
 import Icon from "util_components/bootstrap/Icon";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
-import sessionRequest from "sessionRequest";
 import {scoresUrl, scoreUrl} from "urls";
 import {username} from "components/utils";
 
@@ -57,11 +56,11 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
   saveScore = (e: FocusEvent<HTMLInputElement>) => {
     const {application, criterion} = this.props;
-    const {reloadApplication} = this.context;
+    const {reloadApplication, request} = this.context;
     const value = Number(e.target.value);
     if (!e.target.value || value > 10 || value < 0) return;
     const data = {application: application.id, criterion: criterion.id, score: value};
-    sessionRequest(scoresUrl, {method: 'POST', data}).then(response => {
+    request(scoresUrl, {method: 'POST', data}).then((response: Response) => {
       if (response.status < 300) {
         this.setState({changed: false});
         reloadApplication(application.id);
@@ -71,10 +70,10 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
   deleteScore = () => {
     const {application, criterion} = this.props;
-    const {reloadApplication} = this.context;
+    const {reloadApplication, request} = this.context;
     const score = application.scores.find(s => s.criterion == criterion.id);
     if (!score) return;
-    sessionRequest(scoreUrl(score.id), {method: 'DELETE'}).then(response => {
+    request(scoreUrl(score.id), {method: 'DELETE'}).then((response: Response) => {
       if (response.status < 300) reloadApplication(application.id);
     })
   }

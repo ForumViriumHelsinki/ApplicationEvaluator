@@ -1,12 +1,12 @@
 import React from 'react';
-import sessionRequest from "sessionRequest";
 import {applicationRoundsUrl, applicationUrl} from "urls";
 import {AppContext, ApplicationRound, User} from "components/types";
 import ApplicationScores from "components/ApplicationScores";
 import {addScores} from "components/utils";
 
 type ApplicationRoundsProps = {
-  user: User
+  user: User,
+  request: (url: string, options?: any) => Promise<Response>
 }
 
 type AppOrder = 'name' | 'score' | 'unevaluated';
@@ -29,7 +29,8 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
   }
 
   loadRounds() {
-    sessionRequest(applicationRoundsUrl).then(response => {
+    const {request} = this.props;
+    request(applicationRoundsUrl).then(response => {
       if (response.status == 200)
         response.json().then(applicationRounds =>
           this.setState({applicationRounds: addScores(applicationRounds)}));
@@ -38,7 +39,8 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
   }
 
   reloadApplication = (appId: number) => {
-    sessionRequest(applicationUrl(appId)).then(response => {
+    const {request} = this.props;
+    request(applicationUrl(appId)).then(response => {
       if (response.status == 200) response.json().then(application => {
         const applicationRounds = [...(this.state.applicationRounds || [])];
         applicationRounds.forEach(r => {
@@ -65,7 +67,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
 
   renderMain() {
     const {applicationRounds} = this.state;
-    const {user} = this.props;
+    const {user, request} = this.props;
     if (!applicationRounds?.length) return null;
 
     const OrderBtn = ({order, label}: { order: AppOrder, label: string }) =>
@@ -74,7 +76,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
                 onClick={() => this.setState({order})}>{label}</button>
       </>;
 
-    return <AppContext.Provider value={{user, reloadApplication: this.reloadApplication}}>
+    return <AppContext.Provider value={{user, request, reloadApplication: this.reloadApplication}}>
       {applicationRounds.map(appRound =>
         <div className="mb-2 pt-3 pb-5" key={appRound.name}>
           <div className="pl-4 pr-4 z-1">

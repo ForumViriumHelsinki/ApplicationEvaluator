@@ -10,7 +10,8 @@ export type User = {
 
 export type AppContextType = {
     user?: User,
-    reloadApplication: (id: number) => any
+    reloadApplication: (id: number) => any,
+    request: (url: string, options?: any) => Promise<Response>
 }
 
 export type Score = {
