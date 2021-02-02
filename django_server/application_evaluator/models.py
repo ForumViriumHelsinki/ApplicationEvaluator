@@ -111,4 +111,4 @@ class Score(TimestampedModel):
     application = models.ForeignKey(Application, related_name='scores', on_delete=models.CASCADE)
     criterion = models.ForeignKey(Criterion, related_name='scores', on_delete=models.CASCADE)
     evaluator = models.ForeignKey(User, related_name='scores', on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
+    score = models.FloatField(default=0)
