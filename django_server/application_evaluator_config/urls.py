@@ -34,7 +34,7 @@ def error_view(request):
 
 
 # Allow logging out when faced with the mysterious CSRF cookie corruption problem:
-method_decorator(csrf_exempt, 'dispatch')(LogoutView)
+LogoutView.dispatch = method_decorator(csrf_exempt)(LogoutView.dispatch)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
