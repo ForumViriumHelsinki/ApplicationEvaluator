@@ -1,7 +1,7 @@
 import settings from './settings';
 
 export function login(token) {
-  sessionStorage.setItem('token', token);
+  localStorage.setItem('token', token);
 }
 
 function deleteAllCookies() {
@@ -16,7 +16,7 @@ function deleteAllCookies() {
 }
 
 export function logout() {
-  sessionStorage.clear();
+  localStorage.clear();
   deleteAllCookies();
 }
 
@@ -26,7 +26,7 @@ export function sessionRequest(url, options = {}) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.data);
   }
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
   if (token) {
     options.headers.Authorization = "Token " + token;
   }
