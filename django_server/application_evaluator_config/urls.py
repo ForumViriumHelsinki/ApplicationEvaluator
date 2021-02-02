@@ -34,10 +34,14 @@ def error_view(request):
 
 
 # Allow logging out when faced with the mysterious CSRF cookie corruption problem:
-LogoutView.dispatch = method_decorator(csrf_exempt)(LogoutView.dispatch)
+@method_decorator(csrf_exempt, 'dispatch')
+class LogoutView(LogoutView):
+    pass
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('rest-auth/logout/', LogoutView.as_view()),
     path('rest-auth/', include('rest_auth.urls')),
     path('rest/error_test/', error_view, name='error-view'),
     path('rest/', include(rest.router.urls)),
