@@ -80,7 +80,7 @@ class RestTests(APITestCase):
 
         # And some scores for non-public criteria
         criterion2 = app_round.criteria.create(name='Wellness', weight=1, public=False)
-        score3 = app.scores.create(evaluator=evaluator, score=5, criterion=criterion2)
+        score3 = app.scores.create(evaluator=evaluator2, score=5, criterion=criterion2)
 
         # When requesting the application round list
         response = self.client.get(url)

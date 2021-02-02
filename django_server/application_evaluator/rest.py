@@ -26,9 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'username', 'organization']
 
     def get_organization(self, user):
-        orgs = user.organizations.all()
-        if len(orgs):
-            return orgs[0].name
+        return user.organization.name if user.organization else None
 
 
 class BaseScoreSerializer(serializers.ModelSerializer):
@@ -51,8 +49,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     def get_scores(self, application):
         return ScoreSerializer(
-            application.scores_for_evaluator(self.context['request'].user) \
-                .prefetch_related('evaluator__organizations'),
+            application.scores_for_evaluator(self.context['request'].user),
             many=True
         ).data
 
@@ -67,9 +64,10 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_applications(self, application_round):
+        user = self.context['request'].user
         applications = application_round \
-            .applications_for_evaluator(self.context['request'].user) \
-            .prefetch_related('evaluating_organizations') \
+            .applications_for_evaluator(user) \
+            .prefetch_related('evaluating_organizations', 'scores__evaluator__organizations') \
             .order_by('name')
         return ApplicationSerializer(applications, many=True, context=self.context).data
 

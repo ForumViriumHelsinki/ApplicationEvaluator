@@ -79,6 +79,16 @@ class Organization(NamedModel):
     users = models.ManyToManyField(User, blank=True, related_name='organizations')
 
 
+def organization(user):
+    if not hasattr(user, '_organization'):
+        orgs = list(user.organizations.all())
+        user._organization = orgs[0] if len(orgs) else None
+    return user._organization
+
+
+User.organization = property(organization)
+
+
 class Application(NamedModel):
     application_round = models.ForeignKey(ApplicationRound, related_name='applications', on_delete=models.CASCADE)
     evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate')
@@ -98,7 +108,10 @@ class Application(NamedModel):
     def scores_for_evaluator(self, user):
         if user.is_staff:
             return self.scores.all()
-        return self.scores.filter(evaluator__organizations__users=user, criterion__public=True).distinct()
+        if not user.organization:
+            return []
+        return [s for s in self.scores.all()
+                if s.evaluator.organization and s.evaluator.organization == user.organization]
 
     @classmethod
     def applications_for_evaluator(cls, user):
