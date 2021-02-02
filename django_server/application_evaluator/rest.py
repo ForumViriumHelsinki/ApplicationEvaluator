@@ -57,7 +57,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ).data
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
 class ApplicationRoundSerializer(serializers.ModelSerializer):
     applications = serializers.SerializerMethodField()
     criteria = serializers.SerializerMethodField()
@@ -81,6 +80,7 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         return CriterionSerializer(criteria, many=True, context=self.context).data
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ApplicationRoundSerializer
