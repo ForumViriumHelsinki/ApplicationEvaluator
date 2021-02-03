@@ -4,8 +4,7 @@ services:
   web:
     build: ./django_server
     command: gunicorn application_evaluator_config.wsgi:application --bind 0.0.0.0:8000 --access-logfile access.log --error-logfile error.log --capture-output --workers 4
-    ports:
-      - 8000:8000
+    network_mode: host
     env_file:
       - ./.env.prod
     depends_on:
@@ -15,6 +14,7 @@ services:
 
   db:
     image: postgres:12.1
+    network_mode: host
     volumes:
       - ./postgres_data:/var/lib/postgresql/data/
     env_file:
