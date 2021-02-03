@@ -94,6 +94,7 @@ class RestTests(APITestCase):
                 'id': app.id,
                 'name': 'SkyNet',
                 'evaluating_organizations': ['Helsinki'],
+                'comments': [],
                 'scores': [{
                     'id': score1.id,
                     'application': app.id,

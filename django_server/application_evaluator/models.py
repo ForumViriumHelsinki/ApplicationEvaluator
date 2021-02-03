@@ -106,12 +106,10 @@ class Application(NamedModel):
         return self.evaluating_organizations.filter(users=user).exists()
 
     def scores_for_evaluator(self, user):
-        if user.is_staff:
-            return self.scores.all()
-        if not user.organization:
-            return []
-        return [s for s in self.scores.all()
-                if s.evaluator.organization and s.evaluator.organization == user.organization]
+        return Score.filter_for_evaluator(self.scores.all(), user)
+
+    def comments_for_evaluator(self, user):
+        return Comment.filter_for_evaluator(self.comments.all(), user)
 
     @classmethod
     def applications_for_evaluator(cls, user):
@@ -120,8 +118,30 @@ class Application(NamedModel):
         return cls.objects.filter(evaluating_organizations__users=user).distinct()
 
 
-class Score(TimestampedModel):
-    application = models.ForeignKey(Application, related_name='scores', on_delete=models.CASCADE)
-    criterion = models.ForeignKey(Criterion, related_name='scores', on_delete=models.CASCADE)
-    evaluator = models.ForeignKey(User, related_name='scores', on_delete=models.CASCADE)
+class EvaluationModel(TimestampedModel):
+    """
+    Model used for evaluating applications
+    """
+    application = models.ForeignKey(Application, related_name='%(class)ss', on_delete=models.CASCADE)
+    criterion = models.ForeignKey(Criterion, related_name='%(class)ss', on_delete=models.CASCADE)
+    evaluator = models.ForeignKey(User, related_name='%(class)ss', on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+    @staticmethod
+    def filter_for_evaluator(instances, user):
+        if user.is_staff:
+            return instances
+        if not user.organization:
+            return []
+        return [s for s in instances
+                if s.evaluator.organization and s.evaluator.organization == user.organization]
+
+
+class Score(EvaluationModel):
     score = models.FloatField(default=0)
+
+
+class Comment(EvaluationModel):
+    comment = models.TextField(blank=True)

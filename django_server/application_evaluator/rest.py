@@ -6,19 +6,24 @@ from rest_framework import serializers, routers, viewsets, permissions
 from application_evaluator import models
 
 
-class CriterionSerializer(serializers.ModelSerializer):
+class ModelSerializer(serializers.ModelSerializer):
+    def user(self):
+        return self.context['request'].user
+
+
+class CriterionSerializer(ModelSerializer):
     class Meta:
         model = models.Criterion
         fields = ['name', 'group', 'id', 'weight']
 
 
-class CriterionGroupSerializer(serializers.ModelSerializer):
+class CriterionGroupSerializer(ModelSerializer):
     class Meta:
         model = models.CriterionGroup
         fields = ['name', 'abbr', 'parent', 'id', 'threshold']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(ModelSerializer):
     organization = serializers.SerializerMethodField()
 
     class Meta:
@@ -29,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user.organization.name if user.organization else None
 
 
-class BaseScoreSerializer(serializers.ModelSerializer):
+class BaseScoreSerializer(ModelSerializer):
     class Meta:
         model = models.Score
         fields = ['score', 'evaluator', 'criterion', 'application', 'id']
@@ -39,22 +44,38 @@ class ScoreSerializer(BaseScoreSerializer):
     evaluator = UserSerializer(read_only=True)
 
 
-class ApplicationSerializer(serializers.ModelSerializer):
+class BaseCommentSerializer(ModelSerializer):
+    class Meta:
+        model = models.Comment
+        fields = ['comment', 'evaluator', 'criterion', 'application', 'id', 'created_at']
+
+
+class CommentSerializer(BaseCommentSerializer):
+    evaluator = UserSerializer(read_only=True)
+
+
+class ApplicationSerializer(ModelSerializer):
     scores = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
     evaluating_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+
+    prefetch_related = [
+        'evaluating_organizations',
+        'scores__evaluator__organizations',
+        'comments__evaluator__organizations']
 
     class Meta:
         model = models.Application
-        fields = ['name', 'scores', 'id', 'evaluating_organizations']
+        fields = ['name', 'scores', 'comments', 'id', 'evaluating_organizations']
 
     def get_scores(self, application):
-        return ScoreSerializer(
-            application.scores_for_evaluator(self.context['request'].user),
-            many=True
-        ).data
+        return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
+
+    def get_comments(self, application):
+        return CommentSerializer(application.comments_for_evaluator(self.user()), many=True).data
 
 
-class ApplicationRoundSerializer(serializers.ModelSerializer):
+class ApplicationRoundSerializer(ModelSerializer):
     applications = serializers.SerializerMethodField()
     criteria = serializers.SerializerMethodField()
     criterion_groups = CriterionGroupSerializer(many=True, read_only=True)
@@ -64,16 +85,16 @@ class ApplicationRoundSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_applications(self, application_round):
-        user = self.context['request'].user
+        user = self.user()
         applications = application_round \
             .applications_for_evaluator(user) \
-            .prefetch_related('evaluating_organizations', 'scores__evaluator__organizations') \
+            .prefetch_related(*ApplicationSerializer.prefetch_related) \
             .order_by('name')
         return ApplicationSerializer(applications, many=True, context=self.context).data
 
     def get_criteria(self, application_round):
         criteria = application_round.criteria.all()
-        if not self.context['request'].user.is_staff:
+        if not self.user().is_staff:
             criteria = criteria.filter(public=True)
         return CriterionSerializer(criteria, many=True, context=self.context).data
 
@@ -88,16 +109,25 @@ class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
             .prefetch_related('criterion_groups')
 
 
-class ScoreViewSet(viewsets.ModelViewSet):
+class EvaluationModelViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = BaseScoreSerializer
 
     def get_queryset(self):
-        return models.Score.objects.filter(evaluator=self.request.user)
+        return self.queryset.filter(evaluator=self.request.user)
 
     def create(self, request, *args, **kwargs):
         request.data['evaluator'] = request.user.id
         return super().create(request, *args, **kwargs)
+
+
+class ScoreViewSet(EvaluationModelViewSet):
+    serializer_class = BaseScoreSerializer
+    queryset = models.Score.objects.all()
+
+
+class CommentViewSet(EvaluationModelViewSet):
+    serializer_class = BaseCommentSerializer
+    queryset = models.Comment.objects.all()
 
 
 class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
@@ -105,10 +135,12 @@ class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
-        return models.Application.applications_for_evaluator(self.request.user)
+        return models.Application.applications_for_evaluator(self.request.user) \
+            .prefetch_related(*ApplicationSerializer.prefetch_related)
 
 
 router = routers.DefaultRouter()
 router.register('application_rounds', ApplicationRoundViewSet, 'application_round')
 router.register('scores', ScoreViewSet, 'score')
+router.register('comments', CommentViewSet, 'comment')
 router.register('applications', ApplicationViewSet, 'application')
