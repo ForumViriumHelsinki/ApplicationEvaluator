@@ -21,10 +21,19 @@ export type Score = {
     criterion: number
 }
 
+export type Comment = {
+    created_at: string;
+    id: number,
+    comment: string,
+    evaluator: User,
+    criterion: number
+}
+
 export type Application = {
     id: number,
     name: string,
     scores: Score[],
+    comments: Comment[],
     score: number,
     groupScores: any,
     scoresByOrganization: {

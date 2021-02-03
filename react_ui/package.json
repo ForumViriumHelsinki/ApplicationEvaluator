@@ -17,6 +17,7 @@
     "@testing-library/user-event": "^7.1.2",
     "@types/lodash": "^4.14.168",
     "bootstrap": "^4.4.1",
+    "moment": "^2.29.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-jsonschema-form": "^1.8.1",

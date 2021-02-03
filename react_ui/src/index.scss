@@ -109,3 +109,11 @@ body {
   position: relative;
   z-index: 100;
 }
+
+.btn-trans {
+  opacity: 0.3
+}
+
+.btn-trans:hover {
+  opacity: 1
+}
