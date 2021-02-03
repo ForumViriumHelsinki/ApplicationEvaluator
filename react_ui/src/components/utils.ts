@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {ApplicationRound, Criterion, CriterionGroup, Score, User} from "components/types";
+import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "components/types";
 
 const sum = (lst: number[]) => lst.reduce((a, b) => a + b, 0);
 
@@ -21,44 +21,47 @@ const allCriteria = (applicationRound: ApplicationRound, criterionGroup: Criteri
   ]);
 };
 
-export const addScores = (rounds: ApplicationRound[]) => {
-  rounds.forEach(round => {
-    const thresholdGroups = round.criterion_groups.filter(g => g.threshold);
-    const criteriaByGroup = Object.fromEntries(round.criterion_groups.map(g => [g.id, allCriteria(round, g)]))
-    const weightIndex = Object.fromEntries(round.criteria.map(c => [c.id, c.weight]));
+export const addApplicationScores = (round: ApplicationRound, applications: Application[]) => {
+  const thresholdGroups = round.criterion_groups.filter(g => g.threshold);
+  const criteriaByGroup = Object.fromEntries(round.criterion_groups.map(g => [g.id, allCriteria(round, g)]))
+  const weightIndex = Object.fromEntries(round.criteria.map(c => [c.id, c.weight]));
 
-    const weightedAvg = (scores: Score[]) => {
-      const scoresByCriterion = _.groupBy(scores, 'criterion');
-      const avgScores = Object.entries(scoresByCriterion).map(([criterion, cScores]) =>
-        ({criterion, score: avg((cScores as Score[]).map(s => s.score))}));
-      const weightedScores = avgScores.map(s => s.score * weightIndex[s.criterion]);
-      const weights = avgScores.map(s => weightIndex[s.criterion]);
-      return sum(weightedScores) / sum(weights);
-    };
+  const weightedAvg = (scores: Score[]) => {
+    const scoresByCriterion = _.groupBy(scores, 'criterion');
+    const avgScores = Object.entries(scoresByCriterion).map(([criterion, cScores]) =>
+      ({criterion, score: avg((cScores as Score[]).map(s => s.score))}));
+    const weightedScores = avgScores.map(s => s.score * weightIndex[s.criterion]);
+    const weights = avgScores.map(s => weightIndex[s.criterion]);
+    return sum(weightedScores) / sum(weights);
+  };
 
-    const groupScores = (scores: Score[]) => {
-      const groupScores: any = {};
-      thresholdGroups.forEach(group => {
-        const criterionIndex = Object.fromEntries(criteriaByGroup[group.id].map(c => [c.id, c]));
-        const gScores = scores.filter(s => criterionIndex[s.criterion]);
-        if (gScores.length) groupScores[group.id] = weightedAvg(gScores);
-      });
-      return groupScores;
-    };
+  const groupScores = (scores: Score[]) => {
+    const groupScores: any = {};
+    thresholdGroups.forEach(group => {
+      const criterionIndex = Object.fromEntries(criteriaByGroup[group.id].map(c => [c.id, c]));
+      const gScores = scores.filter(s => criterionIndex[s.criterion]);
+      if (gScores.length) groupScores[group.id] = weightedAvg(gScores);
+    });
+    return groupScores;
+  };
 
-    round.applications.forEach(app => {
-      app.groupScores = {};
-      app.scoresByOrganization = {};
-      if (!app.scores.length) return;
-      app.score = weightedAvg(app.scores);
-      app.groupScores = groupScores(app.scores);
-      const scoresByOrganization = _.groupBy(app.scores, s => s.evaluator.organization);
-      app.scoresByOrganization =
-        Object.fromEntries(Object.entries(scoresByOrganization)
-          .map(([organization, scores]) =>
-            [organization, {score: weightedAvg(scores), groupScores: groupScores(scores)}]));
-    })
+  applications.forEach(app => {
+    app.groupScores = {};
+    app.scoresByOrganization = {};
+    if (!app.scores.length) return;
+    app.score = weightedAvg(app.scores);
+    app.groupScores = groupScores(app.scores);
+    const scoresByOrganization = _.groupBy(app.scores, s => s.evaluator.organization);
+    app.scoresByOrganization =
+      Object.fromEntries(Object.entries(scoresByOrganization)
+        .map(([organization, scores]) =>
+          [organization, {score: weightedAvg(scores), groupScores: groupScores(scores)}]));
   });
+  return round;
+};
+
+export const addScores = (rounds: ApplicationRound[]) => {
+  rounds.forEach(round => addApplicationScores(round, round.applications))
   return rounds;
 };
 

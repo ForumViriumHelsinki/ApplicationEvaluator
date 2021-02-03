@@ -2,7 +2,7 @@ import React from 'react';
 import {applicationRoundsUrl, applicationUrl} from "urls";
 import {AppContext, ApplicationRound, User} from "components/types";
 import ApplicationScores from "components/ApplicationScores";
-import {addScores} from "components/utils";
+import {addApplicationScores, addScores} from "components/utils";
 
 type ApplicationRoundsProps = {
   user: User,
@@ -45,9 +45,12 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
         const applicationRounds = [...(this.state.applicationRounds || [])];
         applicationRounds.forEach(r => {
           const i = r.applications.findIndex(a => a.id == appId);
-          if (i > -1) r.applications.splice(i, 1, application);
+          if (i > -1) {
+            r.applications.splice(i, 1, application);
+            addApplicationScores(r, [application]);
+          }
         });
-        this.setState({applicationRounds: addScores(applicationRounds)})
+        this.setState({applicationRounds: applicationRounds})
       });
       else this.setState({error: true});
     })
