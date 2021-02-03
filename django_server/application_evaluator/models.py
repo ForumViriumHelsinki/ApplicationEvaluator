@@ -51,6 +51,19 @@ class ApplicationRound(NamedModel):
             return self.applications.all()
         return self.applications.filter(evaluating_organizations__users=user).distinct()
 
+    def clone(self):
+        copy = ApplicationRound.objects.create(name=f'Copy of {self.name}')
+        groupCopies = {}
+        for group in self.criterion_groups.all():
+            groupCopies[group.id] = copy.criterion_groups.create(
+                name=group.name, threshold=group.threshold, order=group.order, abbr=group.abbr)
+        for group in self.criterion_groups.all():
+            groupCopies[group.id].parent = groupCopies.get(group.parent_id, None)
+            groupCopies[group.id].save()
+        for criterion in self.criteria.all():
+            copy.criteria.create(name=criterion.name, group=groupCopies[criterion.group_id],
+                                 public=criterion.public, order=criterion.order, weight=criterion.weight)
+
 
 class CriterionGroup(NamedModel):
     """

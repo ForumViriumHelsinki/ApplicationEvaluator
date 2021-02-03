@@ -3,22 +3,46 @@ from django.contrib import admin
 from application_evaluator import models
 
 
-class CriterionGroupInline(admin.TabularInline):
-    model = models.CriterionGroup
+class InlineForApplicationRound(admin.TabularInline):
     extra = 0
+    filter_fks = []
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        field = super().formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name in self.filter_fks:
+            if request._obj_ is not None:
+                field.queryset = field.queryset.filter(application_round=request._obj_)
+            else:
+                field.queryset = field.queryset.none()
+        return field
+
+
+class CriterionGroupInline(InlineForApplicationRound):
+    model = models.CriterionGroup
+    filter_fks = ['parent']
 
     def get_queryset(self, request):
         return super().get_queryset(request).order_by('order', 'name')
 
 
-class CriterionInline(admin.TabularInline):
+class CriterionInline(InlineForApplicationRound):
     model = models.Criterion
-    extra = 0
+    filter_fks = ['group']
 
 
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
     inlines = [CriterionGroupInline, CriterionInline]
+    actions = ['duplicate']
+
+    def duplicate(self, request, queryset):
+        for round in queryset:
+            round.clone()
+
+    def get_form(self, request, obj=None, **kwargs):
+        # just save obj reference for future processing in Inline
+        request._obj_ = obj
+        return super().get_form(request, obj, **kwargs)
 
 
 class ScoreInline(admin.TabularInline):
