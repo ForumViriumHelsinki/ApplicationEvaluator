@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django import forms
+from django.db.models import Count
 
 from application_evaluator import models
 
@@ -30,10 +32,58 @@ class CriterionInline(InlineForApplicationRound):
     filter_fks = ['group']
 
 
+class ApplicationInline(admin.TabularInline):
+    model = models.Application
+    extra = 0
+
+
+class ApplicationRoundForm(forms.ModelForm):
+    import_applications = forms.CharField(
+        widget=forms.Textarea({'rows': 3}),
+        required=False,
+        help_text='Paste application names here, one per row; optionally, you can also ' +
+                  'include evaluating organizations after application name, separated by tabs.')
+
+    class Meta:
+        model = models.ApplicationRound
+        exclude = []
+
+    def save(self, commit=True):
+        round = super().save(commit)
+        if commit:
+            self.save_applications()
+        return round
+
+    def _save_m2m(self):
+        self.save_applications()
+        return super()._save_m2m()
+
+    def save_applications(self):
+        orgs = dict((o.name, o) for o in models.Organization.objects.all())
+        for row in self.data['import_applications'].strip().split('\n'):
+            parts = row.strip().split('\t')
+            name = parts.pop(0)
+            if not name:
+                continue
+            app = self.instance.applications.create(name=name)
+            for org_name in parts:
+                org = orgs.get(org_name.strip(), None)
+                if org:
+                    app.evaluating_organizations.add(org)
+
+
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [CriterionGroupInline, CriterionInline]
+    inlines = [CriterionGroupInline, CriterionInline, ApplicationInline]
+    list_display = ['name', 'applications_']
     actions = ['duplicate']
+    form = ApplicationRoundForm
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(app_count=Count('applications'))
+
+    def applications_(self, round):
+        return round.app_count
 
     def duplicate(self, request, queryset):
         for round in queryset:
