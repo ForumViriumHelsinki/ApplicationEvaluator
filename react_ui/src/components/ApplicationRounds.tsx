@@ -85,20 +85,22 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
         <div className="mb-2 pt-3 pb-5" key={appRound.name}>
           <div className="pl-4 pr-4 z-1">
             <h3>{appRound.name}</h3>
-            {this.scoredApps(appRound).length}/{appRound.applications.length} applications evaluated<br/>
-            Order by:
-            <OrderBtn label="Name" order="name"/>
-            <OrderBtn label="Score" order="score"/>
-            <OrderBtn label="Unevaluated" order="unevaluated"/>
+            {appRound.attachments.length > 0 &&
+            <div>
+              Documents:
+              {appRound.attachments.map(({attachment, name}) =>
+                <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
+              )}
+            </div>
+            }
+            {this.scoredApps(appRound).length}/{appRound.applications.length} applications evaluated
+            <div className="mt-2">
+              Order by:
+              <OrderBtn label="Name" order="name"/>
+              <OrderBtn label="Score" order="score"/>
+              <OrderBtn label="Unevaluated" order="unevaluated"/>
+            </div>
           </div>
-          {appRound.attachments.length > 0 &&
-          <div className="m-2 ml-4 z-1">
-            Documents:
-            {appRound.attachments.map(({attachment, name}) =>
-              <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
-            )}
-          </div>
-          }
           {this.getApplications(appRound).map(app =>
             <ApplicationScores application={app} applicationRound={appRound} key={app.name}/>
           )}
