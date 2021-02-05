@@ -126,7 +126,7 @@ class AttachmentInline(admin.TabularInline):
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline, ScoreInline]
-    list_display = ['name', 'organizations', 'score', 'scores_']
+    list_display = ['name', 'organizations', 'score', 'scores_', 'attachments_']
     list_filter = ['application_round', 'evaluating_organizations']
 
     def get_actions(self, request):
@@ -137,12 +137,16 @@ class ApplicationAdmin(admin.ModelAdmin):
     def scores_(self, app):
         return len(app.scores.all())
 
+    def attachments_(self, app):
+        return app.attachment_count
+
     def organizations(self, app):
         return ', '.join(o.name for o in app.evaluating_organizations.all())
 
     def get_queryset(self, request):
         return super().get_queryset(request) \
-            .prefetch_related('scores', 'application_round__criteria', 'evaluating_organizations')
+            .prefetch_related('scores', 'application_round__criteria', 'evaluating_organizations') \
+            .annotate(attachment_count=Count('attachments'))
 
 
 class CriterionScoreInline(ScoreInline):
