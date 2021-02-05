@@ -67,6 +67,15 @@ class ApplicationRound(NamedModel):
                                  public=criterion.public, order=criterion.order, weight=criterion.weight)
 
 
+def upload_round_attachment_to(instance, filename):
+    return f'application_round_attachments/{secrets.token_hex(32)}/{filename}'
+
+
+class ApplicationRoundAttachment(NamedModel):
+    application_round = models.ForeignKey(ApplicationRound, related_name='attachments', on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to=upload_round_attachment_to, max_length=256)
+
+
 class CriterionGroup(NamedModel):
     """
     Grouping element for the evaluation criteria. Can be used to create a hierarchy of any depth.

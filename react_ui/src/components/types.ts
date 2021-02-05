@@ -29,7 +29,7 @@ export type Comment = {
     criterion: number
 }
 
-export type ApplicationAttachment = {
+export type Attachment = {
     name: string,
     attachment: string,
 }
@@ -39,7 +39,7 @@ export type Application = {
     name: string,
     scores: Score[],
     comments: Comment[],
-    attachments: ApplicationAttachment[],
+    attachments: Attachment[],
     score: number,
     groupScores: any,
     scoresByOrganization: {
@@ -70,7 +70,8 @@ export type ApplicationRound = {
     name: string,
     applications: Application[],
     criteria: Criterion[],
-    criterion_groups: CriterionGroup[]
+    criterion_groups: CriterionGroup[],
+    attachments: Attachment[]
 }
 
 export const AppContext = React.createContext({user: undefined} as AppContextType);

@@ -111,6 +111,7 @@ class RestTests(APITestCase):
             }],
             'criteria': [{'name': 'Goodness', 'group': None, 'id': criterion1.id, 'weight': 1}],
             'criterion_groups': [],
+            'attachments': [],
             'name': 'AI4Cities'
         }])
 

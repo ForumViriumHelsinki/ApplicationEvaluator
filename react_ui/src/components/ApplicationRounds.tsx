@@ -3,6 +3,7 @@ import {applicationRoundsUrl, applicationUrl} from "urls";
 import {AppContext, ApplicationRound, User} from "components/types";
 import ApplicationScores from "components/ApplicationScores";
 import {addApplicationScores, addScores} from "components/utils";
+import Modal from "util_components/bootstrap/Modal";
 
 type ApplicationRoundsProps = {
   user: User,
@@ -90,6 +91,14 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
             <OrderBtn label="Score" order="score"/>
             <OrderBtn label="Unevaluated" order="unevaluated"/>
           </div>
+          {appRound.attachments.length > 0 &&
+          <div className="m-2 ml-4 z-1">
+            Documents:
+            {appRound.attachments.map(({attachment, name}) =>
+              <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
+            )}
+          </div>
+          }
           {this.getApplications(appRound).map(app =>
             <ApplicationScores application={app} applicationRound={appRound} key={app.name}/>
           )}

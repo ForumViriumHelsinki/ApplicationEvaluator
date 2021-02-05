@@ -32,11 +32,6 @@ class CriterionInline(InlineForApplicationRound):
     filter_fks = ['group']
 
 
-class ApplicationInline(admin.TabularInline):
-    model = models.Application
-    extra = 0
-
-
 class ApplicationRoundForm(forms.ModelForm):
     import_applications = forms.CharField(
         widget=forms.Textarea({'rows': 3}),
@@ -72,9 +67,14 @@ class ApplicationRoundForm(forms.ModelForm):
                     app.evaluating_organizations.add(org)
 
 
+class RoundAttachmentInline(admin.TabularInline):
+    model = models.ApplicationRoundAttachment
+    extra = 0
+
+
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [CriterionGroupInline, CriterionInline, ApplicationInline]
+    inlines = [RoundAttachmentInline, CriterionGroupInline, CriterionInline]
     list_display = ['name', 'applications_']
     actions = ['duplicate']
     form = ApplicationRoundForm

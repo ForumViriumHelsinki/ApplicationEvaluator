@@ -83,10 +83,17 @@ class ApplicationSerializer(ModelSerializer):
         return CommentSerializer(application.comments_for_evaluator(self.user()), many=True).data
 
 
+class ApplicationRoundAttachmentSerializer(ModelSerializer):
+    class Meta:
+        model = models.ApplicationRoundAttachment
+        fields = ['name', 'attachment']
+
+
 class ApplicationRoundSerializer(ModelSerializer):
     applications = serializers.SerializerMethodField()
     criteria = serializers.SerializerMethodField()
     criterion_groups = CriterionGroupSerializer(many=True, read_only=True)
+    attachments = ApplicationRoundAttachmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.ApplicationRound
@@ -114,7 +121,7 @@ class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return models.ApplicationRound.rounds_for_evaluator(self.request.user) \
-            .prefetch_related('criterion_groups')
+            .prefetch_related('criterion_groups', 'attachments')
 
 
 class EvaluationModelViewSet(viewsets.ModelViewSet):
