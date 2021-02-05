@@ -71,6 +71,16 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
       {expanded &&
       <Modal onClose={() => this.setState({expanded: false})} title={application.name}>
+        {application.attachments.length > 0 &&
+        <div className="m-2">
+          <h5 className="text-primary">Application attachments</h5>
+          <div className="ml-2">
+            {application.attachments.map(({attachment, name}) =>
+              <a href={attachment} target='_blank' className="d-block text-secondary" key={attachment}>{name}</a>
+            )}
+          </div>
+        </div>
+        }
         {rootGroups.map(group =>
           <CriterionGroupComponent allGroups={applicationRound.criterion_groups} application={application}
                                    criteria={applicationRound.criteria} group={group} key={group.name}/>

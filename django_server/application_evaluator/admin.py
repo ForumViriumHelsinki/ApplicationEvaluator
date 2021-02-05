@@ -109,9 +109,23 @@ def add_evaluating_organization_action(organization):
     return action
 
 
+class AttachmentForm(forms.ModelForm):
+    name = forms.CharField(max_length=128, required=False, label="Name; will use file name if empty.")
+
+    class Meta:
+        model = models.ApplicationAttachment
+        exclude = []
+
+
+class AttachmentInline(admin.TabularInline):
+    model = models.ApplicationAttachment
+    extra = 0
+    form = AttachmentForm
+
+
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    inlines = [ScoreInline]
+    inlines = [AttachmentInline, ScoreInline]
     list_display = ['name', 'organizations', 'score', 'scores_']
     list_filter = ['application_round', 'evaluating_organizations']
 

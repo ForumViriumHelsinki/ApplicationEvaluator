@@ -29,11 +29,17 @@ export type Comment = {
     criterion: number
 }
 
+export type ApplicationAttachment = {
+    name: string,
+    attachment: string,
+}
+
 export type Application = {
     id: number,
     name: string,
     scores: Score[],
     comments: Comment[],
+    attachments: ApplicationAttachment[],
     score: number,
     groupScores: any,
     scoresByOrganization: {

@@ -1,3 +1,5 @@
+import secrets
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -129,6 +131,20 @@ class Application(NamedModel):
         if user.is_staff:
             return cls.objects.all()
         return cls.objects.filter(evaluating_organizations__users=user).distinct()
+
+
+def upload_attachment_to(instance, filename):
+    return f'application_attachments/{secrets.token_hex(32)}/{filename}'
+
+
+class ApplicationAttachment(NamedModel):
+    application = models.ForeignKey(Application, related_name='attachments', on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to=upload_attachment_to, max_length=256)
+
+    def save(self, **kwargs):
+        if self.attachment and not self.name:
+            self.name = self.attachment.name
+        return super().save(**kwargs)
 
 
 class EvaluationModel(TimestampedModel):

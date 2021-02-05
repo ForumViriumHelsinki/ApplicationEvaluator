@@ -54,19 +54,27 @@ class CommentSerializer(BaseCommentSerializer):
     evaluator = UserSerializer(read_only=True)
 
 
+class AttachmentSerializer(ModelSerializer):
+    class Meta:
+        model = models.ApplicationAttachment
+        fields = ['name', 'attachment']
+
+
 class ApplicationSerializer(ModelSerializer):
     scores = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     evaluating_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    attachments = AttachmentSerializer(many=True, read_only=True)
 
     prefetch_related = [
         'evaluating_organizations',
         'scores__evaluator__organizations',
-        'comments__evaluator__organizations']
+        'comments__evaluator__organizations',
+        'attachments']
 
     class Meta:
         model = models.Application
-        fields = ['name', 'scores', 'comments', 'id', 'evaluating_organizations']
+        fields = ['name', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments']
 
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
