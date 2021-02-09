@@ -18,14 +18,18 @@ export default class ResetPasswordScreen extends React.Component<ResetPasswordSc
   render() {
     const {uid, token} = this.props;
     return (
-      <div className="container mt-5 p-4 rounded trans-bg">
-        <div className="text-center">
-          <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
-          <h3>FVH Application Evaluator</h3>
-          <p className="lead">Reset password</p>
+      <div className="container mt-5 rounded trans-bg p-0">
+        <div className="text-center p-4 bg-dark">
+          <img className="w-50" src="images/PNG_AI4CITIES_Logo.png" alt="logo"/>
         </div>
-        <ResetPasswordForm changePasswordUrl={changePasswordUrl} token={token} uid={uid}/>
-        <Terms/>
+        <div className="p-4">
+          <div className="text-center">
+            <h3>FVH Application Evaluator</h3>
+            <p className="lead">Reset password</p>
+          </div>
+          <ResetPasswordForm changePasswordUrl={changePasswordUrl} token={token} uid={uid}/>
+          <Terms/>
+        </div>
       </div>
     );
   }

@@ -20,14 +20,18 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
     const {onLogin} = this.props;
 
     return (
-      <div className="container p-4 mt-5 rounded trans-bg">
-        <div className="text-center">
-          <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
-          <h3>FVH Application Evaluator</h3>
-          <p className="lead text-primary">Sign in</p>
+      <div className="container mt-5 rounded trans-bg p-0">
+        <div className="text-center p-4 bg-dark">
+          <img className="w-50" src="images/PNG_AI4CITIES_Logo.png" alt="logo"/>
         </div>
+        <div className="p-4">
+          <div className="text-center">
+            <h3>FVH Application Evaluator</h3>
+            <p className="lead text-primary">Sign in</p>
+          </div>
           <LoginForm loginUrl={loginUrl} onLogin={onLogin} passwordResetUrl={passwordResetUrl}/>
-        <Terms/>
+          <Terms/>
+        </div>
       </div>
     );
   }

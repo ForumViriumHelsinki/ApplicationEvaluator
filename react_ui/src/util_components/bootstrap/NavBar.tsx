@@ -9,7 +9,7 @@ export default class NavBar extends React.Component<NavBarProps> {
 
     const iconCls = "text-center d-inline-block ml-2 mt-1" + (onIconClick ? ' clickable' : '');
 
-    return <nav className="navbar navbar-dark bg-primary text-light p-0 flex-shrink-0">
+    return <nav className="navbar navbar-dark bg-dark text-primary p-0 flex-shrink-0">
       <div className="w-25">
         <div className={iconCls} onClick={onIconClick}>
           {icon && <Icon icon={icon} text={iconText}/>}
@@ -17,7 +17,7 @@ export default class NavBar extends React.Component<NavBarProps> {
       </div>
       <div className="w-50 text-center">{children}</div>
       <div className="w-25 d-flex justify-content-end">
-        <img style={{maxHeight: 48}} src="images/FORUM_VIRIUM_logo_white.png"/>
+        <img style={{maxHeight: 48}} src="images/PNG_AI4CITIES_Logo.png"/>
       </div>
     </nav>;
   }
