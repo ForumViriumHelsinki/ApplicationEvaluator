@@ -13,7 +13,8 @@ import ApplicationScoresTable from "components/ApplicationScoresTable";
 
 type ApplicationScoresProps = {
   application: Application,
-  applicationRound: ApplicationRound
+  applicationRound: ApplicationRound,
+  showEvaluators: boolean
 }
 
 type ApplicationScoresState = {
@@ -27,7 +28,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   static contextType = AppContext;
 
   render() {
-    const {application, applicationRound} = this.props;
+    const {application, applicationRound, showEvaluators} = this.props;
     const {expanded} = this.state;
     const {user} = this.context;
 
@@ -47,25 +48,31 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           <a onClick={() => this.setState({expanded: !this.state.expanded})}>
             <h5 className="text-primary mb-1">{application.name}</h5>
           </a>
+          {showEvaluators &&
           <div className="mb-1">
             {application.evaluating_organizations.map(o =>
               <span className={`mr-2 small`} style={{color: this.organizationColor(o)}}
                     key={o}>{o}</span>
             )}
           </div>
-          {application.score != null &&
-          <><strong>{(application.score * 10).toPrecision(2)} / 100</strong> overall from </>}
-          {application.scores.length} scores for {applicationRound.criteria.length} criteria.
-          {application.score != null && <>
-            <br/>
-            Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
-          </>}
+          }
+          {application.score != null ?
+            showEvaluators ? <>
+                <strong>{(application.score * 10).toPrecision(2)}/100</strong>{' '}
+                overall from {application.scores.length} scores for {applicationRound.criteria.length} criteria.
+                <br/>
+                Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
+              </>
+              : <><strong>{(application.score * 10).toPrecision(2)}/100</strong> overall score.</>
+            : <>No scores given.</>
+          }
         </div>
       </div>
 
       {application.score != null &&
       <div className="pl-4 pr-4">
-        <ApplicationScoresTable application={application} applicationRound={applicationRound}/>
+        <ApplicationScoresTable application={application} applicationRound={applicationRound}
+                                showEvaluators={showEvaluators}/>
       </div>
       }
 
@@ -96,14 +103,14 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   }
 
   plotData() {
-    const {applicationRound, application} = this.props;
+    const {applicationRound, application, showEvaluators} = this.props;
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     if (!application.groupScores) return [];
 
     const data = (groupScores: any) => Object.fromEntries(thresholdGroups.map(g =>
       [g.id, (groupScores[g.id] || 1) / 10]));
 
-    if (Object.keys(application.scoresByOrganization).length < 2)
+    if (!showEvaluators || Object.keys(application.scoresByOrganization).length < 2)
       return [{data: data(application.groupScores), meta: {color: organizationColor('total')}}];
     else return Object.entries(application.scoresByOrganization).map(([org, {groupScores}]) =>
       ({data: data(groupScores), meta: {color: organizationColor(org)}})

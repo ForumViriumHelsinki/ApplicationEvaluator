@@ -4,7 +4,8 @@ import {organizationColor} from "components/utils";
 
 type ApplicationScoresTableProps = {
   application: Application,
-  applicationRound: ApplicationRound
+  applicationRound: ApplicationRound,
+  showEvaluators: boolean
 }
 
 type ApplicationScoresTableState = {}
@@ -15,9 +16,10 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
   state = initialState;
 
   render() {
-    const {application, applicationRound} = this.props;
+    const {application, applicationRound, showEvaluators} = this.props;
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     const organizations = Object.keys(application.scoresByOrganization);
+    const showOrganizations = showEvaluators && organizations.length > 1;
 
     const GroupScore = ({group, groupScores}: { group: CriterionGroup, groupScores: any }) => {
       const groupScore = groupScores[group.id];
@@ -32,7 +34,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
     return <table className="table table-hover table-sm mt-2 border-bottom">
       <thead>
       <tr>
-        {organizations.length > 1 && <>
+        {showOrganizations && <>
           <th></th>
           <th></th>
         </>}
@@ -40,7 +42,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
       </tr>
       </thead>
       <tbody>
-      {organizations.length > 1 && Object.entries(application.scoresByOrganization).map(
+      {showOrganizations && Object.entries(application.scoresByOrganization).map(
         ([organization, {groupScores, score}]) =>
           <tr key={organization}>
             <td><LegendPill org={organization}/> {organization}</td>
@@ -50,7 +52,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
           </tr>
       )}
       <tr>
-        {organizations.length > 1 && <>
+        {showOrganizations && <>
           <td style={{paddingLeft: 29}}>Total</td>
           <td className="font-weight-bold">{application.score?.toPrecision(3)}</td>
         </>}

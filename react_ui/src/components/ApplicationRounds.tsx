@@ -15,11 +15,13 @@ type AppOrder = 'name' | 'score' | 'unevaluated';
 type ApplicationRoundsState = {
   applicationRounds?: ApplicationRound[],
   error?: boolean,
-  order: AppOrder
+  order: AppOrder,
+  showEvaluators: boolean
 }
 
 const initialState: ApplicationRoundsState = {
-  order: 'name'
+  order: 'name',
+  showEvaluators: true
 };
 
 export default class ApplicationRounds extends React.Component<ApplicationRoundsProps, ApplicationRoundsState> {
@@ -70,7 +72,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
   }
 
   renderMain() {
-    const {applicationRounds} = this.state;
+    const {applicationRounds, showEvaluators} = this.state;
     const {user, request} = this.props;
     if (!applicationRounds?.length) return null;
 
@@ -99,10 +101,16 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
               <OrderBtn label="Name" order="name"/>
               <OrderBtn label="Score" order="score"/>
               <OrderBtn label="Unevaluated" order="unevaluated"/>
+              <div className="form-check d-inline-block ml-3"
+                   onClick={() => this.setState({showEvaluators: !showEvaluators})}>
+                <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
+                <label className="form-check-label">Show evaluators</label>
+              </div>
             </div>
           </div>
           {this.getApplications(appRound).map(app =>
-            <ApplicationScores application={app} applicationRound={appRound} key={app.name}/>
+            <ApplicationScores application={app} applicationRound={appRound}
+                               key={app.name} showEvaluators={showEvaluators}/>
           )}
         </div>
       )}

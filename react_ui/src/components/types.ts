@@ -67,6 +67,7 @@ export type CriterionGroup = {
 }
 
 export type ApplicationRound = {
+    id: number,
     name: string,
     applications: Application[],
     criteria: Criterion[],
