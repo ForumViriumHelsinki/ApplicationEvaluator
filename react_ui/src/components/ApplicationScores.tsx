@@ -55,7 +55,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           </div>
           {application.score != null &&
           <><strong>{(application.score * 10).toPrecision(2)} / 100</strong> overall from </>}
-          {application.scores.length}/{applicationRound.criteria.length} scores.
+          {application.scores.length} scores for {applicationRound.criteria.length} criteria.
           {application.score != null && <>
             <br/>
             Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
