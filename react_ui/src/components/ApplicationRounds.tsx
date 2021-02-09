@@ -1,9 +1,8 @@
 import React from 'react';
 import {applicationRoundsUrl, applicationUrl} from "urls";
 import {AppContext, ApplicationRound, User} from "components/types";
-import ApplicationScores from "components/ApplicationScores";
 import {addApplicationScores, addScores} from "components/utils";
-import Modal from "util_components/bootstrap/Modal";
+import ApplicationRoundCard from "components/ApplicationRoundCard";
 
 type ApplicationRoundsProps = {
   user: User,
@@ -60,78 +59,23 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
   };
 
   render() {
-    const {} = this.props;
+    const {user, request} = this.props;
     const {error, applicationRounds} = this.state;
 
     return applicationRounds ?
-      applicationRounds.length ? this.renderMain()
-      : <h5 className="text-center">No applications currently awaiting evaluation.</h5>
-    : error ?
-      <h5 className="text-center">Error fetching applications. Perhaps try reloading or logging out and in again?</h5>
-      : null;
-  }
-
-  renderMain() {
-    const {applicationRounds, showEvaluators} = this.state;
-    const {user, request} = this.props;
-    if (!applicationRounds?.length) return null;
-
-    const OrderBtn = ({order, label}: { order: AppOrder, label: string }) =>
-      <>{' '}
-        <button className="btn btn-sm btn-outline-secondary rounded-pill"
-                onClick={() => this.setState({order})}>{label}</button>
-      </>;
-
-    return <AppContext.Provider value={{user, request, reloadApplication: this.reloadApplication}}>
-      {applicationRounds.map(appRound =>
-        <div className="mb-2 pt-3 pb-5" key={appRound.name}>
-          <div className="pl-4 pr-4 z-1">
-            <h3>{appRound.name}</h3>
-            {appRound.attachments.length > 0 &&
-            <div>
-              Documents:
-              {appRound.attachments.map(({attachment, name}) =>
-                <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
-              )}
-            </div>
-            }
-            {this.scoredApps(appRound).length}/{appRound.applications.length} applications evaluated
-            <div className="mt-2">
-              Order by:
-              <OrderBtn label="Name" order="name"/>
-              <OrderBtn label="Score" order="score"/>
-              <OrderBtn label="Unevaluated" order="unevaluated"/>
-              <div className="form-check d-inline-block ml-3"
-                   onClick={() => this.setState({showEvaluators: !showEvaluators})}>
-                <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
-                <label className="form-check-label">Show evaluators</label>
-              </div>
-            </div>
-          </div>
-          {this.getApplications(appRound).map(app =>
-            <ApplicationScores application={app} applicationRound={appRound}
-                               key={app.name} showEvaluators={showEvaluators}/>
-          )}
+      applicationRounds.length ?
+        <AppContext.Provider value={{user, request, reloadApplication: this.reloadApplication}}>
+          {applicationRounds.map(appRound =>
+            <ApplicationRoundCard applicationRound={appRound} key={appRound.id}/>)}
+        </AppContext.Provider>
+        : <div className="container mt-4 mb-5 rounded trans-bg pl-0 pr-0">
+          <h5 className="text-center">No applications currently awaiting evaluation.</h5>
         </div>
-      )}
-    </AppContext.Provider>
-  }
-
-  getApplications(appRound: ApplicationRound) {
-    const {order} = this.state;
-    if (order == 'name') return appRound.applications;
-
-    const apps = [...appRound.applications];
-
-    if (order == 'unevaluated') apps.sort((a, b) =>
-      a.scores.length - b.scores.length);
-
-    else if (order == 'score') apps.sort((a, b) =>
-      (b.score || 0) - (a.score || 0));
-    return apps;
-  }
-
-  scoredApps(appRound: ApplicationRound) {
-    return appRound.applications.filter(a => a.scores.length == appRound.criteria.length);
+      : error ?
+        <div className="container mt-4 mb-5 rounded trans-bg pl-0 pr-0">
+          <h5 className="text-center">Error fetching applications. Perhaps try reloading or logging out and in
+            again?</h5>
+        </div>
+        : null;
   }
 }

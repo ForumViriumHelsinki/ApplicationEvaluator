@@ -86,9 +86,7 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
               iconText={user?.username || ''}>
         <h5 className="m-2">FVH Application Evaluator</h5>
       </NavBar>
-      <div className="container mt-4 mb-5 rounded trans-bg pl-0 pr-0">
-        <ApplicationRounds user={user as User} request={this.request}/>
-      </div>
+      <ApplicationRounds user={user as User} request={this.request}/>
       <p className="text-white text-center">
         Background: Selkämerenpuisto park, Helsinki. (c) City of Helsinki, photo by Jussi Hellsten
       </p>
