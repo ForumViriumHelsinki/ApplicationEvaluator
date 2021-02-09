@@ -44,7 +44,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
         ([organization, {groupScores, score}]) =>
           <tr key={organization}>
             <td><LegendPill org={organization}/> {organization}</td>
-            <td className="font-weight-bold">{score.toPrecision(2)}</td>
+            <td className="font-weight-bold">{score.toPrecision(3)}</td>
             {thresholdGroups.map(group =>
               <GroupScore key={group.id} group={group} groupScores={groupScores}/>)}
           </tr>
@@ -52,7 +52,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
       <tr>
         {organizations.length > 1 && <>
           <td style={{paddingLeft: 29}}>Total</td>
-          <td className="font-weight-bold">{application.score?.toPrecision(2)}</td>
+          <td className="font-weight-bold">{application.score?.toPrecision(3)}</td>
         </>}
         {thresholdGroups.map(group =>
           <GroupScore key={group.id} group={group} groupScores={application.groupScores}/>)}
