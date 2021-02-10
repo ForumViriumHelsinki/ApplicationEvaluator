@@ -47,7 +47,7 @@ class ScoreSerializer(BaseScoreSerializer):
 class BaseCommentSerializer(ModelSerializer):
     class Meta:
         model = models.Comment
-        fields = ['comment', 'evaluator', 'criterion', 'application', 'id', 'created_at']
+        fields = ['comment', 'evaluator', 'criterion_group', 'application', 'id', 'created_at']
 
 
 class CommentSerializer(BaseCommentSerializer):

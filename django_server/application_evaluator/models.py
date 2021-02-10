@@ -161,7 +161,6 @@ class EvaluationModel(TimestampedModel):
     Model used for evaluating applications
     """
     application = models.ForeignKey(Application, related_name='%(class)ss', on_delete=models.CASCADE)
-    criterion = models.ForeignKey(Criterion, related_name='%(class)ss', on_delete=models.CASCADE)
     evaluator = models.ForeignKey(User, related_name='%(class)ss', on_delete=models.CASCADE)
 
     class Meta:
@@ -179,7 +178,9 @@ class EvaluationModel(TimestampedModel):
 
 class Score(EvaluationModel):
     score = models.FloatField(default=0)
+    criterion = models.ForeignKey(Criterion, related_name='scores', on_delete=models.CASCADE)
 
 
 class Comment(EvaluationModel):
     comment = models.TextField(blank=True)
+    criterion_group = models.ForeignKey(CriterionGroup, related_name='comments', on_delete=models.CASCADE)

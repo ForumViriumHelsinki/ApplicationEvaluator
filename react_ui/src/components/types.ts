@@ -26,7 +26,7 @@ export type Comment = {
     id: number,
     comment: string,
     evaluator: User,
-    criterion: number
+    criterion_group: number
 }
 
 export type Attachment = {
