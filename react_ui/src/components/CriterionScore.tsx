@@ -8,7 +8,8 @@ import {username} from "components/utils";
 
 type CriterionScoreProps = {
   criterion: Criterion,
-  application: Application
+  application: Application,
+  readOnly?: boolean
 }
 
 type CriterionScoreState = {
@@ -22,7 +23,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
   static contextType = AppContext;
 
   render() {
-    const {criterion, application} = this.props;
+    const {criterion, application, readOnly} = this.props;
     const {changed} = this.state;
     const {user} = this.context;
 
@@ -32,7 +33,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
     return <div className="ml-2 mb-2">
       {criterion.name}:
-      {!myOrgScore &&
+      {!myOrgScore && !readOnly &&
       <div className="form-inline">
         <input type="number" min="0" max="10" className="form-control form-control-sm"
                onBlur={this.saveScore}
@@ -44,7 +45,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
       {scores.map((score: Score) =>
         <div key={score.id}>
           <strong>{score.score}</strong> (by {username(score.evaluator)})
-          {score.evaluator.id == user.id &&
+          {score.evaluator.id == user.id && !readOnly &&
           <ConfirmButton className="btn-light btn-sm text-danger p-1 btn-trans" confirm="Delete score?"
                          onClick={this.deleteScore}>
             <Icon icon="clear"/>

@@ -41,6 +41,7 @@ export type Application = {
     comments: Comment[],
     attachments: Attachment[],
     score: number,
+    scored: boolean,
     groupScores: any,
     scoresByOrganization: {
         [organization: string]: {
@@ -72,7 +73,8 @@ export type ApplicationRound = {
     applications: Application[],
     criteria: Criterion[],
     criterion_groups: CriterionGroup[],
-    attachments: Attachment[]
+    attachments: Attachment[],
+    submitted_organizations: string[]
 }
 
 export const AppContext = React.createContext({user: undefined} as AppContextType);

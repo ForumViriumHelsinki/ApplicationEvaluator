@@ -4,6 +4,7 @@ export const passwordResetUrl = '/rest-auth/password/reset/';
 export const changePasswordUrl = '/rest-auth/password/reset/confirm/';
 
 export const applicationRoundsUrl = '/rest/application_rounds/';
+export const submitApplicationRoundUrl = (roundId: number) => `/rest/application_rounds/${roundId}/submit/`;
 export const scoresUrl = `/rest/scores/`;
 export const scoreUrl = (scoreId: number) => `/rest/scores/${scoreId}/`;
 export const commentsUrl = `/rest/comments/`;

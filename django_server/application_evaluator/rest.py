@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import serializers, routers, viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 
 from application_evaluator import models
 
@@ -94,6 +97,7 @@ class ApplicationRoundSerializer(ModelSerializer):
     criteria = serializers.SerializerMethodField()
     criterion_groups = CriterionGroupSerializer(many=True, read_only=True)
     attachments = ApplicationRoundAttachmentSerializer(many=True, read_only=True)
+    submitted_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
 
     class Meta:
         model = models.ApplicationRound
@@ -121,16 +125,30 @@ class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return models.ApplicationRound.rounds_for_evaluator(self.request.user) \
-            .prefetch_related('criterion_groups', 'attachments')
+            .prefetch_related('criterion_groups', 'attachments', 'submitted_organizations')
+
+    @action(detail=True, methods=['post'])
+    def submit(self, request, pk=None):
+        instance = get_object_or_404(models.ApplicationRound.rounds_for_evaluator(self.request.user), id=pk)
+        try:
+            instance.submit_by_user(request.user)
+        except ValueError:
+            raise Http404
+        return self.retrieve(request, pk=pk)
 
 
 class EvaluationModelViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(evaluator=self.request.user)
+        return self.queryset.filter(evaluator=self.request.user) \
+            .exclude(application__application_round__submitted_organizations=self.request.user.organization)
 
     def create(self, request, *args, **kwargs):
+        get_object_or_404(
+            models.Application.objects.exclude(
+                application_round__submitted_organizations=self.request.user.organization),
+            id=request.data['application'])
         request.data['evaluator'] = request.user.id
         return super().create(request, *args, **kwargs)
 

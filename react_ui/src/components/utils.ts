@@ -49,6 +49,7 @@ export const addApplicationScores = (round: ApplicationRound, applications: Appl
     app.groupScores = {};
     app.scoresByOrganization = {};
     if (!app.scores.length) return;
+    app.scored = _.uniq(app.scores.map(s => s.criterion)).length == round.criteria.length;
     app.score = weightedAvg(app.scores);
     app.groupScores = groupScores(app.scores);
     const scoresByOrganization = _.groupBy(app.scores, s => s.evaluator.organization);

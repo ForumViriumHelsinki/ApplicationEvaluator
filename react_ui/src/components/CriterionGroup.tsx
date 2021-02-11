@@ -1,7 +1,7 @@
 import React, {FocusEvent} from 'react';
 import moment from "moment";
 
-import {AppContext, Application, Criterion, CriterionGroup} from "components/types";
+import {AppContext, Application, ApplicationRound, CriterionGroup} from "components/types";
 import CriterionScore from "components/CriterionScore";
 import {commentsUrl, commentUrl} from "urls";
 import {username} from "components/utils";
@@ -9,9 +9,8 @@ import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import Icon from "util_components/bootstrap/Icon";
 
 type CriterionGroupProps = {
+  applicationRound: ApplicationRound,
   group: CriterionGroup,
-  allGroups: CriterionGroup[],
-  criteria: Criterion[],
   application: Application
 }
 
@@ -28,31 +27,33 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
   static contextType = AppContext;
 
   render() {
-    const {group, allGroups, criteria, application} = this.props;
+    const {group, applicationRound, application} = this.props;
     const {comment} = this.state;
     const {user} = this.context;
 
-    const groupCriteria = criteria.filter(c => c.group == group.id);
-    const subGroups = allGroups.filter(g => g.parent == group.id);
+    const groupCriteria = applicationRound.criteria.filter(c => c.group == group.id);
+    const subGroups = applicationRound.criterion_groups.filter(g => g.parent == group.id);
+    const submitted = applicationRound.submitted_organizations.includes(user.organization);
 
     if (!subGroups.length && !groupCriteria.length) return null;
 
     const comments = application.comments.filter(s => s.criterion_group == group.id);
-    const showComment = groupCriteria.length > 0 && !comments.find(c => c.evaluator.id == user.id);
+    const myComment = comments.find(c => c.evaluator.id == user.id);
+    const showComment = !submitted && groupCriteria.length > 0 && !myComment;
 
     return <div className="ml-2 mt-4" key={group.name}>
       {subGroups.length ? <h5 className="text-primary">{group.name}</h5> :
         <h6 className="text-secondary">{group.name}</h6>}
       {subGroups.map(childGroup =>
-        <CriterionGroupComponent key={childGroup.name} group={childGroup} allGroups={allGroups}
-                                 criteria={criteria} application={application}/>
+        <CriterionGroupComponent key={childGroup.name} group={childGroup} applicationRound={applicationRound}
+                                 application={application}/>
       )}
       {groupCriteria.map(criterion =>
-        <CriterionScore key={criterion.name} criterion={criterion} application={application}/>
+        <CriterionScore key={criterion.name} criterion={criterion} application={application} readOnly={submitted}/>
       )}
 
       {comments.length > 0 &&
-      <div className="mt-1 mb-3">
+      <div className="mt-1 mb-3 ml-2">
         {comments.map((comment) =>
           <div key={comment.id} className="d-flex">
             <div>
@@ -60,7 +61,7 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
               <small>{moment(comment.created_at).format('lll')}:</small><br/>
               {comment.comment}
             </div>
-            {comment.evaluator.id == user.id &&
+            {comment.evaluator.id == user.id && !submitted &&
             <div>
               <ConfirmButton className="btn-light btn-sm text-danger p-1 btn-trans" confirm="Delete comment?"
                              onClick={() => this.deleteComment(comment.id)}>
@@ -73,8 +74,8 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
       </div>
       }
 
-      {showComment && <div className="mt-3">
-        {group.abbr} - Reasoning and conclusions:
+      {showComment && <div className="mt-3 ml-2">
+        {group.abbr || group.name} - Reasoning and conclusions:
         <textarea className="form-control" rows={3} onBlur={this.saveComment} maxLength={500}
                   value={comment}
                   onChange={(e) => this.setState({comment: e.target.value})}/>

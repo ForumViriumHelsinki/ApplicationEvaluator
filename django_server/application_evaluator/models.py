@@ -36,6 +36,10 @@ class ApplicationRound(NamedModel):
 
     All applications in the same round will be evaluated using the same criteria.
     """
+    submitted_organizations = models.ManyToManyField(
+        'Organization', through='ApplicationRoundSubmittal', related_name='submitted_application_rounds',
+        blank=True)
+
     def total_weight(self):
         """
         Return the total weight of all criteria in this Application Round.
@@ -51,6 +55,9 @@ class ApplicationRound(NamedModel):
     def applications_for_evaluator(self, user):
         if user.is_staff:
             return self.applications.all()
+        if user.organization in self.submitted_organizations.all():
+            return self.applications.filter(
+                scores__evaluator__organizations__in=self.submitted_organizations.all()).distinct()
         return self.applications.filter(evaluating_organizations__users=user).distinct()
 
     def clone(self):
@@ -65,6 +72,25 @@ class ApplicationRound(NamedModel):
         for criterion in self.criteria.all():
             copy.criteria.create(name=criterion.name, group=groupCopies[criterion.group_id],
                                  public=criterion.public, order=criterion.order, weight=criterion.weight)
+
+    def organization_scores_completed(self, organization):
+        scores = self.scores_for_organization(organization).count()
+        applications = self.applications.filter(evaluating_organizations=organization).count()
+        criteria = self.criteria.filter(public=True).count()
+
+        return scores >= applications * criteria
+
+    def scores_for_organization(self, organization):
+        return self.scores().filter(evaluator__organizations=organization)
+
+    def scores(self):
+        return Score.objects.filter(application__application_round=self)
+
+    def submit_by_user(self, user):
+        if self.organization_scores_completed(user.organization):
+            return self.submittals.create(user=user, organization=user.organization)
+        else:
+            raise ValueError('Scores not completed, submittal not allowed.')
 
 
 def upload_round_attachment_to(instance, filename):
@@ -130,10 +156,10 @@ class Application(NamedModel):
         return self.evaluating_organizations.filter(users=user).exists()
 
     def scores_for_evaluator(self, user):
-        return Score.filter_for_evaluator(self.scores.all(), user)
+        return Score.filter_for_evaluator(self.scores.all(), user, self.application_round)
 
     def comments_for_evaluator(self, user):
-        return Comment.filter_for_evaluator(self.comments.all(), user)
+        return Comment.filter_for_evaluator(self.comments.all(), user, self.application_round)
 
     @classmethod
     def applications_for_evaluator(cls, user):
@@ -167,11 +193,16 @@ class EvaluationModel(TimestampedModel):
         abstract = True
 
     @staticmethod
-    def filter_for_evaluator(instances, user):
+    def filter_for_evaluator(instances, user, application_round):
+        submitted_organizations = application_round.submitted_organizations.all()
+        submitted = user.organization in submitted_organizations
         if user.is_staff:
             return instances
         if not user.organization:
             return []
+        if submitted:
+            return [s for s in instances
+                    if s.evaluator.organization and s.evaluator.organization in submitted_organizations]
         return [s for s in instances
                 if s.evaluator.organization and s.evaluator.organization == user.organization]
 
@@ -184,3 +215,10 @@ class Score(EvaluationModel):
 class Comment(EvaluationModel):
     comment = models.TextField(blank=True)
     criterion_group = models.ForeignKey(CriterionGroup, related_name='comments', on_delete=models.CASCADE)
+
+
+class ApplicationRoundSubmittal(Model):
+    application_round = models.ForeignKey(ApplicationRound, related_name='submittals', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, related_name='submittals', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='submittals', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

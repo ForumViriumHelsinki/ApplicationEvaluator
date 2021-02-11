@@ -30,12 +30,14 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   render() {
     const {application, applicationRound, showEvaluators} = this.props;
     const {expanded} = this.state;
-    const {user} = this.context;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
+    const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
+    const scoredCriteria = _.uniq(application.scores.map(s => s.criterion));
 
     return <div className="mt-4 pb-4">
       <div className="d-flex">
+        {thresholdGroups.length > 1 &&
         <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
           {application.scores.length > 0 &&
           <RadarChart data={this.plotData()} size={200}
@@ -43,8 +45,9 @@ export default class ApplicationScores extends React.Component<ApplicationScores
                       options={this.plotOptions()}/>
           }
         </div>
+        }
 
-        <div className="flex-grow-1 flex-shrink-1">
+        <div className={`flex-grow-1 flex-shrink-1 ${thresholdGroups.length < 2 ? 'ml-4' : ''}`}>
           <a onClick={() => this.setState({expanded: !this.state.expanded})}>
             <h5 className="text-primary mb-1">{application.name}</h5>
           </a>
@@ -59,7 +62,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           {application.score != null ?
             showEvaluators ? <>
                 <strong>{(application.score * 10).toPrecision(2)}/100</strong>{' '}
-                overall from {application.scores.length} scores for {applicationRound.criteria.length} criteria.
+                overall from {application.scores.length} scores for {scoredCriteria.length} criteria.
                 <br/>
                 Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
               </>
@@ -89,8 +92,8 @@ export default class ApplicationScores extends React.Component<ApplicationScores
         </div>
         }
         {rootGroups.map(group =>
-          <CriterionGroupComponent allGroups={applicationRound.criterion_groups} application={application}
-                                   criteria={applicationRound.criteria} group={group} key={group.name}/>
+          <CriterionGroupComponent applicationRound={applicationRound} application={application}
+                                   group={group} key={group.name}/>
         )}
         <div className="m-2">
           <button className="btn btn-block btn-secondary"

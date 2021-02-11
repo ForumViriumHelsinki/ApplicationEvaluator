@@ -30,7 +30,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     this.loadRounds();
   }
 
-  loadRounds() {
+  loadRounds = () => {
     const {request} = this.props;
     request(applicationRoundsUrl).then(response => {
       if (response.status == 200)
@@ -38,7 +38,7 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
           this.setState({applicationRounds: addScores(applicationRounds)}));
       else this.setState({error: true});
     })
-  }
+  };
 
   reloadApplication = (appId: number) => {
     const {request} = this.props;
@@ -62,9 +62,11 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
     const {user, request} = this.props;
     const {error, applicationRounds} = this.state;
 
+    const context = {user, request, reloadApplication: this.reloadApplication, loadRounds: this.loadRounds};
+
     return applicationRounds ?
       applicationRounds.length ?
-        <AppContext.Provider value={{user, request, reloadApplication: this.reloadApplication}}>
+        <AppContext.Provider value={context}>
           {applicationRounds.map(appRound =>
             <ApplicationRoundCard applicationRound={appRound} key={appRound.id}/>)}
         </AppContext.Provider>
