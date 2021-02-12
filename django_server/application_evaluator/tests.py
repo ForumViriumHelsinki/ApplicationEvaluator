@@ -14,6 +14,7 @@ class ModelTests(TestCase):
         criterion1 = app_round.criteria.create(name='Goodness', weight=1)
 
         evaluator = User.objects.create(username="evaluator")
+        org = evaluator.organizations.create(name='Org')
 
         # Given an application with no scores
         # When the total score is requested
@@ -40,6 +41,7 @@ class ModelTests(TestCase):
 
         # Given an application with several criteria and multiple scores for the same criterion
         evaluator2 = User.objects.create(username="evaluator2")
+        org2 = evaluator2.organizations.create(name='Org2')
         app.scores.create(criterion=criterion2, evaluator=evaluator2, score=4)
         # When the total score is requested
         # Then the scores for each separate criterion is averaged before the total weighed average is computed

@@ -145,7 +145,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request) \
-            .prefetch_related('scores', 'application_round__criteria', 'evaluating_organizations') \
+            .prefetch_related('scores__evaluator__organizations', 'application_round__criteria',
+                              'evaluating_organizations') \
             .annotate(attachment_count=Count('attachments'))
 
 

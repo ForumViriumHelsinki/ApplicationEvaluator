@@ -14,6 +14,7 @@ type CriterionScoreProps = {
 
 type CriterionScoreState = {
   changed?: boolean,
+  addScore?: boolean
 }
 
 const initialState: CriterionScoreState = {};
@@ -24,16 +25,18 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
   render() {
     const {criterion, application, readOnly} = this.props;
-    const {changed} = this.state;
+    const {changed, addScore} = this.state;
     const {user} = this.context;
 
     const scores = application.scores.filter(s => s.criterion == criterion.id);
+    const myScore = application.scores.find(s =>
+      s.criterion == criterion.id && s.evaluator.id == user.id);
     const myOrgScore = application.scores.find(s =>
       s.criterion == criterion.id && s.evaluator.organization == user.organization);
 
     return <div className="ml-2 mb-2">
-      {criterion.name}:
-      {!myOrgScore && !readOnly &&
+      {criterion.name}:{' '}
+      {!myScore && !readOnly && (!myOrgScore || addScore) &&
       <div className="form-inline">
         <input type="number" min="0" max="10" className="form-control form-control-sm"
                onBlur={this.saveScore}
@@ -53,6 +56,12 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
           }
         </div>
       )}
+      {myOrgScore && !myScore && !addScore &&
+      <a className="clickable text-success d-block" style={{marginLeft: -4}}
+         onClick={() => this.setState({addScore: true})}>
+        <Icon icon="add"/>
+      </a>
+      }
     </div>;
   }
 
@@ -64,7 +73,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const data = {application: application.id, criterion: criterion.id, score: value};
     request(scoresUrl, {method: 'POST', data}).then((response: Response) => {
       if (response.status < 300) {
-        this.setState({changed: false});
+        this.setState({changed: false, addScore: false});
         reloadApplication(application.id);
       }
     })

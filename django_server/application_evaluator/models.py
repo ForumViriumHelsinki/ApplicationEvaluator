@@ -145,11 +145,14 @@ class Application(NamedModel):
 
     def score(self):
         total = 0
+        mean = lambda scores: sum(scores) / len(scores) if len(scores) else 0
         for criterion in self.application_round.criteria.all():
             scores = [s for s in self.scores.all() if s.criterion_id == criterion.id]
             if len(scores):
-                mean = sum(s.score for s in scores) / len(scores)
-                total += mean * criterion.weight
+                orgs = {s.evaluator.organization.id for s in scores if s.evaluator.organization}
+                org_scores = [mean([s.score for s in scores if s.evaluator.organization.id == org_id])
+                              for org_id in orgs]
+                total += mean(org_scores) * criterion.weight
         return total / self.application_round.total_weight()
 
     def can_be_evaluated_by(self, user):

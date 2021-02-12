@@ -28,8 +28,11 @@ export const addApplicationScores = (round: ApplicationRound, applications: Appl
 
   const weightedAvg = (scores: Score[]) => {
     const scoresByCriterion = _.groupBy(scores, 'criterion');
-    const avgScores = Object.entries(scoresByCriterion).map(([criterion, cScores]) =>
-      ({criterion, score: avg((cScores as Score[]).map(s => s.score))}));
+    const avgScores = Object.entries(scoresByCriterion).map(([criterion, cScores]) => {
+      const orgScores = Object.values(_.groupBy(cScores, s => s.evaluator.organization))
+        .map(scores => avg(scores.map(s => s.score)));
+      return {criterion, score: avg(orgScores)};
+    });
     const weightedScores = avgScores.map(s => s.score * weightIndex[s.criterion]);
     const weights = avgScores.map(s => weightIndex[s.criterion]);
     return sum(weightedScores) / sum(weights);
