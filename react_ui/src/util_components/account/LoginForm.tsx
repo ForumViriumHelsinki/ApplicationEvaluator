@@ -95,14 +95,14 @@ export default class LoginForm extends React.Component<Props, State> {
     // @ts-ignore
     formData.forEach((value: any, key: string) => data[key] = value);
     this.setState({error: false, ...data});
-    logout();
-    sessionRequest(loginUrl, {method: 'POST', data: data }).then((response) => {
-      if (response.status == 200) response.json().then((data) => {
-        login(data.key);
-        onLogin();
-      });
-      else this.setState({error: true});
-    })
+    logout().then(() => sessionRequest(loginUrl, {method: 'POST', data: data}))
+      .then((response) => {
+        if (response.status == 200) response.json().then((data) => {
+          login(data.key);
+          onLogin();
+        });
+        else this.setState({error: true});
+      })
   };
 
   resetPassword = (e: FormEvent) => {

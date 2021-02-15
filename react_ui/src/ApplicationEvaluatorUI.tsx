@@ -36,12 +36,7 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
     })
   }
 
-  logout = () => {
-    sessionRequest('/rest-auth/logout/', {method: 'POST'}).then(response => {
-      logout();
-      this.setState({user: undefined});
-    });
-  };
+  logout = () => logout().then(() => this.setState({user: undefined}));
 
   request = (url: string, options: any = {}) => {
     return sessionRequest(url, options).then(response => {

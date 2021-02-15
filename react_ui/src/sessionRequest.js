@@ -16,8 +16,11 @@ function deleteAllCookies() {
 }
 
 export function logout() {
-  localStorage.clear();
-  deleteAllCookies();
+  return sessionRequest('/rest-auth/logout/', {method: 'POST'}).then(response => {
+    localStorage.clear();
+    deleteAllCookies();
+    return response;
+  })
 }
 
 export function sessionRequest(url, options = {}) {

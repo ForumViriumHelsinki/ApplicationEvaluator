@@ -60,17 +60,19 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
     // @ts-ignore
     formData.forEach((value: any, key: string) => data[key] = value);
     this.setState({error: false, ...data});
-    logout();
-    sessionRequest(changePasswordUrl, {method: 'POST', data: {...data, uid, token}}).then((response) => {
-      if (response.status == 200) this.setState({success: true});
-      else if (response.status == 400) response.json().then(resp => {
-        if (resp.token) this.setState({error:
-            <>Invalid token. You may need to request a new reset from the <a href='/#/'>login screen</a>.</>
+    logout().then(() =>
+      sessionRequest(changePasswordUrl, {method: 'POST', data: {...data, uid, token}}))
+      .then((response) => {
+        if (response.status == 200) this.setState({success: true});
+        else if (response.status == 400) response.json().then(resp => {
+          if (resp.token) this.setState({
+            error:
+              <>Invalid token. You may need to request a new reset from the <a href='/#/'>login screen</a>.</>
+          });
+          const field_error = resp.new_password1 || resp.new_password2;
+          if (field_error) this.setState({error: field_error});
         });
-        const field_error = resp.new_password1 || resp.new_password2;
-        if (field_error) this.setState({error: field_error});
-      });
-      else this.setState({error: "Reset failed. Please try again."});
-    })
+        else this.setState({error: "Reset failed. Please try again."});
+      })
   };
 }
