@@ -14,7 +14,8 @@ type CriterionScoreProps = {
 
 type CriterionScoreState = {
   changed?: boolean,
-  addScore?: boolean
+  addScore?: boolean,
+  error?: boolean
 }
 
 const initialState: CriterionScoreState = {};
@@ -25,7 +26,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
   render() {
     const {criterion, application, readOnly} = this.props;
-    const {changed, addScore} = this.state;
+    const {changed, addScore, error} = this.state;
     const {user} = this.context;
 
     const scores = application.scores.filter(s => s.criterion == criterion.id);
@@ -38,7 +39,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
       {criterion.name}:{' '}
       {!myScore && !readOnly && (!myOrgScore || addScore) &&
       <div className="form-inline">
-        <input type="number" min="0" max="10" className="form-control form-control-sm"
+        <input type="number" min="0" max="10" className={`form-control form-control-sm ${error ? 'is-invalid' : ''}`}
                onBlur={this.saveScore}
                onChange={() => this.setState({changed: true})}/>{' '}
         {changed && <button className="btn btn-sm btn-outline-primary ml-2">Save</button>}
@@ -69,7 +70,8 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const {application, criterion} = this.props;
     const {reloadApplication, request} = this.context;
     const value = Number(e.target.value);
-    if (!e.target.value || value > 10 || value < 0) return;
+    if (!e.target.value || value > 10 || value < 0) return this.setState({error: true});
+    else this.setState({error: false});
     const data = {application: application.id, criterion: criterion.id, score: value};
     request(scoresUrl, {method: 'POST', data}).then((response: Response) => {
       if (response.status < 300) {
