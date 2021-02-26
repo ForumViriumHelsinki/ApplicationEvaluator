@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.contrib.admin.models import LogEntry
 from django.db.models import Count
 
 from application_evaluator import models
@@ -72,9 +73,14 @@ class RoundAttachmentInline(admin.TabularInline):
     extra = 0
 
 
+class ApplicationRoundSubmittalInline(admin.TabularInline):
+    model = models.ApplicationRoundSubmittal
+    extra = 0
+
+
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [RoundAttachmentInline, CriterionGroupInline, CriterionInline]
+    inlines = [RoundAttachmentInline, ApplicationRoundSubmittalInline, CriterionGroupInline, CriterionInline]
     list_display = ['name', 'applications_', 'scores_', 'published']
     actions = ['duplicate']
     form = ApplicationRoundForm
@@ -178,3 +184,9 @@ class CriterionAdmin(admin.ModelAdmin):
 @admin.register(models.Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     filter_horizontal = ['users']
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'action_time', 'user']
+    list_filter = ['user']

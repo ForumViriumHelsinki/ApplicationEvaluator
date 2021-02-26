@@ -215,6 +215,9 @@ class Score(EvaluationModel):
     score = models.FloatField(default=0)
     criterion = models.ForeignKey(Criterion, related_name='scores', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'Score(score={self.score}, application={self.application_id}, criterion={self.criterion_id})'
+
 
 class Comment(EvaluationModel):
     comment = models.TextField(blank=True)
