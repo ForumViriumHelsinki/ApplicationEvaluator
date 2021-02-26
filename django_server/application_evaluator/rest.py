@@ -101,7 +101,7 @@ class ApplicationRoundSerializer(ModelSerializer):
 
     class Meta:
         model = models.ApplicationRound
-        fields = '__all__'
+        exclude = ['published']
 
     def get_applications(self, application_round):
         user = self.user()

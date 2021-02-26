@@ -74,11 +74,29 @@ class RestTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, [])
 
+    def test_application_rounds_when_not_published(self):
+        # Given a logged in user that belongs to an organization with allocated applications only in unpublished rounds
+        evaluator = User.objects.create(username="evaluator")
+        organization = evaluator.organizations.create(name='Helsinki')
+        self.client.force_login(evaluator)
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+        app = app_round.applications.create(name='SkyNet')
+        criterion1 = app_round.criteria.create(name='Goodness', weight=1)
+        app.evaluating_organizations.add(organization)
+
+        # When requesting the application round list
+        url = reverse('application_round-list')
+        response = self.client.get(url)
+
+        # Then an empty list is received
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+
     def test_application_rounds(self):
         # Given a logged in user that belongs to an organization with allocated applications
         evaluator = User.objects.create(username="evaluator")
         self.client.force_login(evaluator)
-        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities', published=True)
         app = app_round.applications.create(name='SkyNet')
         criterion1 = app_round.criteria.create(name='Goodness', weight=1)
         organization = evaluator.organizations.create(name='Helsinki')
@@ -153,7 +171,7 @@ class RestTests(APITestCase):
         # in an application round
         evaluator = User.objects.create(username="evaluator")
         self.client.force_login(evaluator)
-        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities', published=True)
         app = app_round.applications.create(name='SkyNet')
         criterion1 = app_round.criteria.create(name='Goodness', weight=1)
         organization = evaluator.organizations.create(name='Helsinki')

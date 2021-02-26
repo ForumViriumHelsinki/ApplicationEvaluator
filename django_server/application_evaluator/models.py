@@ -39,6 +39,7 @@ class ApplicationRound(NamedModel):
     submitted_organizations = models.ManyToManyField(
         'Organization', through='ApplicationRoundSubmittal', related_name='submitted_application_rounds',
         blank=True)
+    published = models.BooleanField(default=False)
 
     def total_weight(self):
         """
@@ -50,7 +51,7 @@ class ApplicationRound(NamedModel):
     def rounds_for_evaluator(cls, user):
         if user.is_staff:
             return cls.objects.all()
-        return cls.objects.filter(applications__evaluating_organizations__users=user).distinct()
+        return cls.objects.filter(applications__evaluating_organizations__users=user, published=True).distinct()
 
     def applications_for_evaluator(self, user):
         if user.is_staff:
