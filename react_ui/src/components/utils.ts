@@ -88,3 +88,5 @@ export const organizationColor = (org: string) => {
   if (!organizationColors[org]) organizationColors[org] = colors.shift();
   return organizationColors[org];
 };
+
+export const slug = (name: string) => name.replace(/[^a-z]/ig, '');

@@ -5,7 +5,8 @@ import {organizationColor} from "components/utils";
 type ApplicationScoresTableProps = {
   application: Application,
   applicationRound: ApplicationRound,
-  showEvaluators: boolean
+  showEvaluators: boolean,
+  onOrganizationHover?: (org: string | null) => any
 }
 
 type ApplicationScoresTableState = {}
@@ -16,7 +17,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
   state = initialState;
 
   render() {
-    const {application, applicationRound, showEvaluators} = this.props;
+    const {application, applicationRound, showEvaluators, onOrganizationHover} = this.props;
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     const organizations = Object.keys(application.scoresByOrganization);
     const showOrganizations = showEvaluators && organizations.length > 1;
@@ -31,7 +32,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
     const LegendPill = ({org}: { org: string }) =>
       <span className="rounded-pill d-inline-block" style={this.legendPillStyle(org)}></span>;
 
-    return <table className="table table-hover table-sm mt-2 border-bottom">
+    return <table className="table table-hover table-sm mt-2 border-bottom mb-0">
       <thead>
       <tr>
         {showOrganizations && <>
@@ -44,7 +45,9 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
       <tbody>
       {showOrganizations && Object.entries(application.scoresByOrganization).map(
         ([organization, {groupScores, score}]) =>
-          <tr key={organization}>
+          <tr key={organization}
+              onMouseOver={() => onOrganizationHover && onOrganizationHover(organization)}
+              onMouseOut={() => onOrganizationHover && onOrganizationHover(null)}>
             <td><LegendPill org={organization}/> {organization}</td>
             <td className="font-weight-bold">{score.toPrecision(3)}</td>
             {thresholdGroups.map(group =>

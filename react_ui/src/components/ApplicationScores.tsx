@@ -7,7 +7,7 @@ import 'react-svg-radar-chart/build/css/index.css'
 import CriterionGroupComponent from "components/CriterionGroup";
 import {AppContext, Application, ApplicationRound} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
-import {organizationColor, username} from "components/utils";
+import {organizationColor, slug, username} from "components/utils";
 import ApplicationScoresTable from "components/ApplicationScoresTable";
 
 
@@ -18,7 +18,8 @@ type ApplicationScoresProps = {
 }
 
 type ApplicationScoresState = {
-  expanded?: boolean
+  expanded?: boolean,
+  highlightOrganization?: string | null
 }
 
 const initialState: ApplicationScoresState = {};
@@ -29,14 +30,23 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
   render() {
     const {application, applicationRound, showEvaluators} = this.props;
-    const {expanded} = this.state;
+    const {expanded, highlightOrganization} = this.state;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
     const scoredCriteria = _.uniq(application.scores.map(s => s.criterion));
 
-    return <div className="mt-4 pb-4">
+    const organizations = Object.keys(application.scoresByOrganization);
+    const showOrganizations = showEvaluators && organizations.length > 1;
+
+    return <div className={`mt-4 pb-4 app-${application.id}`}>
       <div className="d-flex">
+        {highlightOrganization &&
+        <style>
+          .app-{application.id} .org-shape {'{opacity: 0.2}'}
+          .app-{application.id} .org-shape-{slug(highlightOrganization)} {'{opacity: 1}'}
+        </style>
+        }
         {thresholdGroups.length > 1 &&
         <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
           {application.scores.length > 0 &&
@@ -74,8 +84,10 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
       {application.score != null &&
       <div className="pl-4 pr-4">
-        <ApplicationScoresTable application={application} applicationRound={applicationRound}
-                                showEvaluators={showEvaluators}/>
+        <ApplicationScoresTable
+          application={application} applicationRound={applicationRound} showEvaluators={showEvaluators}
+          onOrganizationHover={(highlightOrganization) => this.setState({highlightOrganization})}/>
+        {showOrganizations && <small>Move mouse over table to highlight organization in plot.</small>}
       </div>
       }
 
@@ -114,9 +126,13 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       [g.id, (groupScores[g.id] || 1) / 10]));
 
     if (!showEvaluators || Object.keys(application.scoresByOrganization).length < 2)
-      return [{data: data(application.groupScores), meta: {color: organizationColor('total')}}];
+      return [{
+        data: data(application.groupScores),
+        meta: {color: organizationColor('total')}
+      }];
+
     else return Object.entries(application.scoresByOrganization).map(([org, {groupScores}]) =>
-      ({data: data(groupScores), meta: {color: organizationColor(org)}})
+      ({data: data(groupScores), meta: {color: organizationColor(org), class: `org-shape org-shape-${slug(org)}`}})
     );
   }
 
