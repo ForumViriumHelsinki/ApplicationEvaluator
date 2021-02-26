@@ -75,15 +75,19 @@ class RoundAttachmentInline(admin.TabularInline):
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
     inlines = [RoundAttachmentInline, CriterionGroupInline, CriterionInline]
-    list_display = ['name', 'applications_']
+    list_display = ['name', 'applications_', 'scores_', 'published']
     actions = ['duplicate']
     form = ApplicationRoundForm
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(app_count=Count('applications'))
+        return super().get_queryset(request).annotate(app_count=Count('applications'),
+                                                      score_count=Count('applications__scores'))
 
     def applications_(self, round):
         return round.app_count
+
+    def scores_(self, round):
+        return round.score_count
 
     def duplicate(self, request, queryset):
         for round in queryset:
