@@ -27,6 +27,7 @@ const initialState: ApplicationScoresState = {};
 export default class ApplicationScores extends React.Component<ApplicationScoresProps, ApplicationScoresState> {
   state = initialState;
   static contextType = AppContext;
+  endHighlight: any = null;
 
   render() {
     const {application, applicationRound, showEvaluators} = this.props;
@@ -43,7 +44,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       <div className="d-flex">
         {highlightOrganization &&
         <style>
-          .app-{application.id} .org-shape {'{opacity: 0.2}'}
+          .app-{application.id} .org-shape {'{opacity: 0.2; transition: opacity 100ms;}'}
           .app-{application.id} .org-shape-{slug(highlightOrganization)} {'{opacity: 1}'}
         </style>
         }
@@ -86,7 +87,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       <div className="pl-4 pr-4">
         <ApplicationScoresTable
           application={application} applicationRound={applicationRound} showEvaluators={showEvaluators}
-          onOrganizationHover={(highlightOrganization) => this.setState({highlightOrganization})}/>
+          onOrganizationHover={this.highlightOrganization}/>
         {showOrganizations && <small>Move mouse over table to highlight organization in plot.</small>}
       </div>
       }
@@ -180,5 +181,15 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   organizationColor(o: string) {
     const {application} = this.props;
     return application.scoresByOrganization[o] ? 'black' : '#aaa';
+  }
+
+  highlightOrganization = (highlightOrganization: string | null) => {
+    this.setState({highlightOrganization});
+    if (this.endHighlight) clearTimeout(this.endHighlight);
+    this.endHighlight = setTimeout(() => this.setState({highlightOrganization: null}), 1000);
+  };
+
+  componentWillUnmount() {
+    if (this.endHighlight) clearTimeout(this.endHighlight);
   }
 }

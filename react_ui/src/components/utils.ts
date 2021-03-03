@@ -74,12 +74,13 @@ export const username = (user: User) => {
 };
 
 const colors = [
-  '#009E92',
-  '#FF5000',
-  '#6610f2',
-  '#007bff',
-  '#28a745',
-  '#d70074',
+  '#1B2C41',
+  '#F9B122',
+  '#56B4E9',
+  '#009E73',
+  '#0072B2',
+  '#D55E00',
+  '#CC79A7',
 ];
 
 const organizationColors: any = {};

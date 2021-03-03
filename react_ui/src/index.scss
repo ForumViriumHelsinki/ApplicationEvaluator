@@ -126,3 +126,7 @@ body {
 .font-size-base {
   font-size: $font-size-base;
 }
+
+.org-shape {
+  transition: opacity 1s;
+}

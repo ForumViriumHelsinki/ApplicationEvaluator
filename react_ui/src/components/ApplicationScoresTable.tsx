@@ -32,6 +32,8 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
     const LegendPill = ({org}: { org: string }) =>
       <span className="rounded-pill d-inline-block" style={this.legendPillStyle(org)}></span>;
 
+    const selectNone = () => onOrganizationHover && showOrganizations && onOrganizationHover(null);
+
     return <table className="table table-hover table-sm mt-2 border-bottom mb-0">
       <thead>
       <tr>
@@ -42,19 +44,18 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
         {thresholdGroups.map(group => <th key={group.abbr}>{group.abbr}</th>)}
       </tr>
       </thead>
-      <tbody>
+      <tbody onMouseOut={selectNone}>
       {showOrganizations && Object.entries(application.scoresByOrganization).map(
         ([organization, {groupScores, score}]) =>
           <tr key={organization}
-              onMouseOver={() => onOrganizationHover && onOrganizationHover(organization)}
-              onMouseOut={() => onOrganizationHover && onOrganizationHover(null)}>
+              onMouseOver={() => onOrganizationHover && onOrganizationHover(organization)}>
             <td><LegendPill org={organization}/> {organization}</td>
             <td className="font-weight-bold">{score.toPrecision(3)}</td>
             {thresholdGroups.map(group =>
               <GroupScore key={group.id} group={group} groupScores={groupScores}/>)}
           </tr>
       )}
-      <tr>
+      <tr onMouseOver={selectNone}>
         {showOrganizations && <>
           <td style={{paddingLeft: 29}}>Total</td>
           <td className="font-weight-bold">{application.score?.toPrecision(3)}</td>
