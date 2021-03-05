@@ -39,6 +39,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
     const organizations = Object.keys(application.scoresByOrganization);
     const showOrganizations = showEvaluators && organizations.length > 1;
+    const showPlot = showOrganizations && thresholdGroups.length > 1;
 
     return <div className={`mt-4 pb-4 app-${application.id}`}>
       <div className="d-flex">
@@ -88,7 +89,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
         <ApplicationScoresTable
           application={application} applicationRound={applicationRound} showEvaluators={showEvaluators}
           onOrganizationHover={this.highlightOrganization}/>
-        {showOrganizations && <small>Move mouse over table to highlight organization in plot.</small>}
+        {showPlot && <small>Move mouse over table to highlight organization in plot.</small>}
       </div>
       }
 
