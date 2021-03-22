@@ -63,7 +63,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         </div>
         }
         {applicationRound.description &&
-        <ReactMarkdown linkTarget="_blank">{applicationRound.description}</ReactMarkdown>
+        <ReactMarkdown linkTarget="_blank" className="mt-2">{applicationRound.description}</ReactMarkdown>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
         {!submitted && scoredApps.length == applicationRound.applications.length &&
