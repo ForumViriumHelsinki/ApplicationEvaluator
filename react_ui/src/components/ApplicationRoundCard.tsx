@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown'
 import {AppContext, ApplicationRound} from "components/types";
 import ApplicationScores from "components/ApplicationScores";
 import Icon from "util_components/bootstrap/Icon";
@@ -60,6 +61,9 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
           )}
         </div>
+        }
+        {applicationRound.description &&
+        <ReactMarkdown linkTarget="_blank">{applicationRound.description}</ReactMarkdown>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
         {!submitted && scoredApps.length == applicationRound.applications.length &&

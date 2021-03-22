@@ -2,6 +2,7 @@ import secrets
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.safestring import mark_safe
 
 
 class Model(models.Model):
@@ -40,6 +41,10 @@ class ApplicationRound(NamedModel):
         'Organization', through='ApplicationRoundSubmittal', related_name='submitted_application_rounds',
         blank=True)
     published = models.BooleanField(default=False)
+    description = models.TextField(blank=True, help_text=mark_safe(
+        'Content that will be shown to the evaluators in the public UI. May use ' +
+        '<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown</a>' +
+        ' for e.g. links and formatting.'))
 
     def total_weight(self):
         """

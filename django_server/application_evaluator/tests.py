@@ -145,6 +145,7 @@ class RestTests(APITestCase):
             'criterion_groups': [],
             'attachments': [],
             'submitted_organizations': [],
+            'description': '',
             'name': 'AI4Cities'
         }])
 
