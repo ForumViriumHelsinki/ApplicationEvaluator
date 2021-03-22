@@ -15,7 +15,8 @@ type CriterionGroupProps = {
 }
 
 type CriterionGroupState = {
-  comment: string
+  comment: string,
+  editingComment?: boolean
 }
 
 const initialState: CriterionGroupState = {
@@ -28,7 +29,7 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
 
   render() {
     const {group, applicationRound, application} = this.props;
-    const {comment} = this.state;
+    const {comment, editingComment} = this.state;
     const {user} = this.context;
 
     const groupCriteria = applicationRound.criteria.filter(c => c.group == group.id);
@@ -39,7 +40,20 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
 
     const comments = application.comments.filter(s => s.criterion_group == group.id);
     const myComment = comments.find(c => c.evaluator.id == user.id);
-    const showComment = !submitted && groupCriteria.length > 0 && !myComment;
+    const showNewComment = !submitted && groupCriteria.length > 0 && !myComment;
+
+    const editCommentField = () =>
+      <>
+        <textarea className="form-control" rows={3} onBlur={this.saveComment} maxLength={500}
+                  value={comment} autoFocus={editingComment}
+                  onChange={(e) => this.setState({comment: e.target.value})}/>
+        <small className="text-black-50">
+          500 characters max{comment.length > 0 && <>, {500 - comment.length} left.</>}
+        </small>
+        {comment.length > 0 &&
+        <button className="btn btn-sm btn-outline-primary btn-block mt-1">Save</button>
+        }
+      </>;
 
     return <div className="ml-2 mt-4" key={group.name}>
       {subGroups.length ? <h5 className="text-primary">{group.name}</h5> :
@@ -56,13 +70,17 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
       <div className="mt-1 mb-3 ml-2">
         {comments.map((comment) =>
           <div key={comment.id} className="d-flex">
-            <div>
+            <div className={editingComment ? "flex-grow-1" : ''}>
               <strong>{username(comment.evaluator)} </strong>
               <small>{moment(comment.created_at).format('lll')}:</small><br/>
-              {comment.comment}
+              {comment.evaluator.id == user.id && editingComment ? editCommentField() : comment.comment}
             </div>
-            {comment.evaluator.id == user.id && !submitted &&
-            <div>
+            {comment.evaluator.id == user.id && !submitted && !editingComment &&
+            <div className="flex-grow-1">
+              <button className="btn btn-light btn-sm p-1 btn-trans"
+                      onClick={() => this.setState({editingComment: true, comment: comment.comment})}>
+                <Icon icon="mode_edit"/>
+              </button>
               <ConfirmButton className="btn-light btn-sm text-danger p-1 btn-trans" confirm="Delete comment?"
                              onClick={() => this.deleteComment(comment.id)}>
                 <Icon icon="clear"/>
@@ -74,30 +92,33 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
       </div>
       }
 
-      {showComment && <div className="mt-3 ml-2">
+      {showNewComment && <div className="mt-3 ml-2">
         {group.abbr || group.name} - Reasoning and conclusions:
-        <textarea className="form-control" rows={3} onBlur={this.saveComment} maxLength={500}
-                  value={comment}
-                  onChange={(e) => this.setState({comment: e.target.value})}/>
-        <small className="text-black-50">
-          500 characters max{comment.length > 0 && <>, {500 - comment.length} left.</>}
-        </small>
-        {comment.length > 0 &&
-        <button className="btn btn-sm btn-outline-primary btn-block mt-1">Save</button>
-        }
+        {editCommentField()}
       </div>}
     </div>;
   }
 
   saveComment = (e: FocusEvent<HTMLTextAreaElement>) => {
     const {application, group} = this.props;
-    const {reloadApplication, request} = this.context;
+    const {reloadApplication, request, user} = this.context;
+    const comments = application.comments.filter(s => s.criterion_group == group.id);
+    const myComment = comments.find(c => c.evaluator.id == user.id);
     const value = e.target.value;
     if (!value) return;
-    const data = {application: application.id, criterion_group: group.id, comment: value};
-    request(commentsUrl, {method: 'POST', data}).then((response: Response) => {
+
+    const req =
+      myComment ?
+        request(commentUrl(myComment.id), {method: 'PATCH', data: {comment: value}})
+        :
+        request(commentsUrl, {
+          method: 'POST',
+          data: {application: application.id, criterion_group: group.id, comment: value}
+        });
+
+    req.then((response: Response) => {
       if (response.status < 300) {
-        this.setState({comment: ''});
+        this.setState({comment: '', editingComment: false});
         reloadApplication(application.id);
       }
     })
