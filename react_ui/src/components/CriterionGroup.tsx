@@ -26,6 +26,7 @@ const initialState: CriterionGroupState = {
 export default class CriterionGroupComponent extends React.Component<CriterionGroupProps, CriterionGroupState> {
   state = initialState;
   static contextType = AppContext;
+  savingComment = false;
 
   render() {
     const {group, applicationRound, application} = this.props;
@@ -99,24 +100,31 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
     </div>;
   }
 
-  saveComment = (e: FocusEvent<HTMLTextAreaElement>) => {
+  componentWillUnmount() {
+    if (this.state.comment) this.saveComment();
+  }
+
+  saveComment = () => {
     const {application, group} = this.props;
+    const {comment} = this.state;
     const {reloadApplication, request, user} = this.context;
     const comments = application.comments.filter(s => s.criterion_group == group.id);
     const myComment = comments.find(c => c.evaluator.id == user.id);
-    const value = e.target.value;
-    if (!value) return;
+
+    if (this.savingComment || !comment) return;
 
     const req =
       myComment ?
-        request(commentUrl(myComment.id), {method: 'PATCH', data: {comment: value}})
+        request(commentUrl(myComment.id), {method: 'PATCH', data: {comment}})
         :
         request(commentsUrl, {
           method: 'POST',
-          data: {application: application.id, criterion_group: group.id, comment: value}
+          data: {application: application.id, criterion_group: group.id, comment}
         });
 
+    this.savingComment = true;
     req.then((response: Response) => {
+      this.savingComment = false;
       if (response.status < 300) {
         this.setState({comment: '', editingComment: false});
         reloadApplication(application.id);
