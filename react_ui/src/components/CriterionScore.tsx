@@ -57,7 +57,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
           }
         </div>
       )}
-      {myOrgScore && !myScore && !addScore &&
+      {myOrgScore && !myScore && !addScore && !readOnly &&
       <a className="clickable text-success d-block" style={{marginLeft: -4}}
          onClick={() => this.setState({addScore: true})}>
         <Icon icon="add"/>
