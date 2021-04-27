@@ -9,6 +9,7 @@ services:
       - ./.env.prod
     volumes:
       - ./django_server:/app
+    restart: always
 
   react:
     build: ./react_ui
