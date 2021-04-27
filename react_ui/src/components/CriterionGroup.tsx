@@ -11,7 +11,8 @@ import Icon from "util_components/bootstrap/Icon";
 type CriterionGroupProps = {
   applicationRound: ApplicationRound,
   group: CriterionGroup,
-  application: Application
+  application: Application,
+  showScores?: boolean
 }
 
 type CriterionGroupState = {
@@ -29,7 +30,7 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
   savingComment = false;
 
   render() {
-    const {group, applicationRound, application} = this.props;
+    const {group, applicationRound, application, showScores} = this.props;
     const {comment, editingComment} = this.state;
     const {user} = this.context;
 
@@ -61,10 +62,11 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
         <h6 className="text-secondary">{group.name}</h6>}
       {subGroups.map(childGroup =>
         <CriterionGroupComponent key={childGroup.name} group={childGroup} applicationRound={applicationRound}
-                                 application={application}/>
+                                 application={application} showScores={showScores}/>
       )}
       {groupCriteria.map(criterion =>
-        <CriterionScore key={criterion.name} criterion={criterion} application={application} readOnly={submitted}/>
+        <CriterionScore key={criterion.name} criterion={criterion} application={application}
+                        readOnly={submitted} showScores={showScores}/>
       )}
 
       {comments.length > 0 &&

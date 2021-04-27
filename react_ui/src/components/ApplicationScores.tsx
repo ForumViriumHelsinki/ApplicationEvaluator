@@ -14,7 +14,8 @@ import ApplicationScoresTable from "components/ApplicationScoresTable";
 type ApplicationScoresProps = {
   application: Application,
   applicationRound: ApplicationRound,
-  showEvaluators: boolean
+  showEvaluators: boolean,
+  showScores: boolean
 }
 
 type ApplicationScoresState = {
@@ -30,7 +31,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   endHighlight: any = null;
 
   render() {
-    const {application, applicationRound, showEvaluators} = this.props;
+    const {application, applicationRound, showEvaluators, showScores} = this.props;
     const {expanded, highlightOrganization} = this.state;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
@@ -107,7 +108,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
         }
         {rootGroups.map(group =>
           <CriterionGroupComponent applicationRound={applicationRound} application={application}
-                                   group={group} key={group.name}/>
+                                   group={group} key={group.name} showScores={showScores}/>
         )}
         <div className="m-2">
           <button className="btn btn-block btn-secondary"

@@ -16,12 +16,14 @@ type AppOrder = 'name' | 'score' | 'unevaluated';
 type ApplicationRoundCardState = {
   order: AppOrder,
   showEvaluators: boolean,
+  showScores: boolean,
   expanded?: boolean
 }
 
 const initialState: ApplicationRoundCardState = {
   order: 'name',
-  showEvaluators: true
+  showEvaluators: true,
+  showScores: true,
 };
 
 export default class ApplicationRoundCard extends React.Component<ApplicationRoundCardProps, ApplicationRoundCardState> {
@@ -31,7 +33,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
   render() {
     const {applicationRound} = this.props;
     const {user} = this.context;
-    const {showEvaluators, expanded} = this.state;
+    const {showEvaluators, expanded, showScores} = this.state;
     const scoredApps = applicationRound.applications.filter(a => a.scored);
     const submitted = applicationRound.submitted_organizations.includes(user.organization);
 
@@ -86,12 +88,17 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
             <label className="form-check-label">Show evaluators</label>
           </div>
+          <div className="form-check d-inline-block mr-3"
+               onClick={() => this.setState({showScores: !showScores})}>
+            <input className="form-check-input" type="checkbox" checked={showScores}/>
+            <label className="form-check-label">Show scores from other evaluators</label>
+          </div>
         </div>
         }
       </div>
       {expanded && this.getApplications().map(app =>
         <ApplicationScores application={app} applicationRound={applicationRound}
-                           key={app.name} showEvaluators={showEvaluators}/>
+                           key={app.name} showEvaluators={showEvaluators} showScores={showScores}/>
       )}
     </div>;
   }

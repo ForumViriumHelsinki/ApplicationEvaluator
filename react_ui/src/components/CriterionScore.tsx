@@ -9,7 +9,8 @@ import {username} from "components/utils";
 type CriterionScoreProps = {
   criterion: Criterion,
   application: Application,
-  readOnly?: boolean
+  readOnly?: boolean,
+  showScores?: boolean
 }
 
 type CriterionScoreState = {
@@ -25,7 +26,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
   static contextType = AppContext;
 
   render() {
-    const {criterion, application, readOnly} = this.props;
+    const {criterion, application, readOnly, showScores} = this.props;
     const {changed, addScore, error} = this.state;
     const {user} = this.context;
 
@@ -48,7 +49,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
 
       {scores.map((score: Score) =>
         <div key={score.id}>
-          <strong>{score.score}</strong> (by {username(score.evaluator)})
+          <strong>{(showScores || (score.evaluator.id == user.id)) ? score.score : '?'}</strong> (by {username(score.evaluator)})
           {score.evaluator.id == user.id && !readOnly &&
           <ConfirmButton className="btn-light btn-sm text-danger p-1 btn-trans" confirm="Delete score?"
                          onClick={this.deleteScore}>
