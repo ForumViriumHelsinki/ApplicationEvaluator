@@ -98,6 +98,9 @@ class ApplicationRound(NamedModel):
         else:
             raise ValueError('Scores not completed, submittal not allowed.')
 
+    def organization_has_submitted(self, organization):
+        return organization.id in [o.id for o in self.submitted_organizations.all()]
+
 
 def upload_round_attachment_to(instance, filename):
     return f'application_round_attachments/{secrets.token_hex(32)}/{filename}'
