@@ -122,6 +122,9 @@ class CriterionGroup(NamedModel):
     order = models.IntegerField(default=0)
     threshold = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        ordering = ['application_round_id', 'order']
+
 
 class Criterion(NamedModel):
     """
@@ -132,6 +135,9 @@ class Criterion(NamedModel):
     public = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     weight = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ['group_id', 'order']
 
 
 class Organization(NamedModel):
