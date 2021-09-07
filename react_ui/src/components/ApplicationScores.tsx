@@ -79,7 +79,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
                 <br/>
                 Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
               </>
-              : <><strong>{(application.score * 10).toPrecision(2)}/100</strong> overall score.</>
+              : <><strong>{(application.score * 10).toPrecision(3)}/100</strong> overall score.</>
             : <>No scores given.</>
           }
         </div>
