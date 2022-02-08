@@ -35,6 +35,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
     const {user} = this.context;
     const {showEvaluators, expanded, showScores} = this.state;
     const scoredApps = applicationRound.applications.filter(a => a.scored);
+    const partialApps = applicationRound.applications.filter(a => a.scores.length > 0);
     const submitted = applicationRound.submitted_organizations.includes(user.organization);
 
     const OrderBtn = ({order, label}: { order: AppOrder, label: string }) =>
@@ -68,10 +69,19 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         </div>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
-        {!submitted && scoredApps.length == applicationRound.applications.length &&
-        <ConfirmButton onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"
-                       confirm={`Submit all ${applicationRound.name} scores for ${user.organization}? 
-                                   Scores cannot be changed after submitting.`}>
+        {!submitted && partialApps.length == applicationRound.applications.length &&
+        <ConfirmButton
+          onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"
+          confirm={<>
+            Submit all {applicationRound.name} scores for {user.organization}?
+            Scores cannot be changed after submitting.
+            <div className="mt-2">
+              {scoredApps.length}/{applicationRound.applications.length} applications completely evaluated
+              {scoredApps.length < applicationRound.applications.length &&
+              <>, {partialApps.length - scoredApps.length} partially.</>}
+            </div>
+          </>}
+        >
           <Icon icon="lock"/> Submit scores for {user.organization}
         </ConfirmButton>
         }

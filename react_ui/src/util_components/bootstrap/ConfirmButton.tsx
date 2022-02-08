@@ -4,7 +4,7 @@ import Confirm from "util_components/bootstrap/Confirm";
 type ButtonProps = {
   onClick: () => any,
   children: any,
-  confirm?: string,
+  confirm?: any,
   className: string
 };
 

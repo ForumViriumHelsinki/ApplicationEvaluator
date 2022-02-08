@@ -84,11 +84,10 @@ class ApplicationRound(NamedModel):
                                  public=criterion.public, order=criterion.order, weight=criterion.weight)
 
     def organization_scores_completed(self, organization):
-        scores = self.scores_for_organization(organization).count()
         applications = self.applications.filter(evaluating_organizations=organization).count()
-        criteria = self.criteria.filter(public=True).count()
+        scored = self.applications.filter(scores__evaluator__organizations=organization).distinct().count()
 
-        return scores >= applications * criteria
+        return scored >= applications
 
     def scores_for_organization(self, organization):
         return self.scores().filter(evaluator__organizations=organization)
