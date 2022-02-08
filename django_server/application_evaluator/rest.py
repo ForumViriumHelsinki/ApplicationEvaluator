@@ -77,7 +77,7 @@ class ApplicationSerializer(ModelSerializer):
 
     class Meta:
         model = models.Application
-        fields = ['name', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments']
+        fields = ['name', 'description', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments']
 
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data

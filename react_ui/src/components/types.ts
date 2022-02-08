@@ -37,6 +37,7 @@ export type Attachment = {
 export type Application = {
     id: number,
     name: string,
+    description: string,
     scores: Score[],
     comments: Comment[],
     attachments: Attachment[],

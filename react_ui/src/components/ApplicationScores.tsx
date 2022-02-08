@@ -9,6 +9,7 @@ import {AppContext, Application, ApplicationRound} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
 import {organizationColor, slug, username} from "components/utils";
 import ApplicationScoresTable from "components/ApplicationScoresTable";
+import ReactMarkdown from "react-markdown";
 
 
 type ApplicationScoresProps = {
@@ -96,6 +97,9 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
       {expanded &&
       <Modal onClose={() => this.setState({expanded: false})} title={application.name}>
+        {application.description &&
+        <ReactMarkdown linkTarget="_blank" className="m-2">{application.description}</ReactMarkdown>
+        }
         {application.attachments.length > 0 &&
         <div className="m-2">
           <h5 className="text-primary">Application attachments</h5>

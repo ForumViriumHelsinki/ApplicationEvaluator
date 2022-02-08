@@ -31,6 +31,13 @@ class NamedModel(Model):
         abstract = True
 
 
+def description_field():
+    return models.TextField(blank=True, help_text=mark_safe(
+        'Content that will be shown to the evaluators in the public UI. May use ' +
+        '<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown</a>' +
+        ' for e.g. links and formatting.'))
+
+
 class ApplicationRound(NamedModel):
     """
     Application round (e.g. request for tenders/quotes).
@@ -41,10 +48,7 @@ class ApplicationRound(NamedModel):
         'Organization', through='ApplicationRoundSubmittal', related_name='submitted_application_rounds',
         blank=True)
     published = models.BooleanField(default=False)
-    description = models.TextField(blank=True, help_text=mark_safe(
-        'Content that will be shown to the evaluators in the public UI. May use ' +
-        '<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markdown</a>' +
-        ' for e.g. links and formatting.'))
+    description = description_field()
 
     def total_weight(self):
         """
@@ -157,6 +161,7 @@ User.organization = property(organization)
 class Application(NamedModel):
     application_round = models.ForeignKey(ApplicationRound, related_name='applications', on_delete=models.CASCADE)
     evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate')
+    description = description_field()
 
     def score(self):
         total = 0
