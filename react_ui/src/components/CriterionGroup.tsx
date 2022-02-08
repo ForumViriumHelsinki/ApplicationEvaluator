@@ -8,6 +8,8 @@ import {username} from "components/utils";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import Icon from "util_components/bootstrap/Icon";
 
+const commentLength = 1500;
+
 type CriterionGroupProps = {
   applicationRound: ApplicationRound,
   group: CriterionGroup,
@@ -46,11 +48,11 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
 
     const editCommentField = () =>
       <>
-        <textarea className="form-control" rows={3} onBlur={this.saveComment} maxLength={500}
+        <textarea className="form-control" rows={3} onBlur={this.saveComment} maxLength={commentLength}
                   value={comment} autoFocus={editingComment}
                   onChange={(e) => this.setState({comment: e.target.value})}/>
         <small className="text-black-50">
-          500 characters max{comment.length > 0 && <>, {500 - comment.length} left.</>}
+          {commentLength} characters max{comment.length > 0 && <>, {commentLength - comment.length} left.</>}
         </small>
         {comment.length > 0 &&
         <button className="btn btn-sm btn-outline-primary btn-block mt-1">Save</button>
