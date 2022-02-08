@@ -56,16 +56,16 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             </span>
           }
         </div>
+        {applicationRound.description &&
+        <ReactMarkdown linkTarget="_blank">{applicationRound.description}</ReactMarkdown>
+        }
         {applicationRound.attachments.length > 0 &&
-        <div>
+        <div className="mt-2">
           Documents:
           {applicationRound.attachments.map(({attachment, name}) =>
             <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
           )}
         </div>
-        }
-        {applicationRound.description &&
-        <ReactMarkdown linkTarget="_blank" className="mt-2">{applicationRound.description}</ReactMarkdown>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
         {!submitted && scoredApps.length == applicationRound.applications.length &&
