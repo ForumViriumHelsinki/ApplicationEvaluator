@@ -10,6 +10,7 @@ import Modal from "util_components/bootstrap/Modal";
 import {organizationColor, slug, username} from "components/utils";
 import ApplicationScoresTable from "components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
+import ExportScoresWidget from "components/ExportScoresWidget";
 
 
 type ApplicationScoresProps = {
@@ -42,6 +43,8 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const organizations = Object.keys(application.scoresByOrganization);
     const showOrganizations = showEvaluators && organizations.length > 1;
     const showPlot = showOrganizations && thresholdGroups.length > 1;
+
+    const applicationAsRound = {...applicationRound, name: application.name, applications: [application]};
 
     return <div className={`mt-4 pb-4 app-${application.id}`}>
       <div className="d-flex">
@@ -110,6 +113,8 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           </div>
         </div>
         }
+        {application.scores.length > 0 &&
+        <div className="m-2"><ExportScoresWidget applicationRound={applicationAsRound}/></div>}
         {rootGroups.map(group =>
           <CriterionGroupComponent applicationRound={applicationRound} application={application}
                                    group={group} key={group.name} showScores={showScores}/>

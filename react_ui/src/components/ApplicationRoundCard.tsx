@@ -6,6 +6,7 @@ import Icon from "util_components/bootstrap/Icon";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import sessionRequest from "sessionRequest";
 import {submitApplicationRoundUrl} from "urls";
+import ExportScoresWidget from "components/ExportScoresWidget";
 
 type ApplicationRoundCardProps = {
   applicationRound: ApplicationRound
@@ -45,7 +46,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
       </>;
 
     return <div className="container mt-4 mb-3 rounded trans-bg pl-0 pr-0 pt-4 pb-4">
-      <div className="pl-4 pr-4 z-1">
+      <div className="pl-4 pr-4">
         <div>
           <h3 className="clickable text-primary d-inline"
               onClick={() => this.setState({expanded: !expanded})}>
@@ -69,6 +70,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         </div>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
+        {scoredApps.length > 0 && <ExportScoresWidget {...{applicationRound}} />}
         {!submitted && partialApps.length == applicationRound.applications.length &&
         <ConfirmButton
           onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"

@@ -27,7 +27,8 @@
     "react-svg-radar-chart": "^1.2.0",
     "reactstrap": "^8.9.0",
     "sass": "^1.23.7",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "xlsx": "^0.18.0"
   },
   "browserslist": {
     "production": [
