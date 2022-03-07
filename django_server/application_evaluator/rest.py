@@ -82,8 +82,12 @@ class ApplicationSerializer(ModelSerializer):
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
 
-    def get_comments(self, application):
-        return CommentSerializer(application.comments_for_evaluator(self.user()), many=True).data
+    def get_comments(self, application, show_all=True):
+        if show_all:
+            comments = application.comments.all()
+        else:
+            comments = application.comments_for_evaluator(self.user())
+        return CommentSerializer(comments, many=True).data
 
 
 class ApplicationRoundAttachmentSerializer(ModelSerializer):
