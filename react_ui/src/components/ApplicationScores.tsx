@@ -66,7 +66,12 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
         <div className={`flex-grow-1 flex-shrink-1 ${thresholdGroups.length < 2 ? 'ml-4' : ''}`}>
           <a onClick={() => this.setState({expanded: !this.state.expanded})}>
-            <h5 className="text-primary mb-1">{application.name}</h5>
+            <h5 className="text-primary mb-1">
+              {application.name}
+              <button className="btn btn-outline-primary btn-sm float-right mr-4">
+                {expanded ? 'Hide' : 'Show'} scores
+              </button>
+            </h5>
           </a>
           {showEvaluators &&
           <div className="mb-1">

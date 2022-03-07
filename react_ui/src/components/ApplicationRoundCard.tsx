@@ -50,10 +50,13 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         <div>
           <h3 className="clickable text-primary d-inline"
               onClick={() => this.setState({expanded: !expanded})}>
-            {applicationRound.name}
+            <span className="mr-2">{applicationRound.name}</span>
+            <button className="btn btn-outline-primary btn-sm float-right">
+              {expanded ? 'Hide' : 'Show'} applications
+            </button>
           </h3>
           {submitted &&
-          <span className="badge badge-pill badge-success ml-2 small align-text-bottom">
+          <span className="badge badge-pill badge-success small align-text-bottom">
               <Icon icon="done" className="font-size-base"/> Submitted
             </span>
           }
@@ -71,7 +74,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
         {scoredApps.length > 0 && <ExportScoresWidget {...{applicationRound}} />}
-        {!submitted && partialApps.length == applicationRound.applications.length &&
+        {expanded && !submitted && partialApps.length == applicationRound.applications.length &&
         <ConfirmButton
           onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"
           confirm={<>
