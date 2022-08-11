@@ -28,7 +28,7 @@ Possible next steps include improvements to the application round definition int
 
 ## Architecture and development
 
-The application is based on a Django ReST Framework-based backend and a React/TypeScript/Bootstrap frontend.
+The application is based on a Django ReST Framework-based backend and a React/TypeScript/Bootstrap frontend. If you are interested in taking the tool into use and / or developing it further, feel free to contact johan.lindqvist(at)forumvirium.fi.
 
 To start UI development:
 
