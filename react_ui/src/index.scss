@@ -9,10 +9,8 @@ $gray-500: #adb5bd;
 $gray-600: #6c757d;
 $gray-700: #495057;
 $gray-800: #343a40;
-// $gray-900: #212529;
-// $black:    #000;
-$gray-900: #1b2c41;
-$black: #1b2c41;
+$gray-900: #212529;
+$black: #000;
 
 $blue: #007bff;
 $indigo: #6610f2;
@@ -20,11 +18,16 @@ $purple: #6f42c1;
 $pink: #e83e8c;
 $red: #d70074;
 $orange: #FF5000;
-// $yellow:  #Ffd650;
-$yellow: #f9b122;
+$yellow: #Ffd650;
 $green: #28a745;
 $teal: #009E92;
 $cyan: #00a4cc;
+
+// Override with CommuniCity colors:
+$blue: #5438e0;
+$cyan: #59c4ce;
+$red: #ff3915;
+$yellow: #ffc93e;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $colors: (
@@ -43,10 +46,8 @@ $colors: (
         "gray-dark": $gray-800
 );
 
-// $primary:       $orange;
-// $secondary:     $teal;
-$primary: $yellow;
-$secondary: $yellow;
+$primary: $orange;
+$secondary: $teal;
 $success: $green;
 $info: $cyan;
 $warning: $yellow;
@@ -54,16 +55,20 @@ $danger: $red;
 $light: $white;
 $dark: $black;
 
+// Override with CommuniCity colors:
+$primary: $blue;
+
+
 // stylelint-disable-next-line scss/dollar-variable-default
 $theme-colors: (
         "primary": $primary,
-    "secondary":  $secondary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger,
-    "light":      $light,
-    "dark":       $dark
+        "secondary": $secondary,
+        "success": $success,
+        "info": $info,
+        "warning": $warning,
+        "danger": $danger,
+        "light": $light,
+        "dark": $dark
 );
 
 @import "../node_modules/bootstrap/scss/bootstrap";
@@ -93,9 +98,7 @@ button.nav-link:focus {
 }
 
 body {
-  background-image: url("/images/Blue_road_Jussi_Hellsten.jpg");
-  background-attachment: fixed;
-  background-size: cover;
+  background-color: $yellow;
 }
 
 .trans-bg {
@@ -129,4 +132,8 @@ body {
 
 .org-shape {
   transition: opacity 1s;
+}
+
+.navbar {
+  border-bottom: 6px solid white;
 }
