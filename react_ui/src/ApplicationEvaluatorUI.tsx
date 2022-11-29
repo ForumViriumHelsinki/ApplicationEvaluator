@@ -82,9 +82,6 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
         <h5 className="m-2">FVH Application Evaluator</h5>
       </NavBar>
       <ApplicationRounds user={user as User} request={this.request}/>
-      <p className="text-white text-center">
-        Background: Selkämerenpuisto park, Helsinki. (c) City of Helsinki, photo by Jussi Hellsten
-      </p>
       {showLogout &&
       <Confirm title="Log out?"
                onClose={() => this.setState({showLogout: false})}
