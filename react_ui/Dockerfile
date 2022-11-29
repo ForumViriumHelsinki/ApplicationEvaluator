@@ -5,7 +5,7 @@
 # these are what will be served by nginx
 # use alias build to be easier to refer this container elsewhere
 # e.g inside nginx container
-FROM node:13
+FROM node:16
 # set working directory
 # this is the working folder in the container
 # from which the app will be running from
