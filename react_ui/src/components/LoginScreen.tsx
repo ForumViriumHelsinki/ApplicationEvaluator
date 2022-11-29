@@ -21,8 +21,8 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
 
     return (
       <div className="container mt-5 rounded trans-bg p-0">
-        <div className="text-center p-4 bg-dark">
-          <img className="w-50" src="images/PNG_AI4CITIES_Logo.png" alt="logo"/>
+        <div className="text-center p-4 bg-primary">
+          <img className="w-50" src="images/CommuniCity-logo-blue.png" alt="logo"/>
         </div>
         <div className="p-4">
           <div className="text-center">
