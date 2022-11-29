@@ -1,5 +1,5 @@
 import React from 'react';
-import {Application, ApplicationRound, Comment, Criterion, Score} from "components/types";
+import {Application, ApplicationRound, Comment, Criterion, Score} from "/components/types";
 import XLSX from 'xlsx';
 
 type ExportScoresWidgetProps = {

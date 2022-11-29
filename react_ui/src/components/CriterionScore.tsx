@@ -1,10 +1,10 @@
 import React, {FocusEvent} from 'react';
 
-import {AppContext, Application, Criterion, Score} from "components/types";
-import Icon from "util_components/bootstrap/Icon";
-import ConfirmButton from "util_components/bootstrap/ConfirmButton";
-import {scoresUrl, scoreUrl} from "urls";
-import {username} from "components/utils";
+import {AppContext, Application, Criterion, Score} from "/components/types";
+import Icon from "/util_components/bootstrap/Icon";
+import ConfirmButton from "/util_components/bootstrap/ConfirmButton";
+import {scoresUrl, scoreUrl} from "/urls";
+import {username} from "/components/utils";
 
 type CriterionScoreProps = {
   criterion: Criterion,

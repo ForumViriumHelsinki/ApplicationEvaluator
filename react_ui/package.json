@@ -4,10 +4,8 @@
   "private": true,
   "description": "UI for the FVH Application Evaluator application",
   "scripts": {
-    "start": "react-scripts start --no-cache",
-    "build": "react-scripts build",
-    "test": "react-scripts test --no-cache",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build"
   },
   "author": "Forum Virium Helsinki",
   "dependencies": {
@@ -16,6 +14,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@types/lodash": "^4.14.168",
+    "@vitejs/plugin-react": "^1.1.1",
     "bootstrap": "^4.4.1",
     "moment": "^2.29.1",
     "react": "^16.12.0",
@@ -28,6 +27,7 @@
     "reactstrap": "^8.9.0",
     "sass": "^1.23.7",
     "typescript": "^3.7.4",
+    "vite": "^2.7.0",
     "xlsx": "^0.18.0"
   },
   "browserslist": {

@@ -1,12 +1,12 @@
 import React, {FocusEvent} from 'react';
 import moment from "moment";
 
-import {AppContext, Application, ApplicationRound, CriterionGroup} from "components/types";
-import CriterionScore from "components/CriterionScore";
-import {commentsUrl, commentUrl} from "urls";
-import {username} from "components/utils";
-import ConfirmButton from "util_components/bootstrap/ConfirmButton";
-import Icon from "util_components/bootstrap/Icon";
+import {AppContext, Application, ApplicationRound, CriterionGroup} from "/components/types";
+import CriterionScore from "/components/CriterionScore";
+import {commentsUrl, commentUrl} from "/urls";
+import {username} from "/components/utils";
+import ConfirmButton from "/util_components/bootstrap/ConfirmButton";
+import Icon from "/util_components/bootstrap/Icon";
 
 const commentLength = 1500;
 

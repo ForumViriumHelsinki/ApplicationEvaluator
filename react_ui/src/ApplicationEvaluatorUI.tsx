@@ -2,15 +2,15 @@ import React from 'react';
 // @ts-ignore
 import {HashRouter as Router, Route, Switch, useParams, Redirect} from "react-router-dom";
 
-import sessionRequest, {logout} from "sessionRequest";
+import sessionRequest, {logout} from "/sessionRequest";
 
-import LoginScreen from 'components/LoginScreen';
-import LoadScreen from "components/LoadScreen";
-import {User} from "components/types";
-import ResetPasswordScreen from "components/ResetPasswordScreen";
-import NavBar from "util_components/bootstrap/NavBar";
-import Confirm from "util_components/bootstrap/Confirm";
-import ApplicationRounds from "components/ApplicationRounds";
+import LoginScreen from '/components/LoginScreen';
+import LoadScreen from "/components/LoadScreen";
+import {User} from "/components/types";
+import ResetPasswordScreen from "/components/ResetPasswordScreen";
+import NavBar from "/util_components/bootstrap/NavBar";
+import Confirm from "/util_components/bootstrap/Confirm";
+import ApplicationRounds from "/components/ApplicationRounds";
 
 type UIState = {
   user?: User,

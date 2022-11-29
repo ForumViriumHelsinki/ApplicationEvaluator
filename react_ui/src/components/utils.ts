@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "components/types";
+import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "/components/types";
 
 const sum = (lst: number[]) => lst.reduce((a, b) => a + b, 0);
 

@@ -4,13 +4,13 @@ import _ from 'lodash';
 import RadarChart from 'react-svg-radar-chart';
 import 'react-svg-radar-chart/build/css/index.css'
 
-import CriterionGroupComponent from "components/CriterionGroup";
-import {AppContext, Application, ApplicationRound} from "components/types";
-import Modal from "util_components/bootstrap/Modal";
-import {organizationColor, slug, username} from "components/utils";
-import ApplicationScoresTable from "components/ApplicationScoresTable";
+import CriterionGroupComponent from "/components/CriterionGroup";
+import {AppContext, Application, ApplicationRound} from "/components/types";
+import Modal from "/util_components/bootstrap/Modal";
+import {organizationColor, slug, username} from "/components/utils";
+import ApplicationScoresTable from "/components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
-import ExportScoresWidget from "components/ExportScoresWidget";
+import ExportScoresWidget from "/components/ExportScoresWidget";
 
 
 type ApplicationScoresProps = {

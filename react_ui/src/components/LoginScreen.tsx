@@ -1,7 +1,7 @@
 import React from 'react';
-import {loginUrl, registerUrl, passwordResetUrl} from "urls";
-import LoginForm from "util_components/account/LoginForm";
-import Terms from "components/Terms";
+import {loginUrl, registerUrl, passwordResetUrl} from "/urls";
+import LoginForm from "/util_components/account/LoginForm";
+import Terms from "/components/Terms";
 
 type func = () => any;
 

@@ -1,6 +1,6 @@
 import React, {FormEvent} from 'react';
-import sessionRequest, {login, logout} from "sessionRequest";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
+import sessionRequest, {login, logout} from "/sessionRequest";
+import ErrorAlert from "/util_components/bootstrap/ErrorAlert";
 
 type Props = {
   changePasswordUrl: string,

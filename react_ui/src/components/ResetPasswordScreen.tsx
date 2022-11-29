@@ -1,15 +1,14 @@
 import React from 'react';
-import Terms from "components/Terms";
-import ResetPasswordForm from "util_components/account/ResetPasswordForm";
-import {changePasswordUrl} from "urls";
+import Terms from "/components/Terms";
+import ResetPasswordForm from "/util_components/account/ResetPasswordForm";
+import {changePasswordUrl} from "/urls";
 
 type ResetPasswordScreenProps = {
   uid: string,
   token: string
 };
 
-type ResetPasswordScreenState = {
-};
+type ResetPasswordScreenState = {};
 
 export default class ResetPasswordScreen extends React.Component<ResetPasswordScreenProps, ResetPasswordScreenState> {
   state: ResetPasswordScreenState = {

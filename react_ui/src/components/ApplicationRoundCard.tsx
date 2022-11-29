@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown'
-import {AppContext, ApplicationRound} from "components/types";
-import ApplicationScores from "components/ApplicationScores";
-import Icon from "util_components/bootstrap/Icon";
-import ConfirmButton from "util_components/bootstrap/ConfirmButton";
-import sessionRequest from "sessionRequest";
-import {submitApplicationRoundUrl} from "urls";
-import ExportScoresWidget from "components/ExportScoresWidget";
+import {AppContext, ApplicationRound} from "/components/types";
+import ApplicationScores from "/components/ApplicationScores";
+import Icon from "/util_components/bootstrap/Icon";
+import ConfirmButton from "/util_components/bootstrap/ConfirmButton";
+import sessionRequest from "/sessionRequest";
+import {submitApplicationRoundUrl} from "/urls";
+import ExportScoresWidget from "/components/ExportScoresWidget";
 
 type ApplicationRoundCardProps = {
   applicationRound: ApplicationRound

@@ -1,6 +1,6 @@
 import React from 'react';
-import {Application, ApplicationRound, CriterionGroup} from "components/types";
-import {organizationColor} from "components/utils";
+import {Application, ApplicationRound, CriterionGroup} from "/components/types";
+import {organizationColor} from "/components/utils";
 
 type ApplicationScoresTableProps = {
   application: Application,

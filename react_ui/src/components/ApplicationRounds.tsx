@@ -1,8 +1,8 @@
 import React from 'react';
-import {applicationRoundsUrl, applicationUrl} from "urls";
-import {AppContext, ApplicationRound, User} from "components/types";
-import {addApplicationScores, addScores} from "components/utils";
-import ApplicationRoundCard from "components/ApplicationRoundCard";
+import {applicationRoundsUrl, applicationUrl} from "/urls";
+import {AppContext, ApplicationRound, User} from "/components/types";
+import {addApplicationScores, addScores} from "/components/utils";
+import ApplicationRoundCard from "/components/ApplicationRoundCard";
 
 type ApplicationRoundsProps = {
   user: User,
