@@ -12,5 +12,5 @@ FROM node:16
 WORKDIR /app
 # add the node_modules folder to $PATH
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json tsconfig.json yarn.lock /app/
+COPY package.json tsconfig.json yarn.lock vite.config.js /app/
 RUN yarn install --network-timeout=30000
