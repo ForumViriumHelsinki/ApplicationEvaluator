@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ai4cities.fvh.io']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ai4cities.fvh.io', 'evaluator.fvh.io']
 
 
 # Application definition
