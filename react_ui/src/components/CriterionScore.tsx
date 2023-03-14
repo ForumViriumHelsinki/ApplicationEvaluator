@@ -5,6 +5,7 @@ import Icon from "/util_components/bootstrap/Icon";
 import ConfirmButton from "/util_components/bootstrap/ConfirmButton";
 import {scoresUrl, scoreUrl} from "/urls";
 import {username} from "/components/utils";
+import settings from "/settings";
 
 type CriterionScoreProps = {
   criterion: Criterion,
@@ -40,7 +41,8 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
       {criterion.name}:{' '}
       {!myScore && !readOnly && (!myOrgScore || addScore) &&
       <div className="form-inline">
-        <input type="number" min="0" max="10" className={`form-control form-control-sm ${error ? 'is-invalid' : ''}`}
+        <input type="number" min="0" max={settings.maxScore}
+               className={`form-control form-control-sm ${error ? 'is-invalid' : ''}`}
                onBlur={this.saveScore}
                onChange={() => this.setState({changed: true})}/>{' '}
         {changed && <button className="btn btn-sm btn-outline-primary ml-2">Save</button>}
@@ -71,7 +73,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
     const {application, criterion} = this.props;
     const {reloadApplication, request} = this.context;
     const value = Number(e.target.value);
-    if (!e.target.value || value > 10 || value < 0) return this.setState({error: true});
+    if (!e.target.value || value > settings.maxScore || value < 0) return this.setState({error: true});
     else this.setState({error: false});
     const data = {application: application.id, criterion: criterion.id, score: value};
     request(scoresUrl, {method: 'POST', data}).then((response: Response) => {
