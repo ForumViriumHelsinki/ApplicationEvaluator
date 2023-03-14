@@ -1,5 +1,6 @@
 {
   "serverRoot": "http://localhost:8000",
   "maxScore": 5,
-  "finalScoreMultiplier": 4
+  "finalScoreMultiplier": 4,
+  "showScoresFromOtherUsers": false
 }

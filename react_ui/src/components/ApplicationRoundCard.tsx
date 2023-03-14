@@ -7,6 +7,7 @@ import ConfirmButton from "/util_components/bootstrap/ConfirmButton";
 import sessionRequest from "/sessionRequest";
 import {submitApplicationRoundUrl} from "/urls";
 import ExportScoresWidget from "/components/ExportScoresWidget";
+import settings from "/settings";
 
 type ApplicationRoundCardProps = {
   applicationRound: ApplicationRound
@@ -24,7 +25,7 @@ type ApplicationRoundCardState = {
 const initialState: ApplicationRoundCardState = {
   order: 'name',
   showEvaluators: true,
-  showScores: true,
+  showScores: settings.showScoresFromOtherUsers,
 };
 
 export default class ApplicationRoundCard extends React.Component<ApplicationRoundCardProps, ApplicationRoundCardState> {
@@ -103,11 +104,13 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
             <label className="form-check-label">Show evaluators</label>
           </div>
-          <div className="form-check d-inline-block mr-3"
-               onClick={() => this.setState({showScores: !showScores})}>
-            <input className="form-check-input" type="checkbox" checked={showScores}/>
-            <label className="form-check-label">Show scores from other evaluators</label>
-          </div>
+          {settings.showScoresFromOtherUsers &&
+            <div className="form-check d-inline-block mr-3"
+                 onClick={() => this.setState({showScores: !showScores})}>
+              <input className="form-check-input" type="checkbox" checked={showScores}/>
+              <label className="form-check-label">Show scores from other evaluators</label>
+            </div>
+          }
         </div>
         }
       </div>
