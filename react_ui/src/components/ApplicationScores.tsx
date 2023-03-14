@@ -11,6 +11,7 @@ import {organizationColor, slug, username} from "/components/utils";
 import ApplicationScoresTable from "/components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
 import ExportScoresWidget from "/components/ExportScoresWidget";
+import settings from "/settings";
 
 
 type ApplicationScoresProps = {
@@ -46,13 +47,16 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
     const applicationAsRound = {...applicationRound, name: application.name, applications: [application]};
 
+    const totalScore = application.score && (application.score * settings.finalScoreMultiplier).toPrecision(3);
+    const maxScore = settings.maxScore * settings.finalScoreMultiplier;
+
     return <div className={`mt-4 pb-4 app-${application.id}`}>
       <div className="d-flex">
         {highlightOrganization &&
-        <style>
-          .app-{application.id} .org-shape {'{opacity: 0.2; transition: opacity 100ms;}'}
-          .app-{application.id} .org-shape-{slug(highlightOrganization)} {'{opacity: 1}'}
-        </style>
+          <style>
+            .app-{application.id} .org-shape {'{opacity: 0.2; transition: opacity 100ms;}'}
+            .app-{application.id} .org-shape-{slug(highlightOrganization)} {'{opacity: 1}'}
+          </style>
         }
         {thresholdGroups.length > 1 &&
         <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
@@ -83,12 +87,12 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           }
           {application.score != null ?
             showEvaluators ? <>
-                <strong>{(application.score * 10).toPrecision(3)}/100</strong>{' '}
+                <strong>{totalScore}/{maxScore}</strong>{' '}
                 overall from {application.scores.length} scores for {scoredCriteria.length} criteria.
                 <br/>
                 Evaluated by {_.uniq(application.scores.map(s => username(s.evaluator))).join(', ')}.
               </>
-              : <><strong>{(application.score * 10).toPrecision(3)}/100</strong> overall score.</>
+              : <><strong>{totalScore}/{maxScore}</strong> overall score.</>
             : <>No scores given.</>
           }
         </div>
