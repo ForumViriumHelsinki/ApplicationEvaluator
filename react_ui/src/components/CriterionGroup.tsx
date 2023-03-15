@@ -98,7 +98,7 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
       }
 
       {showNewComment && <div className="mt-3 ml-2">
-        {group.abbr || group.name} - Reasoning and conclusions:
+        {group.name || group.abbr} - Reasoning and conclusions:
         {editCommentField()}
       </div>}
     </div>;

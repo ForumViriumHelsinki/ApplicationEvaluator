@@ -108,30 +108,33 @@ export default class ApplicationScores extends React.Component<ApplicationScores
       }
 
       {expanded &&
-      <Modal onClose={() => this.setState({expanded: false})} title={application.name}>
-        {application.description &&
-        <ReactMarkdown linkTarget="_blank" className="m-2">{application.description}</ReactMarkdown>
-        }
-        {application.attachments.length > 0 &&
-        <div className="m-2">
-          <h5 className="text-primary">Application attachments</h5>
-          <div className="ml-2">
-            {application.attachments.map(({attachment, name}) =>
-              <a href={attachment} target='_blank' className="d-block text-secondary" key={attachment}>{name}</a>
-            )}
-          </div>
-        </div>
-        }
-        {application.scores.length > 0 &&
-        <div className="m-2"><ExportScoresWidget applicationRound={applicationAsRound}/></div>}
-        {rootGroups.map(group =>
-          <CriterionGroupComponent applicationRound={applicationRound} application={application}
-                                   group={group} key={group.name} showScores={showScores}/>
-        )}
-        <div className="m-2">
-          <button className="btn btn-block btn-secondary"
-                  onClick={() => this.setState({expanded: false})}>Done
-          </button>
+        <Modal onClose={() => this.setState({expanded: false})} title={application.name} className="modal-lg">
+          {application.description && <>
+            <h3 className="p-2 bg-primary text-white">Application information</h3>
+            <ReactMarkdown linkTarget="_blank" className="m-2">{application.description}</ReactMarkdown>
+          </>}
+          {application.attachments.length > 0 &&
+            <div className="m-2">
+              <h5 className="text-primary">Application attachments</h5>
+              <div className="ml-2">
+                {application.attachments.map(({attachment, name}) =>
+                  <a href={attachment} target='_blank' className="d-block text-secondary" key={attachment}>{name}</a>
+                )}
+              </div>
+            </div>
+          }
+
+          <h3 className="mt-3 p-2 bg-primary text-white">Application evaluation</h3>
+          {application.scores.length > 0 &&
+            <div className="m-2"><ExportScoresWidget applicationRound={applicationAsRound}/></div>}
+          {rootGroups.map(group =>
+            <CriterionGroupComponent applicationRound={applicationRound} application={application}
+                                     group={group} key={group.name} showScores={showScores}/>
+          )}
+          <div className="m-2">
+            <button className="btn btn-block btn-secondary"
+                    onClick={() => this.setState({expanded: false})}>Done
+            </button>
         </div>
       </Modal>
       }
