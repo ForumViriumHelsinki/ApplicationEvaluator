@@ -78,6 +78,9 @@ class ApplicationImportInline(admin.TabularInline):
     readonly_fields = ['created_at', 'error', 'status']
     extra = 1
 
+    def has_change_permission(self, request, obj):
+        return False
+
 
 class ApplicationRoundSubmittalInline(admin.TabularInline):
     model = models.ApplicationRoundSubmittal
