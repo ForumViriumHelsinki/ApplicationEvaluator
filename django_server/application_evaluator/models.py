@@ -1,3 +1,4 @@
+import csv
 import secrets
 
 from django.contrib.auth.models import User
@@ -216,6 +217,8 @@ class EvaluationModel(TimestampedModel):
 
     @staticmethod
     def filter_for_evaluator(instances, user, application_round):
+        if not user:
+            return []
         submitted_organizations = application_round.submitted_organizations.all()
         submitted = user.organization in submitted_organizations
         if user.is_staff:
@@ -247,3 +250,47 @@ class ApplicationRoundSubmittal(Model):
     organization = models.ForeignKey(Organization, related_name='submittals', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='submittals', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ApplicationImport(Model):
+    application_round = models.ForeignKey(ApplicationRound, related_name='application_imports',
+                                          on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to='application_imports', max_length=256)
+    error = models.TextField(blank=True)
+    status = models.CharField(max_length=16, choices=(
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('error', 'Error'),
+        ('done', 'Done'),
+    ), default='pending')
+
+    application_name_column = 'Application Number'
+    ignore_columns = ['Applications', '\ufeffApplications']  # Extremely silly way to deal with encoding issue...
+
+    def save(self, **kwargs):
+        if self.file and (self.status == 'pending'):
+            self.status = 'processing'
+            super().save(**kwargs)
+            try:
+                self._process()
+            except Exception as e:
+                self.error = str(e)
+                self.status = 'error'
+            else:
+                self.status = 'done'
+        return super().save()
+
+    def _process(self):
+        with self.file.open('r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                name = row.pop(self.application_name_column)
+                for column in self.ignore_columns:
+                    row.pop(column, None)
+                description = '\n\n'.join([f'#### {k}\n\n{v}' for k, v in row.items()])
+                application = Application.objects.create(
+                    application_round=self.application_round,
+                    name=name,
+                    description=description,
+                )

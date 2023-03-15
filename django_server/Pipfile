@@ -17,10 +17,10 @@ jsonschema=">=3.2"
 psycopg2-binary = ">2.8"
 flake8 = ">=3.7"
 coverage=">=5.0"
-
 gunicorn=">=20.0"
 sentry-sdk=">=0.14.1"
 elastic-apm = ">=5.5"
+dj-inmemorystorage = "*"
 
 [requires]
 python_version = "3.7"

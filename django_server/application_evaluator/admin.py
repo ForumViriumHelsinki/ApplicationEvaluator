@@ -73,6 +73,12 @@ class RoundAttachmentInline(admin.TabularInline):
     extra = 0
 
 
+class ApplicationImportInline(admin.TabularInline):
+    model = models.ApplicationImport
+    readonly_fields = ['created_at', 'error', 'status']
+    extra = 1
+
+
 class ApplicationRoundSubmittalInline(admin.TabularInline):
     model = models.ApplicationRoundSubmittal
     extra = 0
@@ -80,7 +86,8 @@ class ApplicationRoundSubmittalInline(admin.TabularInline):
 
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [RoundAttachmentInline, ApplicationRoundSubmittalInline, CriterionGroupInline, CriterionInline]
+    inlines = [RoundAttachmentInline, ApplicationImportInline, ApplicationRoundSubmittalInline,
+               CriterionGroupInline, CriterionInline]
     list_display = ['name', 'applications_', 'scores_', 'published']
     actions = ['duplicate']
     form = ApplicationRoundForm

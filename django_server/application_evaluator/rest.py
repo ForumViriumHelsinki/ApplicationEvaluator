@@ -11,8 +11,10 @@ from application_evaluator import models
 
 class ModelSerializer(serializers.ModelSerializer):
     def user(self):
-        return self.context['request'].user
-
+        try:
+            return self.context['request'].user
+        except KeyError:
+            return None
 
 class CriterionSerializer(ModelSerializer):
     class Meta:
@@ -107,20 +109,33 @@ class ApplicationRoundSerializer(ModelSerializer):
         model = models.ApplicationRound
         exclude = ['published']
 
-    def get_applications(self, application_round):
+    def _get_applications(self, application_round):
         user = self.user()
-        applications = application_round \
-            .applications_for_evaluator(user) \
+        return application_round.applications_for_evaluator(user)
+
+    def get_applications(self, application_round):
+        applications = self._get_applications(application_round) \
             .prefetch_related(*ApplicationSerializer.prefetch_related) \
             .order_by('name')
         return ApplicationSerializer(applications, many=True, context=self.context).data
 
+    def _get_criteria(self, application_round):
+        if self.user().is_staff or application_round.organization_has_submitted(self.user().organization):
+            return application_round.criteria.all()
+        else:
+            return application_round.criteria.filter(public=True)
+
     def get_criteria(self, application_round):
-        criteria = application_round.criteria.all()
-        if not (self.user().is_staff or
-                application_round.organization_has_submitted(self.user().organization)):
-            criteria = criteria.filter(public=True)
+        criteria = self._get_criteria(application_round)
         return CriterionSerializer(criteria, many=True, context=self.context).data
+
+
+class UnfilteredApplicationRoundSerializer(ApplicationRoundSerializer):
+    def _get_applications(self, application_round):
+        return application_round.applications.all()
+
+    def _get_criteria(self, application_round):
+        return application_round.criteria.all()
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')

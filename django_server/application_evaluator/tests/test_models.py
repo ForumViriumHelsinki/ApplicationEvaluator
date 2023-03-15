@@ -44,3 +44,17 @@ class ModelTests(TestCase):
         # When the total score is requested
         # Then the scores for each separate criterion is averaged before the total weighed average is computed
         self.assertEqual(app.score(), (2 * 3.5 + 5) / 3)
+
+    def test_import_csv(self):
+        # Given an application round
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+
+        # And a CSV file containing applications exported from Salesforce
+        with open('application_evaluator/tests/applications.csv', encoding='utf-8-sig') as f:
+            csv_file = ContentFile(f.read(), 'applications.csv')
+
+        # When saving an ApplicationImport object with the CSV file in its file field
+        app_import = models.ApplicationImport.objects.create(application_round=app_round, file=csv_file)
+
+        # Then the applications are imported
+        self.assertEqual(app_round.applications.count(), 3)
