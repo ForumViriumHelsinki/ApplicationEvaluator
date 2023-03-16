@@ -147,8 +147,8 @@ class AttachmentInline(admin.TabularInline):
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline, ScoreInline]
-    list_display = ['name', 'organizations', 'score', 'scores_', 'attachments_']
-    list_filter = ['application_round', 'evaluating_organizations']
+    list_display = ['name', 'organizations', 'score', 'approved', 'scores_', 'attachments_']
+    list_filter = ['application_round', 'evaluating_organizations', 'approved']
 
     def get_actions(self, request):
         self.actions = [add_evaluating_organization_action(o)
