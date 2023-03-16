@@ -104,7 +104,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
             <label className="form-check-label">Show evaluators</label>
           </div>
-          {settings.showScoresFromOtherUsers &&
+          {settings.showScoresFromOtherUsers && !submitted &&
             <div className="form-check d-inline-block mr-3"
                  onClick={() => this.setState({showScores: !showScores})}>
               <input className="form-check-input" type="checkbox" checked={showScores}/>
@@ -116,7 +116,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
       </div>
       {expanded && this.getApplications().map(app =>
         <ApplicationScores application={app} applicationRound={applicationRound}
-                           key={app.name} showEvaluators={showEvaluators} showScores={showScores}/>
+                           key={app.name} showEvaluators={showEvaluators} showScores={showScores || submitted}/>
       )}
     </div>;
   }

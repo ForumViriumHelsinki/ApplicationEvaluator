@@ -12,6 +12,7 @@ import ApplicationScoresTable from "/components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
 import ExportScoresWidget from "/components/ExportScoresWidget";
 import settings from "/settings";
+import ApplicationApproveWidget from "/components/ApplicationApproveWidget";
 
 
 type ApplicationScoresProps = {
@@ -36,6 +37,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
   render() {
     const {application, applicationRound, showEvaluators, showScores} = this.props;
     const {expanded, highlightOrganization} = this.state;
+    const {user} = this.context;
 
     const rootGroups = applicationRound.criterion_groups.filter(g => !g.parent);
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
@@ -51,7 +53,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     const maxScore = settings.maxScore * settings.finalScoreMultiplier;
 
     return <div className={`mt-4 pb-4 app-${application.id}`}>
-      <div className="d-flex">
+      <div className="d-flex mr-4">
         {highlightOrganization &&
           <style>
             .app-{application.id} .org-shape {'{opacity: 0.2; transition: opacity 100ms;}'}
@@ -59,9 +61,9 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           </style>
         }
         {thresholdGroups.length > 1 &&
-        <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
-          {application.scores.length > 0 &&
-          <RadarChart data={this.plotData()} size={200}
+          <div style={{width: 200, marginBottom: -48, marginTop: -38}} className="flex-shrink-0">
+            {application.scores.length > 0 &&
+              <RadarChart data={this.plotData()} size={200}
                       captions={this.plotCaptions()}
                       options={this.plotOptions()}/>
           }
@@ -72,19 +74,18 @@ export default class ApplicationScores extends React.Component<ApplicationScores
           <a onClick={() => this.setState({expanded: !this.state.expanded})}>
             <h5 className="text-primary mb-1">
               {application.name}
-              <button className="btn btn-outline-primary btn-sm float-right mr-4">
-                {expanded ? 'Hide' : 'Show'} scores
-              </button>
             </h5>
           </a>
+
           {showEvaluators &&
-          <div className="mb-1">
-            {application.evaluating_organizations.map(o =>
-              <span className={`mr-2 small`} style={{color: this.organizationColor(o)}}
-                    key={o}>{o}</span>
-            )}
-          </div>
+            <div className="mb-1">
+              {application.evaluating_organizations.map(o =>
+                <span className={`mr-2 small`} style={{color: this.organizationColor(o)}}
+                      key={o}>{o}</span>
+              )}
+            </div>
           }
+
           {application.score != null ?
             showEvaluators ? <>
                 <strong>{totalScore}/{maxScore}</strong>{' '}
@@ -95,6 +96,15 @@ export default class ApplicationScores extends React.Component<ApplicationScores
               : <><strong>{totalScore}/{maxScore}</strong> overall score.</>
             : <>No scores given.</>
           }
+        </div>
+
+        <div className="flex-shrink-0 text-right">
+          <button className="btn btn-outline-primary btn-sm btn-block mb-2"
+                  onClick={() => this.setState({expanded: !this.state.expanded})}>
+            {expanded ? 'Hide' : 'Show'} scores
+          </button>
+          <ApplicationApproveWidget className="btn btn-sm btn-block"
+                                    application={application} applicationRound={applicationRound}/>
         </div>
       </div>
 

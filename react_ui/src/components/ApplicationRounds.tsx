@@ -3,6 +3,7 @@ import {applicationRoundsUrl, applicationUrl} from "/urls";
 import {AppContext, ApplicationRound, User} from "/components/types";
 import {addApplicationScores, addScores} from "/components/utils";
 import ApplicationRoundCard from "/components/ApplicationRoundCard";
+import {Application} from "components/types";
 
 type ApplicationRoundsProps = {
   user: User,
@@ -43,26 +44,33 @@ export default class ApplicationRounds extends React.Component<ApplicationRounds
   reloadApplication = (appId: number) => {
     const {request} = this.props;
     request(applicationUrl(appId)).then(response => {
-      if (response.status == 200) response.json().then(application => {
-        const applicationRounds = [...(this.state.applicationRounds || [])];
-        applicationRounds.forEach(r => {
-          const i = r.applications.findIndex(a => a.id == appId);
-          if (i > -1) {
-            r.applications.splice(i, 1, application);
-            addApplicationScores(r, [application]);
-          }
-        });
-        this.setState({applicationRounds: applicationRounds})
-      });
+      if (response.status == 200) response.json().then(this.updateApplication);
       else this.setState({error: true});
     })
+  };
+
+  updateApplication = (application: Application) => {
+    const applicationRounds = [...(this.state.applicationRounds || [])];
+    applicationRounds.forEach(r => {
+      const i = r.applications.findIndex(a => a.id == application.id);
+      if (i > -1) {
+        r.applications.splice(i, 1, application);
+        addApplicationScores(r, [application]);
+      }
+    });
+    this.setState({applicationRounds: applicationRounds})
   };
 
   render() {
     const {user, request} = this.props;
     const {error, applicationRounds} = this.state;
 
-    const context = {user, request, reloadApplication: this.reloadApplication, loadRounds: this.loadRounds};
+    const context = {
+      user, request,
+      reloadApplication: this.reloadApplication,
+      updateApplication: this.updateApplication,
+      loadRounds: this.loadRounds
+    };
 
     return applicationRounds ?
       applicationRounds.length ?

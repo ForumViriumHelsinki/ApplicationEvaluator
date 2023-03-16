@@ -10,3 +10,5 @@ export const scoreUrl = (scoreId: number) => `/rest/scores/${scoreId}/`;
 export const commentsUrl = `/rest/comments/`;
 export const commentUrl = (commentId: number) => `/rest/comments/${commentId}/`;
 export const applicationUrl = (appId: number) => `/rest/applications/${appId}/`;
+export const approveApplicationUrl = (appId: number) => `/rest/applications/${appId}/approve/`;
+export const unapproveApplicationUrl = (appId: number) => `/rest/applications/${appId}/unapprove/`;
