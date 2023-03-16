@@ -86,6 +86,8 @@ class RestTests(APITestCase):
                 'evaluating_organizations': ['Helsinki', 'Tallinn'],
                 'comments': [],
                 'attachments': [],
+                'approved': False,
+                'approved_by': None,
                 'scores': [{
                     'id': score1.id,
                     'application': app.id,
@@ -166,3 +168,41 @@ class RestTests(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['scores']), 2)
+
+    def test_approve_application(self):
+        # Given a logged in user that belongs to an organization with allocated applications
+        evaluator = User.objects.create(username="evaluator")
+        self.client.force_login(evaluator)
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities', published=True)
+        app = app_round.applications.create(name='SkyNet')
+        criterion1 = app_round.criteria.create(name='Goodness', weight=1)
+        organization = evaluator.organizations.create(name='Helsinki')
+        app.evaluating_organizations.add(organization)
+
+        # When a request is made to approve the application
+        url = reverse('application-approve', kwargs={'pk': app.id})
+        response = self.client.patch(url)
+
+        # Then a 200 response is received
+        self.assertEqual(response.status_code, 200)
+
+        # And the application is marked as approved
+        app.refresh_from_db()
+        self.assertTrue(app.approved)
+
+        # And the application is marked as approved_by the user
+        self.assertEqual(app.approved_by_id, evaluator.id)
+
+        # And when a subsequent request is made to unapprove the application
+        url = reverse('application-unapprove', kwargs={'pk': app.id})
+        response = self.client.patch(url)
+
+        # Then a 200 response is received
+        self.assertEqual(response.status_code, 200)
+
+        # And the application is marked as not approved
+        app.refresh_from_db()
+        self.assertFalse(app.approved)
+
+        # And the application approved_by is empty
+        self.assertIsNone(app.approved_by)

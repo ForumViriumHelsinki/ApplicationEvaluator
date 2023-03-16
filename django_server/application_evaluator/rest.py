@@ -33,7 +33,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'organization']
+        fields = ['id', 'first_name', 'last_name', 'username', 'organization', 'is_superuser']
 
     def get_organization(self, user):
         return user.organization.name if user.organization else None
@@ -79,7 +79,8 @@ class ApplicationSerializer(ModelSerializer):
 
     class Meta:
         model = models.Application
-        fields = ['name', 'description', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments']
+        fields = ['name', 'description', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments',
+                  'approved', 'approved_by']
 
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
@@ -190,6 +191,18 @@ class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return models.Application.applications_for_evaluator(self.request.user) \
             .prefetch_related(*ApplicationSerializer.prefetch_related)
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        instance = get_object_or_404(models.Application.applications_for_evaluator(self.request.user), id=pk)
+        instance.approve_by_user(request.user)
+        return self.retrieve(request, pk=pk)
+
+    @action(detail=True, methods=['post'])
+    def unapprove(self, request, pk=None):
+        instance = get_object_or_404(models.Application.applications_for_evaluator(self.request.user), id=pk)
+        instance.unapprove()
+        return self.retrieve(request, pk=pk)
 
 
 router = routers.DefaultRouter()

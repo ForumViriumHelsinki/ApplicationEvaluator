@@ -162,6 +162,9 @@ class Application(NamedModel):
     application_round = models.ForeignKey(ApplicationRound, related_name='applications', on_delete=models.CASCADE)
     evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate')
     description = description_field()
+    approved_by = models.ForeignKey(User, related_name='approved_applications', on_delete=models.SET_NULL, null=True,
+                                    blank=True)
+    approved = models.BooleanField(default=False)
 
     def score(self):
         total = 0
@@ -189,6 +192,16 @@ class Application(NamedModel):
         if user.is_staff:
             return cls.objects.all()
         return cls.objects.filter(evaluating_organizations__users=user).distinct()
+
+    def approve_by_user(self, user):
+        self.approved_by = user
+        self.approved = True
+        self.save()
+
+    def unapprove(self):
+        self.approved_by = None
+        self.approved = False
+        self.save()
 
 
 def upload_attachment_to(instance, filename):
