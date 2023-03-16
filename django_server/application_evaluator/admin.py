@@ -79,6 +79,7 @@ class ApplicationImportInline(admin.TabularInline):
     extra = 1
 
     def has_change_permission(self, request, obj):
+        # Imports cannot be changed; the import is attempted when created, then stays in Done or Error status.
         return False
 
 
