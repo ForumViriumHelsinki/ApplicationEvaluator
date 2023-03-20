@@ -41,7 +41,7 @@ export default class CriterionScore extends React.Component<CriterionScoreProps,
       {criterion.name}:{' '}
       {!myScore && !readOnly && (!myOrgScore || addScore) &&
       <div className="form-inline">
-        <input type="number" min="0" max={settings.maxScore}
+        <input type="number" min="0" max={settings.maxScore} step={0.5} size={5}
                className={`form-control form-control-sm ${error ? 'is-invalid' : ''}`}
                onBlur={this.saveScore}
                onChange={() => this.setState({changed: true})}/>{' '}
