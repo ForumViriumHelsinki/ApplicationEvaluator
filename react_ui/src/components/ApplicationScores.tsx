@@ -7,7 +7,7 @@ import 'react-svg-radar-chart/build/css/index.css'
 import CriterionGroupComponent from "/components/CriterionGroup";
 import {AppContext, Application, ApplicationRound} from "/components/types";
 import Modal from "/util_components/bootstrap/Modal";
-import {organizationColor, slug, username} from "/components/utils";
+import {organizationColor, slug, username, getTotalScore} from "/components/utils";
 import ApplicationScoresTable from "/components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
 import ExportScoresWidget from "/components/ExportScoresWidget";
@@ -49,7 +49,7 @@ export default class ApplicationScores extends React.Component<ApplicationScores
 
     const applicationAsRound = {...applicationRound, name: application.name, applications: [application]};
 
-    const totalScore = application.score && (application.score * settings.finalScoreMultiplier).toPrecision(3);
+    const totalScore = getTotalScore(application);
     const maxScore = settings.maxScore * settings.finalScoreMultiplier;
 
     return <div className={`mt-4 pb-4 app-${application.id}`}>

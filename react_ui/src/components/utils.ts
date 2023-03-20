@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "/components/types";
+import settings from "/settings";
 
 const sum = (lst: number[]) => lst.reduce((a, b) => a + b, 0);
 
@@ -91,3 +92,7 @@ export const organizationColor = (org: string) => {
 };
 
 export const slug = (name: string) => name.replace(/[^a-z]/ig, '');
+
+export function getTotalScore(application: Application) {
+  return application.score && (application.score * settings.finalScoreMultiplier).toPrecision(3);
+}

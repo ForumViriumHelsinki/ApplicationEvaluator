@@ -1,6 +1,7 @@
 import React from 'react';
-import {Application, ApplicationRound, Comment, Criterion, Score} from "/components/types";
+import {Application, ApplicationRound, Comment, CriterionGroup, Score} from "/components/types";
 import XLSX from 'xlsx';
+import {getTotalScore} from "/components/utils";
 
 type ExportScoresWidgetProps = {
   applicationRound: ApplicationRound
@@ -24,14 +25,17 @@ export default class ExportScoresWidget extends React.Component<ExportScoresWidg
         Export scores
       </button>
       {expanded &&
-      <div className="dropdown-menu show">
-        <button className="dropdown-item" onClick={() => this.export('.xlsx')}>.xlsx</button>
-        <button className="dropdown-item" onClick={() => this.export('.csv')}>.csv</button>
-      </div>
+        <div className="dropdown-menu show">
+          <button className="dropdown-item" onClick={() => this.export('.xlsx')}>.xlsx</button>
+          <button className="dropdown-item" onClick={() => this.export('.csv')}>.csv</button>
+          <button className="dropdown-item" onClick={() => this.exportSummary('.xlsx')}>.xlsx (summary)</button>
+          <button className="dropdown-item" onClick={() => this.exportSummary('.csv')}>.csv (summary)</button>
+        </div>
       }
     </div>;
   }
 
+  // Export individual scores, one score per row:
   export(format: string) {
     const applicationRound = this.props.applicationRound;
     const {applications, name} = applicationRound;
@@ -60,6 +64,36 @@ export default class ExportScoresWidget extends React.Component<ExportScoresWidg
       // @ts-ignore
       a.comments.forEach(s => rows.push(columns.map(c => c.value(s, a) as string)));
     });
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
+    XLSX.writeFile(workbook, name + format);
+  }
+
+  // Export score summary, one application per row:
+  exportSummary(format: string) {
+    const applicationRound = this.props.applicationRound;
+    const {applications, name} = applicationRound;
+    const groups = applicationRound.criterion_groups;
+    const groupIndex = Object.fromEntries(groups.map((g: CriterionGroup) => [g.id, g]));
+
+    const columns = [
+      {name: 'Application number', value: (a: Application) => a.name},
+      ...groups.map((g: CriterionGroup) => ({name: g.name, value: (a: Application) => a.groupScores[g.id]})),
+      {name: 'Total score', value: (a: Application) => getTotalScore(a)},
+      {name: 'Approved', value: (a: Application) => a.approved},
+      {
+        name: 'Comments', value: (a: Application) =>
+          a.comments.map(c =>
+            `${c.evaluator.first_name} ${c.evaluator.last_name} - ${groupIndex[c.criterion_group].name}: ${c.comment}`
+          ).join('\n')
+      },
+    ];
+
+    const rows = [columns.map(c => c.name)];
+
+    applications.forEach((a: Application) => rows.push(columns.map(c => c.value(a) as string)));
+
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
