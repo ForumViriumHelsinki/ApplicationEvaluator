@@ -66,40 +66,40 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
         <ReactMarkdown linkTarget="_blank">{applicationRound.description}</ReactMarkdown>
         }
         {applicationRound.attachments.length > 0 &&
-        <div className="mt-2">
-          Documents:
-          {applicationRound.attachments.map(({attachment, name}) =>
-            <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
-          )}
-        </div>
+          <div className="mt-2">
+            Documents:
+            {applicationRound.attachments.map(({attachment, name}) =>
+              <a href={attachment} target='_blank' className="text-secondary ml-2" key={attachment}>{name}</a>
+            )}
+          </div>
         }
         {scoredApps.length}/{applicationRound.applications.length} applications evaluated
         {scoredApps.length > 0 && <ExportScoresWidget {...{applicationRound}} />}
-        {expanded && !submitted && partialApps.length == applicationRound.applications.length &&
-        <ConfirmButton
-          onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"
-          confirm={<>
-            Submit all {applicationRound.name} scores for {user.organization}?
-            Scores cannot be changed after submitting.
-            <div className="mt-2">
-              {scoredApps.length}/{applicationRound.applications.length} applications completely evaluated
-              {scoredApps.length < applicationRound.applications.length &&
-              <>, {partialApps.length - scoredApps.length} partially.</>}
-            </div>
-          </>}
-        >
-          <Icon icon="lock"/> Submit scores for {user.organization}
-        </ConfirmButton>
+        {expanded && settings.allowSubmit && !submitted && partialApps.length == applicationRound.applications.length &&
+          <ConfirmButton
+            onClick={this.submitScores} className="btn btn-outline-success btn-block mt-2 mb-3"
+            confirm={<>
+              Submit all {applicationRound.name} scores for {user.organization}?
+              Scores cannot be changed after submitting.
+              <div className="mt-2">
+                {scoredApps.length}/{applicationRound.applications.length} applications completely evaluated
+                {scoredApps.length < applicationRound.applications.length &&
+                  <>, {partialApps.length - scoredApps.length} partially.</>}
+              </div>
+            </>}
+          >
+            <Icon icon="lock"/> Submit scores for {user.organization}
+          </ConfirmButton>
         }
         {expanded &&
-        <div className="mt-2">
-          <div className="mr-3 d-inline-block">
-            Order by:
-            <OrderBtn label="Name" order="name"/>
-            <OrderBtn label="Score" order="score"/>
-            <OrderBtn label="Unevaluated" order="unevaluated"/>
-          </div>
-          <div className="form-check d-inline-block mr-3"
+          <div className="mt-2">
+            <div className="mr-3 d-inline-block">
+              Order by:
+              <OrderBtn label="Name" order="name"/>
+              <OrderBtn label="Score" order="score"/>
+              <OrderBtn label="Unevaluated" order="unevaluated"/>
+            </div>
+            <div className="form-check d-inline-block mr-3"
                onClick={() => this.setState({showEvaluators: !showEvaluators})}>
             <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
             <label className="form-check-label">Show evaluators</label>
