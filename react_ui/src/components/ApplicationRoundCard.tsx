@@ -49,15 +49,10 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
     return <div className="container mt-4 mb-3 rounded trans-bg pl-0 pr-0 pt-4 pb-4">
       <div className="pl-4 pr-4">
         <div>
-          <h3 className="clickable text-primary d-inline"
-              onClick={() => this.setState({expanded: !expanded})}>
-            <span className="mr-2">{applicationRound.name}</span>
-            <button className="btn btn-outline-primary btn-sm float-right">
-              {expanded ? 'Hide' : 'Show'} applications
-            </button>
-          </h3>
+          <h3 className="clickable text-primary mb-4"
+              onClick={() => this.setState({expanded: !expanded})}>{applicationRound.name}</h3>
           {submitted &&
-          <span className="badge badge-pill badge-success small align-text-bottom">
+            <span className="badge badge-pill badge-success small align-text-bottom">
               <Icon icon="done" className="font-size-base"/> Submitted
             </span>
           }
@@ -91,6 +86,14 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <Icon icon="lock"/> Submit scores for {user.organization}
           </ConfirmButton>
         }
+
+        <div className="mt-2 mb-3">
+          <button className="btn btn-outline-primary btn-sm"
+                  onClick={() => this.setState({expanded: !expanded})}>
+            {expanded ? 'Hide' : 'Show'} applications
+          </button>
+        </div>
+
         {expanded &&
           <div className="mt-2">
             <div className="mr-3 d-inline-block">
