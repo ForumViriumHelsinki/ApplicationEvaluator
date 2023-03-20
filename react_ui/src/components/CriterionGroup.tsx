@@ -61,7 +61,7 @@ export default class CriterionGroupComponent extends React.Component<CriterionGr
 
     return <div className="ml-2 mt-4" key={group.name}>
       {subGroups.length ? <h5 className="text-primary">{group.name}</h5> :
-        <h6 className="text-secondary">{group.name}</h6>}
+        <h6>{group.name}</h6>}
       {subGroups.map(childGroup =>
         <CriterionGroupComponent key={childGroup.name} group={childGroup} applicationRound={applicationRound}
                                  application={application} showScores={showScores}/>
