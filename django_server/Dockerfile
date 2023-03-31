@@ -1,5 +1,5 @@
 # pull base image
-FROM python:3.7
+FROM python:3.11
 
 # set work directory
 WORKDIR /app
@@ -7,6 +7,7 @@ WORKDIR /app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH /app/
 
 # copy Pipfile
 COPY Pipfile /app/

@@ -29,5 +29,5 @@ services:
       ports:
         - 3000:3000
       volumes:
-        - ./react_ui/src/:/app/src
-        - ./react_ui/public/:/app/public
+        - ./react_ui:/app
+        - /app/node_modules
