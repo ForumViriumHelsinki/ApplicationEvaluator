@@ -153,7 +153,8 @@ class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return models.ApplicationRound.rounds_for_evaluator(self.request.user) \
-            .prefetch_related('criterion_groups', 'attachments', 'submitted_organizations')
+            .prefetch_related('criterion_groups', 'attachments', 'submitted_organizations') \
+            .order_by('name')
 
     @action(detail=True, methods=['post'])
     def submit(self, request, pk=None):
