@@ -16,6 +16,7 @@ class ModelSerializer(serializers.ModelSerializer):
         except KeyError:
             return None
 
+
 class CriterionSerializer(ModelSerializer):
     class Meta:
         model = models.Criterion
@@ -28,15 +29,21 @@ class CriterionGroupSerializer(ModelSerializer):
         fields = ['name', 'abbr', 'parent', 'id', 'threshold']
 
 
-class UserSerializer(ModelSerializer):
+class EvaluatorSerializer(ModelSerializer):
     organization = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'organization', 'is_superuser']
+        fields = ['id', 'first_name', 'last_name', 'username', 'organization']
 
     def get_organization(self, user):
         return user.organization.name if user.organization else None
+
+
+class UserSerializer(EvaluatorSerializer):
+    class Meta:
+        model = User
+        fields = EvaluatorSerializer.Meta.fields + ['is_superuser']
 
 
 class BaseScoreSerializer(ModelSerializer):
@@ -46,7 +53,7 @@ class BaseScoreSerializer(ModelSerializer):
 
 
 class ScoreSerializer(BaseScoreSerializer):
-    evaluator = UserSerializer(read_only=True)
+    evaluator = EvaluatorSerializer(read_only=True)
 
 
 class BaseCommentSerializer(ModelSerializer):
@@ -56,7 +63,7 @@ class BaseCommentSerializer(ModelSerializer):
 
 
 class CommentSerializer(BaseCommentSerializer):
-    evaluator = UserSerializer(read_only=True)
+    evaluator = EvaluatorSerializer(read_only=True)
 
 
 class AttachmentSerializer(ModelSerializer):
@@ -163,12 +170,14 @@ class EvaluationModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(evaluator=self.request.user) \
-            .exclude(application__application_round__submitted_organizations=self.request.user.organization)
+            .exclude(application__application_round__submitted_organizations=self.request.user.organization) \
+            .exclude(application__application_round__scoring_completed=True)
 
     def create(self, request, *args, **kwargs):
         get_object_or_404(
-            models.Application.objects.exclude(
-                application_round__submitted_organizations=self.request.user.organization),
+            models.Application.objects
+            .exclude(application_round__submitted_organizations=self.request.user.organization)
+            .exclude(application_round__scoring_completed=True),
             id=request.data['application'])
         request.data['evaluator'] = request.user.id
         return super().create(request, *args, **kwargs)

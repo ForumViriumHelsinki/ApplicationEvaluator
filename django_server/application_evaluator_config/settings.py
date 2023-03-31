@@ -193,6 +193,8 @@ ELASTIC_APM = {
    'SERVER_URL': os.environ.get('ELASTIC_URL', ''),
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 try:
     from .local_settings import *  # noqa
 except ImportError:

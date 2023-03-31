@@ -6,6 +6,8 @@ from application_evaluator import models
 
 
 class RestTests(APITestCase):
+    maxDiff = None
+
     def test_application_rounds_not_logged_in(self):
         # Given no logged in user
         # When requesting the application round list
@@ -91,7 +93,7 @@ class RestTests(APITestCase):
                 'scores': [{
                     'id': score1.id,
                     'application': app.id,
-                    'score': 5,
+                    'score': 5.0,
                     'criterion': criterion1.id,
                     'evaluator': {
                         'id': evaluator.id,
@@ -101,13 +103,44 @@ class RestTests(APITestCase):
                         'username': 'evaluator'}
                 }]
             }],
-            'criteria': [{'name': 'Goodness', 'group': None, 'id': criterion1.id, 'weight': 1}],
+            'criteria': [{'name': 'Goodness', 'group': None, 'id': criterion1.id, 'weight': 1.0}],
             'criterion_groups': [],
             'attachments': [],
             'submitted_organizations': [],
             'description': '',
-            'name': 'AI4Cities'
+            'name': 'AI4Cities',
+            'evaluators': [],
+            'scoring_completed': False,
+            'scoring_model': 'Evaluators average',
         }])
+
+    def test_application_rounds_without_organizations(self):
+        # Given a logged in user who is allocated as evaluator for an application round
+        evaluator = User.objects.create(username="evaluator")
+        self.client.force_login(evaluator)
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities', published=True)
+        app = app_round.applications.create(name='SkyNet')
+        criterion1 = app_round.criteria.create(name='Goodness', weight=1)
+        app_round.evaluators.add(evaluator)
+
+        # And given that applications have received scores from both the user and others
+        evaluator2 = User.objects.create(username="evaluator2")
+        app_round.evaluators.add(evaluator2)
+        score1 = app.scores.create(evaluator=evaluator, score=5, criterion=criterion1)
+        score2 = app.scores.create(evaluator=evaluator2, score=5, criterion=criterion1)
+
+        # When requesting the application round list
+        url = reverse('application_round-list')
+        response = self.client.get(url)
+
+        # Then the allocated application rounds are received, along with the scores given
+        # by the user
+        self.assertEqual(response.status_code, 200)
+        rounds = response.json()
+        self.assertEqual(len(rounds), 1)
+        applications = rounds[0]['applications']
+        self.assertEqual(len(applications), 1)
+        self.assertEqual(len(applications[0]['scores']), 1)
 
     def test_submit_organization_scores_when_none_given(self):
         # Given a logged in user that belongs to an organization with allocated applications
@@ -181,7 +214,7 @@ class RestTests(APITestCase):
 
         # When a request is made to approve the application
         url = reverse('application-approve', kwargs={'pk': app.id})
-        response = self.client.patch(url)
+        response = self.client.post(url)
 
         # Then a 200 response is received
         self.assertEqual(response.status_code, 200)
@@ -195,7 +228,7 @@ class RestTests(APITestCase):
 
         # And when a subsequent request is made to unapprove the application
         url = reverse('application-unapprove', kwargs={'pk': app.id})
-        response = self.client.patch(url)
+        response = self.client.post(url)
 
         # Then a 200 response is received
         self.assertEqual(response.status_code, 200)

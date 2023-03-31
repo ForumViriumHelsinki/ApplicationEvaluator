@@ -50,6 +50,10 @@ class ApplicationRound(NamedModel):
         blank=True)
     published = models.BooleanField(default=False)
     description = description_field()
+    evaluators = models.ManyToManyField(User, related_name='evaluated_application_rounds', blank=True)
+    scoring_model = models.CharField(max_length=32, default='Evaluators average',
+                                     choices=((x, x) for x in ['Evaluators average', 'Organizations average']))
+    scoring_completed = models.BooleanField(default=False, help_text='Set by an admin to close scoring for this round.')
 
     def total_weight(self):
         """
@@ -61,10 +65,12 @@ class ApplicationRound(NamedModel):
     def rounds_for_evaluator(cls, user):
         if user.is_staff:
             return cls.objects.all()
-        return cls.objects.filter(applications__evaluating_organizations__users=user, published=True).distinct()
+        return cls.objects.filter(published=True).filter(
+            models.Q(applications__evaluating_organizations__users=user) | models.Q(evaluators=user)
+        ).distinct()
 
     def applications_for_evaluator(self, user):
-        if user.is_staff:
+        if user.is_staff or self.evaluators.filter(id=user.id).exists():
             return self.applications.all()
         if user.organization in self.submitted_organizations.all():
             return self.applications.filter(
@@ -103,6 +109,8 @@ class ApplicationRound(NamedModel):
             raise ValueError('Scores not completed, submittal not allowed.')
 
     def organization_has_submitted(self, organization):
+        if not organization:
+            return False
         return organization.id in [o.id for o in self.submitted_organizations.all()]
 
 
@@ -172,14 +180,18 @@ class Application(NamedModel):
         for criterion in self.application_round.criteria.all():
             scores = [s for s in self.scores.all() if s.criterion_id == criterion.id]
             if len(scores):
-                orgs = {s.evaluator.organization.id for s in scores if s.evaluator.organization}
-                org_scores = [mean([s.score for s in scores if s.evaluator.organization.id == org_id])
-                              for org_id in orgs]
-                total += mean(org_scores) * criterion.weight
+                if self.application_round.scoring_model == 'Organizations average':
+                    orgs = {s.evaluator.organization.id for s in scores if s.evaluator.organization}
+                    org_scores = [mean([s.score for s in scores if s.evaluator.organization.id == org_id])
+                                  for org_id in orgs]
+                    total += mean(org_scores) * criterion.weight
+                else:
+                    total += mean([s.score for s in scores]) * criterion.weight
         return total / self.application_round.total_weight()
 
     def can_be_evaluated_by(self, user):
-        return self.evaluating_organizations.filter(users=user).exists()
+        return (self.evaluating_organizations.filter(users=user).exists() or
+                self.application_round.evaluators.filter(id=user.id).exists())
 
     def scores_for_evaluator(self, user):
         return Score.filter_for_evaluator(self.scores.all(), user, self.application_round)
@@ -191,7 +203,8 @@ class Application(NamedModel):
     def applications_for_evaluator(cls, user):
         if user.is_staff:
             return cls.objects.all()
-        return cls.objects.filter(evaluating_organizations__users=user).distinct()
+        return cls.objects.filter(models.Q(evaluating_organizations__users=user) |
+                                  models.Q(application_round__evaluators=user)).distinct()
 
     def approve_by_user(self, user):
         self.approved_by = user
@@ -230,14 +243,18 @@ class EvaluationModel(TimestampedModel):
 
     @staticmethod
     def filter_for_evaluator(instances, user, application_round):
+        """
+        Returns a list of instances (scores / comments) that the user is allowed to see.
+        """
         if not user:
             return []
-        submitted_organizations = application_round.submitted_organizations.all()
-        submitted = user.organization in submitted_organizations
-        if user.is_staff:
+        if user.is_staff or application_round.scoring_completed:
             return instances
         if not user.organization:
-            return []
+            return [s for s in instances if s.evaluator_id == user.id]
+
+        submitted_organizations = application_round.submitted_organizations.all()
+        submitted = user.organization in submitted_organizations
         if submitted:
             return [s for s in instances
                     if s.evaluator.organization and s.evaluator.organization in submitted_organizations]
