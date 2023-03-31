@@ -95,6 +95,7 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
     list_display = ['name', 'applications_', 'scores_', 'published']
     actions = ['duplicate']
     form = ApplicationRoundForm
+    filter_horizontal = ['evaluators']
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(app_count=Count('applications'),
