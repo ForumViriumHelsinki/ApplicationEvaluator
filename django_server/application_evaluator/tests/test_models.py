@@ -58,3 +58,22 @@ class ModelTests(TestCase):
 
         # Then the applications are imported
         self.assertEqual(app_round.applications.count(), 3)
+
+    def test_application_attachment_import(self):
+        # Given an application round with some named applications
+        app_round = models.ApplicationRound.objects.create(name='AI4Cities')
+        app = app_round.applications.create(name='PN#-202302-1036')
+
+        # And a zip file containing attachments exported from Salesforce,
+        # with the attachments named after the applications
+        with open('application_evaluator/tests/application_attachments.zip', 'rb') as f:
+            zip_file = ContentFile(f.read(), 'application_attachments.zip')
+
+        # When saving an ApplicationAttachmentImport object with the zip file in its file field
+        app_import = models.ApplicationAttachmentImport.objects.create(application_round=app_round, file=zip_file)
+
+        # Then the import succeeds without errors
+        self.assertEqual(app_import.error, '')
+
+        # And the attachments are imported and associated with the applications
+        self.assertEqual(app.attachments.count(), 1)

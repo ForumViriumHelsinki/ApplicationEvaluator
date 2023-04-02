@@ -1,7 +1,9 @@
 import csv
 import secrets
+import zipfile
 
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.db import models
 from django.utils.safestring import mark_safe
 
@@ -168,7 +170,7 @@ User.organization = property(organization)
 
 class Application(NamedModel):
     application_round = models.ForeignKey(ApplicationRound, related_name='applications', on_delete=models.CASCADE)
-    evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate')
+    evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate', blank=True)
     description = description_field()
     approved_by = models.ForeignKey(User, related_name='approved_applications', on_delete=models.SET_NULL, null=True,
                                     blank=True)
@@ -282,8 +284,8 @@ class ApplicationRoundSubmittal(Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class ApplicationImport(Model):
-    application_round = models.ForeignKey(ApplicationRound, related_name='application_imports',
+class BaseApplicationImport(Model):
+    application_round = models.ForeignKey(ApplicationRound, related_name='%(class)ss',
                                           on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to='application_imports', max_length=256)
@@ -295,8 +297,8 @@ class ApplicationImport(Model):
         ('done', 'Done'),
     ), default='pending')
 
-    application_name_column = 'Application Number'
-    ignore_columns = ['Applications', '\ufeffApplications']  # Extremely silly way to deal with encoding issue...
+    class Meta:
+        abstract = True
 
     def save(self, **kwargs):
         if self.file and (self.status == 'pending'):
@@ -311,6 +313,11 @@ class ApplicationImport(Model):
                 self.status = 'done'
         return super().save()
 
+
+class ApplicationImport(BaseApplicationImport):
+    application_name_column = 'Application Number'
+    ignore_columns = ['Applications', '\ufeffApplications']  # Extremely silly way to deal with encoding issue...
+
     def _process(self):
         with self.file.open('r') as f:
             reader = csv.DictReader(f)
@@ -324,3 +331,23 @@ class ApplicationImport(Model):
                     name=name,
                     description=description,
                 )
+
+
+class ApplicationAttachmentImport(BaseApplicationImport):
+    def _process(self):
+        # Open the zip in self.file and loop through contents:
+        with zipfile.ZipFile(self.file) as zip:
+            for info in zip.infolist():
+                name = info.filename.split('/')[-1].split('.')[0]
+                if info.is_dir() or not name:
+                    continue
+                try:
+                    application = self.application_round.applications.get(name=name)
+                except Application.DoesNotExist:
+                    raise ValueError(f'Application {name} not found')
+                with zip.open(info.filename) as f:
+                    attachment = ApplicationAttachment.objects.create(
+                        application=self.application_round.applications.get(name=name),
+                        attachment=File(f),
+                    )
+                    attachment.save()

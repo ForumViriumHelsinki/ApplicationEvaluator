@@ -73,14 +73,20 @@ class RoundAttachmentInline(admin.TabularInline):
     extra = 0
 
 
-class ApplicationImportInline(admin.TabularInline):
-    model = models.ApplicationImport
+class BaseApplicationImportInline(admin.TabularInline):
     readonly_fields = ['created_at', 'error', 'status']
     extra = 1
 
     def has_change_permission(self, request, obj):
         # Imports cannot be changed; the import is attempted when created, then stays in Done or Error status.
         return False
+
+class ApplicationImportInline(BaseApplicationImportInline):
+    model = models.ApplicationImport
+
+
+class ApplicationAttachmentImportInline(BaseApplicationImportInline):
+    model = models.ApplicationAttachmentImport
 
 
 class ApplicationRoundSubmittalInline(admin.TabularInline):
@@ -90,8 +96,8 @@ class ApplicationRoundSubmittalInline(admin.TabularInline):
 
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [RoundAttachmentInline, ApplicationImportInline, ApplicationRoundSubmittalInline,
-               CriterionGroupInline, CriterionInline]
+    inlines = [RoundAttachmentInline, ApplicationImportInline, ApplicationAttachmentImportInline,
+               ApplicationRoundSubmittalInline, CriterionGroupInline, CriterionInline]
     list_display = ['name', 'applications_', 'scores_', 'published']
     actions = ['duplicate']
     form = ApplicationRoundForm
