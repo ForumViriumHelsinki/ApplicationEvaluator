@@ -177,6 +177,9 @@ class Application(NamedModel):
     approved = models.BooleanField(default=False)
 
     def score(self):
+        # Use .all() to force evaluation of the queryset for later:
+        if not len(self.scores.all()):
+            return 0
         total = 0
         mean = lambda scores: sum(scores) / len(scores) if len(scores) else 0
         for criterion in self.application_round.criteria.all():
@@ -315,19 +318,34 @@ class BaseApplicationImport(Model):
 
 
 class ApplicationImport(BaseApplicationImport):
+    application_round = models.ForeignKey(ApplicationRound, related_name='%(class)ss',
+                                          on_delete=models.SET_NULL, null=True, blank=True)
     application_name_column = 'Application Number'
-    ignore_columns = ['Applications', '\ufeffApplications']  # Extremely silly way to deal with encoding issue...
+    application_round_column = 'Open Call Name'
+
+    ignore_columns = ['Applications']
+
+    def _open_file(self):
+        if self.file.storage.__class__.__name__ == 'InMemoryStorage':
+            return self.file.open('r')
+        else:
+            return open(self.file.path, 'r', encoding='utf-8-sig')
 
     def _process(self):
-        with self.file.open('r') as f:
+        with self._open_file() as f:
             reader = csv.DictReader(f)
             for row in reader:
                 name = row.pop(self.application_name_column)
                 for column in self.ignore_columns:
                     row.pop(column, None)
+                if self.application_round:
+                    app_round = self.application_round
+                else:
+                    app_round_name = row.pop(self.application_round_column)
+                    app_round = ApplicationRound.objects.get_or_create(name=app_round_name)[0]
                 description = '\n\n'.join([f'#### {k}\n\n{v}' for k, v in row.items()])
                 application = Application.objects.create(
-                    application_round=self.application_round,
+                    application_round=app_round,
                     name=name,
                     description=description,
                 )

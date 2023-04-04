@@ -59,6 +59,26 @@ class ModelTests(TestCase):
         # Then the applications are imported
         self.assertEqual(app_round.applications.count(), 3)
 
+    def test_import_rounds_from_csv(self):
+        # Given a CSV file containing applications exported from Salesforce, referencing application rounds
+        # by name
+        with open('application_evaluator/tests/applications.csv', encoding='utf-8-sig') as f:
+            csv_file = ContentFile(f.read(), 'applications.csv')
+
+        # And given that some of the rounds already exist in the db
+        models.ApplicationRound.objects.create(name='Call 1')
+
+        # When saving an ApplicationImport object with the CSV file in its file field without linking it to any
+        # existing application round
+        app_import = models.ApplicationImport.objects.create(file=csv_file)
+
+        # Then the applications are imported
+        self.assertEqual(models.Application.objects.count(), 3)
+
+        # And application rounds are created as needed
+        self.assertEqual(set(models.ApplicationRound.objects.values_list('name', flat=True)), {'Call 1', 'Call 2'})
+
+
     def test_application_attachment_import(self):
         # Given an application round with some named applications
         app_round = models.ApplicationRound.objects.create(name='AI4Cities')

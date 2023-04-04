@@ -123,6 +123,12 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
         return super().get_form(request, obj, **kwargs)
 
 
+@admin.register(models.ApplicationImport)
+class ApplicationImportAdmin(admin.ModelAdmin):
+    list_display = ['application_round', 'created_at', 'status', 'error']
+    list_filter = ['status']
+
+
 class ScoreInline(admin.TabularInline):
     model = models.Score
     extra = 0
