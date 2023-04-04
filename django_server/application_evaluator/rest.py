@@ -175,11 +175,12 @@ class EvaluationModelViewSet(viewsets.ModelViewSet):
             .exclude(application__application_round__scoring_completed=True)
 
     def create(self, request, *args, **kwargs):
-        get_object_or_404(
-            models.Application.objects
-            .exclude(application_round__submitted_organizations=self.request.user.organization)
-            .exclude(application_round__scoring_completed=True),
-            id=request.data['application'])
+        qset = models.Application.objects.exclude(
+            application_round__scoring_completed=True)
+        if self.request.user.organization:
+            qset = qset.exclude(
+                application_round__submitted_organizations=self.request.user.organization)
+        get_object_or_404(qset, id=request.data['application'])
         request.data['evaluator'] = request.user.id
         return super().create(request, *args, **kwargs)
 
