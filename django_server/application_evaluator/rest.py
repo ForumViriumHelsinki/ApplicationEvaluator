@@ -170,12 +170,12 @@ class EvaluationModelViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qset = models.Application.objects.exclude(
-            application_round__scoring_completed=True)
+        qset = self.queryset.filter(evaluator=self.request.user).exclude(
+            application__application_round__scoring_completed=True)
         if self.request.user.organization:
             qset = qset.exclude(
-                application_round__submitted_organizations=self.request.user.organization)
-        return qset.filter(evaluator=self.request.user)
+                application__application_round__submitted_organizations=self.request.user.organization)
+        return qset
 
     def create(self, request, *args, **kwargs):
         qset = models.Application.objects.exclude(
