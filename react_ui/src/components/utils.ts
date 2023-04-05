@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "/components/types";
+import {Application, ApplicationRound, Criterion, CriterionGroup, Score, User} from "../components/types";
 import settings from "/settings";
 
 const sum = (lst: number[]) => lst.reduce((a, b) => a + b, 0);
@@ -53,14 +53,21 @@ export const addApplicationScores = (round: ApplicationRound, applications: Appl
     app.groupScores = {};
     app.scoresByOrganization = {};
     if (!app.scores.length) return;
-    app.scored = _.uniq(app.scores.map(s => s.criterion)).length == round.criteria.length;
+    app.scored = _.uniq(app.scores.map((s: Score) => s.criterion)).length == round.criteria.length;
     app.score = weightedAvg(app.scores);
     app.groupScores = groupScores(app.scores);
+
     const scoresByOrganization = _.groupBy(app.scores, s => s.evaluator.organization);
     app.scoresByOrganization =
       Object.fromEntries(Object.entries(scoresByOrganization)
         .map(([organization, scores]) =>
           [organization, {score: weightedAvg(scores), groupScores: groupScores(scores)}]));
+
+    const scoresByEvaluator = _.groupBy(app.scores, s => username(s.evaluator));
+    app.scoresByEvaluator =
+      Object.fromEntries(Object.entries(scoresByEvaluator)
+        .map(([evaluator, scores]) =>
+          [evaluator, {score: weightedAvg(scores), groupScores: groupScores(scores)}]));
   });
   return round;
 };
@@ -85,9 +92,10 @@ const colors = [
 ];
 
 const organizationColors: any = {};
+let colorIndex = 0;
 
 export const organizationColor = (org: string) => {
-  if (!organizationColors[org]) organizationColors[org] = colors.shift();
+  if (!organizationColors[org]) organizationColors[org] = colors[colorIndex++ % colors.length]
   return organizationColors[org];
 };
 

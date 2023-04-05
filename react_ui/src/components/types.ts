@@ -50,6 +50,12 @@ export type Application = {
             groupScores: any,
         }
     }
+    scoresByEvaluator: {
+        [evaluator: string]: {
+            score: number,
+            groupScores: any,
+        }
+    }
     evaluating_organizations: string[]
 }
 

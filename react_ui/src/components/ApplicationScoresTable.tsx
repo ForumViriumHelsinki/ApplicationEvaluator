@@ -19,7 +19,9 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
   render() {
     const {application, applicationRound, showEvaluators, onOrganizationHover} = this.props;
     const thresholdGroups = applicationRound.criterion_groups.filter(g => g.threshold);
-    const organizations = Object.keys(application.scoresByOrganization);
+    const scoresIndex = applicationRound.scoring_model === 'Evaluators average' ? application.scoresByEvaluator
+        : application.scoresByOrganization;
+    const organizations = Object.keys(scoresIndex);
     const showOrganizations = showEvaluators && organizations.length > 1;
 
     const GroupScore = ({group, groupScores}: { group: CriterionGroup, groupScores: any }) => {
@@ -45,7 +47,7 @@ export default class ApplicationScoresTable extends React.Component<ApplicationS
       </tr>
       </thead>
       <tbody onMouseOut={selectNone}>
-      {showOrganizations && Object.entries(application.scoresByOrganization).map(
+      {showOrganizations && Object.entries(scoresIndex).map(
         ([organization, {groupScores, score}]) =>
           <tr key={organization}
               onMouseOver={() => onOrganizationHover && onOrganizationHover(organization)}>

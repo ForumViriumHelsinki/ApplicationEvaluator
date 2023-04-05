@@ -7,7 +7,7 @@ import 'react-svg-radar-chart/build/css/index.css'
 import CriterionGroupComponent from "/components/CriterionGroup";
 import {AppContext, Application, ApplicationRound} from "/components/types";
 import Modal from "/util_components/bootstrap/Modal";
-import {organizationColor, slug, username, getTotalScore} from "/components/utils";
+import {organizationColor, slug, username, getTotalScore} from "../components/utils";
 import ApplicationScoresTable from "/components/ApplicationScoresTable";
 import ReactMarkdown from "react-markdown";
 import ExportScoresWidget from "/components/ExportScoresWidget";
@@ -157,15 +157,17 @@ export default class ApplicationScores extends React.Component<ApplicationScores
     if (!application.groupScores) return [];
 
     const data = (groupScores: any) => Object.fromEntries(thresholdGroups.map(g =>
-      [g.id, (groupScores[g.id] || 1) / 10]));
+      [g.id, (groupScores[g.id] || 1) / settings.maxScore]));
 
-    if (!showEvaluators || Object.keys(application.scoresByOrganization).length < 2)
+    const scoresIndex = applicationRound.scoring_model === 'Evaluators average' ? application.scoresByEvaluator
+        : application.scoresByOrganization;
+    if (!showEvaluators || Object.keys(scoresIndex).length < 2)
       return [{
         data: data(application.groupScores),
         meta: {color: organizationColor('total')}
       }];
 
-    else return Object.entries(application.scoresByOrganization).map(([org, {groupScores}]) =>
+    else return Object.entries(scoresIndex).map(([org, {groupScores}]) =>
       ({data: data(groupScores), meta: {color: organizationColor(org), class: `org-shape org-shape-${slug(org)}`}})
     );
   }

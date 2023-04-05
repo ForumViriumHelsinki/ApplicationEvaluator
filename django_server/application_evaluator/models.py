@@ -332,6 +332,9 @@ class ApplicationImport(BaseApplicationImport):
             return open(self.file.path, 'r', encoding='utf-8-sig')
 
     def _process(self):
+        # Replace two spaces with \n\n, Salesforce CSV export does the opposite:
+        fix_newlines = lambda s: s.replace('  ', '\n\n')
+
         with self._open_file() as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -343,7 +346,7 @@ class ApplicationImport(BaseApplicationImport):
                 else:
                     app_round_name = row.pop(self.application_round_column)
                     app_round = ApplicationRound.objects.get_or_create(name=app_round_name)[0]
-                description = '\n\n'.join([f'#### {k}\n\n{v}' for k, v in row.items()])
+                description = '\n\n'.join([f'#### {k}\n\n{fix_newlines(v)}' for k, v in row.items()])
                 application = Application.objects.create(
                     application_round=app_round,
                     name=name,

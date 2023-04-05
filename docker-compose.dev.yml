@@ -24,7 +24,7 @@ services:
 
   react:
       build: ./react_ui
-      command: yarn start
+      command: vite --host
       stdin_open: true
       ports:
         - 3000:3000
