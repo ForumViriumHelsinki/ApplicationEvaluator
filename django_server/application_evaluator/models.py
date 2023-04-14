@@ -53,6 +53,7 @@ class ApplicationRound(NamedModel):
     published = models.BooleanField(default=False)
     description = description_field()
     evaluators = models.ManyToManyField(User, related_name='evaluated_application_rounds', blank=True)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='administered_application_rounds', null=True)
     scoring_model = models.CharField(max_length=32, default='Evaluators average',
                                      choices=((x, x) for x in ['Evaluators average', 'Organizations average']))
     scoring_completed = models.BooleanField(default=False, help_text='Set by an admin to close scoring for this round.')
@@ -68,11 +69,12 @@ class ApplicationRound(NamedModel):
         if user.is_staff:
             return cls.objects.all()
         return cls.objects.filter(published=True).filter(
-            models.Q(applications__evaluating_organizations__users=user) | models.Q(evaluators=user)
+            models.Q(applications__evaluating_organizations__users=user) |
+            models.Q(evaluators=user) | models.Q(admin=user)
         ).distinct()
 
     def applications_for_evaluator(self, user):
-        if user.is_staff or self.evaluators.filter(id=user.id).exists():
+        if user.is_staff or self.evaluators.filter(id=user.id).exists() or user.id == self.admin_id:
             return self.applications.all()
         if user.organization in self.submitted_organizations.all():
             return self.applications.filter(
@@ -181,7 +183,9 @@ class Application(NamedModel):
         if not len(self.scores.all()):
             return 0
         total = 0
+
         mean = lambda scores: sum(scores) / len(scores) if len(scores) else 0
+
         for criterion in self.application_round.criteria.all():
             scores = [s for s in self.scores.all() if s.criterion_id == criterion.id]
             if len(scores):
@@ -209,7 +213,8 @@ class Application(NamedModel):
         if user.is_staff:
             return cls.objects.all()
         return cls.objects.filter(models.Q(evaluating_organizations__users=user) |
-                                  models.Q(application_round__evaluators=user)).distinct()
+                                  models.Q(application_round__evaluators=user) |
+                                  models.Q(application_round__admin=user)).distinct()
 
     def approve_by_user(self, user):
         self.approved_by = user
@@ -253,7 +258,7 @@ class EvaluationModel(TimestampedModel):
         """
         if not user:
             return []
-        if user.is_staff or application_round.scoring_completed:
+        if user.is_staff or application_round.scoring_completed or user.id == application_round.admin_id:
             return instances
         if not user.organization:
             return [s for s in instances if s.evaluator_id == user.id]

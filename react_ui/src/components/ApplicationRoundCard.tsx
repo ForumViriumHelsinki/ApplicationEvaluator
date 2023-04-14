@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import ReactMarkdown from 'react-markdown'
 import {AppContext, ApplicationRound} from "/components/types";
 import ApplicationScores from "/components/ApplicationScores";
@@ -35,10 +36,15 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
   render() {
     const {applicationRound} = this.props;
     const {user} = this.context;
-    const {showEvaluators, expanded, showScores} = this.state;
+    const {showEvaluators, expanded} = this.state;
     const scoredApps = applicationRound.applications.filter(a => a.scored);
     const partialApps = applicationRound.applications.filter(a => a.scores.length > 0);
     const submitted = applicationRound.submitted_organizations.includes(user.organization);
+
+    // When scoring model is based on single evaluators, showing the evaluators in itself will show the scores so combine these:
+    const showScores = applicationRound.scoring_model == 'Evaluators average' ? showEvaluators : this.state.showScores;
+
+    const uniqueEvaluators = _.uniq(_.flatten(applicationRound.applications.map(a => a.scores.map(s => s.evaluator))));
 
     const OrderBtn = ({order, label}: { order: AppOrder, label: string }) =>
       <>{' '}
@@ -108,6 +114,8 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             <label className="form-check-label">Show evaluators</label>
           </div>
           {settings.showScoresFromOtherUsers && !submitted &&
+            uniqueEvaluators.length > 1 &&
+            applicationRound.scoring_model !== 'Evaluators average' &&
             <div className="form-check d-inline-block mr-3"
                  onClick={() => this.setState({showScores: !showScores})}>
               <input className="form-check-input" type="checkbox" checked={showScores}/>

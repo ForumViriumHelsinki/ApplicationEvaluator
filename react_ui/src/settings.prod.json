@@ -3,6 +3,6 @@
   "sentryDsn": "https://c23b01cf0ee24b138ca00240fad16237@o1161048.ingest.sentry.io/6759674",
   "maxScore": 5,
   "finalScoreMultiplier": 4,
-  "showScoresFromOtherUsers": false,
+  "showScoresFromOtherUsers": true,
   "allowSubmit": false
 }
