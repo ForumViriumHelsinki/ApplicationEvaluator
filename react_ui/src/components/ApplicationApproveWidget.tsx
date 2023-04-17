@@ -25,7 +25,7 @@ export default class ApplicationApproveWidget extends React.Component<Applicatio
     const {application, applicationRound, className} = this.props;
     const {} = this.state;
     const {user} = this.context;
-    const submitted = applicationRound.submitted_organizations.length > 0;
+    const submitted = applicationRound.scoring_completed || applicationRound.submitted_organizations.length > 0;
     if (!(user.is_superuser && submitted)) return null;
 
     return application.approved ?
