@@ -30,14 +30,21 @@ Possible next steps include improvements to the application round definition int
 
 The application is based on a Django ReST Framework-based backend and a React/TypeScript/Bootstrap frontend. If you are interested in taking the tool into use and / or developing it further, feel free to contact johan.lindqvist(at)forumvirium.fi.
 
-To start UI development:
+To start development:
 
-* Install node.js
+* Install Docker and Docker Compose
 * Run:
 ```
-npm install -g yarn
-cd react_ui
-yarn
-yarn start
+sh configure_dev.sh
+docker-compose up
 ```
-This should install all dependencies in react_ui/node_modules and start a react dev environment serving the UI app at localhost:3000 or a nearby available port.
+
+This should start docker containers for the backend, frontend and database and install all needed dependencies in 
+them. A react dev environment serving the UI app should then be available at localhost:3000 or a nearby available port,
+and the admin interface at http://127.0.0.1:8000/admin/ .
+
+To create a superuser for the admin interface, run:
+```
+docker exec -it applicationevaluator-web-1 python manage.py createsuperuser
+```
+You should then be able to log in to the admin and evaluator interfaces and start defining application rounds.
