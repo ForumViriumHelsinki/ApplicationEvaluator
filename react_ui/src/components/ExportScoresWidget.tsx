@@ -81,6 +81,7 @@ export default class ExportScoresWidget extends React.Component<ExportScoresWidg
       {name: 'Application number', value: (a: Application) => a.name},
       {name: 'Id', value: (a: Application) => a.application_id},
       ...groups.map((g: CriterionGroup) => ({name: g.name, value: (a: Application) => a.groupScores[g.id]})),
+      {name: 'Total score', value: (a: Application) => getTotalScore(a)},
       {name: 'Approved', value: (a: Application) => a.approved},
       {
         name: 'Comments', value: (a: Application) =>
