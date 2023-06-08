@@ -83,6 +83,7 @@ class RestTests(APITestCase):
             'id': app_round.id,
             'applications': [{
                 'id': app.id,
+                'application_id': '',
                 'name': 'SkyNet',
                 'description': '',
                 'evaluating_organizations': ['Helsinki', 'Tallinn'],

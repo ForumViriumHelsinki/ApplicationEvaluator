@@ -172,6 +172,7 @@ User.organization = property(organization)
 
 class Application(NamedModel):
     application_round = models.ForeignKey(ApplicationRound, related_name='applications', on_delete=models.CASCADE)
+    application_id = models.CharField(max_length=64, blank=True)  # Application ID (18 char) from Salesforce CSV
     evaluating_organizations = models.ManyToManyField(Organization, related_name='applications_to_evaluate', blank=True)
     description = description_field()
     approved_by = models.ForeignKey(User, related_name='approved_applications', on_delete=models.SET_NULL, null=True,
@@ -344,6 +345,7 @@ class ApplicationImport(BaseApplicationImport):
             reader = csv.DictReader(f)
             for row in reader:
                 name = row.pop(self.application_name_column)
+                application_id = row.pop('Application ID (18 char)')
                 for column in self.ignore_columns:
                     row.pop(column, None)
                 if self.application_round:
@@ -354,6 +356,7 @@ class ApplicationImport(BaseApplicationImport):
                 description = '\n\n'.join([f'#### {k}\n\n{fix_newlines(v)}' for k, v in row.items()])
                 application = Application.objects.create(
                     application_round=app_round,
+                    application_id=application_id,
                     name=name,
                     description=description,
                 )
