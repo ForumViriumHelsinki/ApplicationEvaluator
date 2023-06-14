@@ -104,7 +104,7 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
     filter_horizontal = ['evaluators']
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(app_count=Count('applications'),
+        return super().get_queryset(request).annotate(app_count=Count('applications', distinct=True),
                                                       score_count=Count('applications__scores'))
 
     def applications_(self, round):
