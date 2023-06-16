@@ -1,0 +1,48 @@
+server {
+    listen 80;
+    server_name evaluator.fvh.io;
+
+    # Let's encrypt's temporary directory
+    location '/.well-known/acme-challenge' {
+        default_type "text/plain";
+        root /var/www/letsencrypt;
+    }
+    location / {
+        return 301 https://evaluator.fvh.io$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name evaluator.fvh.io;
+
+    client_max_body_size 4G;
+
+    access_log /site/evaluator.fvh.io/logs/nginx-access.log;
+    error_log /site/evaluator.fvh.io/logs/nginx-error.log;
+
+    ssl_certificate /etc/letsencrypt/live/evaluator.fvh.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/evaluator.fvh.io/privkey.pem;
+    include /etc/nginx/ssl-security.conf;
+
+    location /staticfiles/ {
+        alias /site/evaluator.fvh.io/CommuniCity/django_server/staticfiles/;
+    }
+
+    location /uploads/ {
+        alias /site/evaluator.fvh.io/CommuniCity/django_server/media/;
+    }
+
+    location ~* ^/(admin|rest) {
+        proxy_pass http://127.0.0.1:8001;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+    location / {
+        alias /site/evaluator.fvh.io/CommuniCity/react_ui/build/;
+    }
+
+}
