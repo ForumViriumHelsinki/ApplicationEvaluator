@@ -14,7 +14,7 @@ COPY Pipfile /app/
 COPY Pipfile.lock /app/
 
 # install dependencies
-RUN apt-get update; apt-get install -y netcat
+RUN apt-get update; apt-get install -y ncat
 RUN pip install pipenv
 RUN pipenv install --system --deploy
 

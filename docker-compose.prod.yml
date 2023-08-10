@@ -3,13 +3,18 @@ version: '3.7'
 services:
   web:
     build: ./django_server
-    command: gunicorn application_evaluator_config.wsgi:application --bind 0.0.0.0:8000 --access-logfile access.log --error-logfile error.log --capture-output --workers 4
+    command: gunicorn application_evaluator_config.wsgi:application --bind 0.0.0.0:8001 --workers 4
     network_mode: host
     env_file:
       - ./.env.prod
     volumes:
       - ./django_server:/app
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "20m"
 
   react:
     build: ./react_ui
