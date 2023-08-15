@@ -1,0 +1,30 @@
+exclude: .*migrations\/.*
+repos:
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.284'
+    hooks:
+      - id: ruff
+        # Respect `exclude` and `extend-exclude` settings.
+        # args: ["--force-exclude", --line-length, "120"]
+        args: ["--line-length", "120"]
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        args: [ --line-length=120 ]
+
+  - repo: https://github.com/myint/autoflake
+    rev: v2.2.0
+    hooks:
+      - id: autoflake
+        exclude: migrations
