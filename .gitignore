@@ -15,3 +15,5 @@ __pycache__
 /react_ui/src/settings.json
 /.env.prod
 /postgres_data/
+
+venv
