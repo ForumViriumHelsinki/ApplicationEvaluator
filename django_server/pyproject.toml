@@ -1,0 +1,92 @@
+[tool.setuptools]
+py-modules = []
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "application-evaluator"
+description = ""
+readme = "README.md"
+requires-python = ">=3.10"
+dynamic = ["version"]
+
+dependencies = [
+  "Django >= 4.2.4, < 5.0",
+  "djangorestframework >=3.10",
+  "pyaml >=19.4",
+  "uritemplate >=3.0",
+  "coreapi >=2.3",
+  "django-cors-headers >=3.2",
+  "dj-rest-auth",
+  "jsonschema >=3.2",
+  "psycopg2-binary >2.8",
+  "flake8 >=3.7",
+  "coverage >=5.0",
+  "gunicorn >=20.0",
+  "sentry-sdk",
+  "dj-inmemorystorage",
+  "openpyxl",
+]
+
+[project.optional-dependencies]
+dev = [
+  "autoflake",
+  "black",
+  "pep8-naming",
+  "pre-commit",
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "ruff",
+]
+
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311']
+exclude = '''
+(
+  migrations         # migrations are automatically generated and should we excluded
+  |
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.tox
+    | \.venv
+    | venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
+# force-exclude is for pre-commit
+force-exclude = '''
+(
+   devices/migrations                     # files in this dir are ignored
+)
+'''
+
+[tool.ruff]
+line-length = 120
+ignore-init-module-imports = true
+exclude = ["devices/migrations/*.py"]
+
+# Enable Pyflakes `E` and `F` codes by default.
+select = ["E", "F"]
+ignore = []
+
+[tool.autoflake]
+in-place = true
+remove-all-unused-imports =true
+remove-unused-variables = true
+exclude = ["migrations", "venv"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "deviceregistry.settings"
+log_cli = 1
+log_cli_level = 20
