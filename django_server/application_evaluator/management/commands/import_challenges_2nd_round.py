@@ -79,8 +79,25 @@ def create_challenge_and_criterion(identifier: str, challenge: dict) -> Applicat
     All objects are created using get_or_create() method, so that existing objects are not duplicated.
     """
     # Create ApplicationRound
-    ar_name = f"{identifier}: {challenge['title']}"[:128]
-    ar, created = ApplicationRound.objects.get_or_create(name=ar_name, description=challenge["text"])
+    long_ar_name = f"{identifier}: {challenge['title']}"
+    ar_name = long_ar_name[:128]
+    # try to get existing ApplicationRound using long_ar_name
+    created = False
+    try:
+        ar = ApplicationRound.objects.get(name=long_ar_name)
+    except ApplicationRound.DoesNotExist:  # Then with ar_name
+        try:
+            ar = ApplicationRound.objects.get(name=ar_name)
+            ar.name = long_ar_name
+            print(f"name changed: {ar_name} -> {long_ar_name}")
+            ar.save()
+        except ApplicationRound.DoesNotExist:  # create new ApplicationRound with long_ar_name
+            ar = ApplicationRound.objects.create(name=long_ar_name, description=challenge["text"])
+            created = True
+    if not ar.city:
+        ar.city = challenge["city"]
+        ar.save()
+    # ar, created = ApplicationRound.objects.get_or_create(name=ar_name, description=challenge["text"])
     print(ar, created)
     # Create CriterionGroup and Criterion objects
     for score in challenge["scores"]:
