@@ -22,23 +22,24 @@ class InlineForApplicationRound(admin.TabularInline):
 
 class CriterionGroupInline(InlineForApplicationRound):
     model = models.CriterionGroup
-    filter_fks = ['parent']
+    filter_fks = ["parent"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).order_by('order', 'name')
+        return super().get_queryset(request).order_by("order", "name")
 
 
 class CriterionInline(InlineForApplicationRound):
     model = models.Criterion
-    filter_fks = ['group']
+    filter_fks = ["group"]
 
 
 class ApplicationRoundForm(forms.ModelForm):
     import_applications = forms.CharField(
-        widget=forms.Textarea({'rows': 3}),
+        widget=forms.Textarea({"rows": 3}),
         required=False,
-        help_text='Paste application names here, one per row; optionally, you can also ' +
-                  'include evaluating organizations after application name, separated by tabs.')
+        help_text="Paste application names here, one per row; optionally, you can also "
+        + "include evaluating organizations after application name, separated by tabs.",
+    )
 
     class Meta:
         model = models.ApplicationRound
@@ -56,8 +57,8 @@ class ApplicationRoundForm(forms.ModelForm):
 
     def save_applications(self):
         orgs = dict((o.name, o) for o in models.Organization.objects.all())
-        for row in self.data['import_applications'].strip().split('\n'):
-            parts = row.strip().split('\t')
+        for row in self.data["import_applications"].strip().split("\n"):
+            parts = row.strip().split("\t")
             name = parts.pop(0)
             if not name:
                 continue
@@ -74,12 +75,13 @@ class RoundAttachmentInline(admin.TabularInline):
 
 
 class BaseApplicationImportInline(admin.TabularInline):
-    readonly_fields = ['created_at', 'error', 'status']
+    readonly_fields = ["created_at", "error", "status"]
     extra = 1
 
     def has_change_permission(self, request, obj):
         # Imports cannot be changed; the import is attempted when created, then stays in Done or Error status.
         return False
+
 
 class ApplicationImportInline(BaseApplicationImportInline):
     model = models.ApplicationImport
@@ -96,16 +98,25 @@ class ApplicationRoundSubmittalInline(admin.TabularInline):
 
 @admin.register(models.ApplicationRound)
 class ApplicationRoundAdmin(admin.ModelAdmin):
-    inlines = [RoundAttachmentInline, ApplicationImportInline, ApplicationAttachmentImportInline,
-               ApplicationRoundSubmittalInline, CriterionGroupInline, CriterionInline]
-    list_display = ['name', 'applications_', 'scores_', 'published']
-    actions = ['duplicate']
+    inlines = [
+        RoundAttachmentInline,
+        ApplicationImportInline,
+        ApplicationAttachmentImportInline,
+        ApplicationRoundSubmittalInline,
+        CriterionGroupInline,
+        CriterionInline,
+    ]
+    list_display = ["name", "city", "applications_", "scores_", "published"]
+    actions = ["duplicate"]
     form = ApplicationRoundForm
-    filter_horizontal = ['evaluators']
+    filter_horizontal = ["evaluators"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(app_count=Count('applications', distinct=True),
-                                                      score_count=Count('applications__scores'))
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(app_count=Count("applications", distinct=True), score_count=Count("applications__scores"))
+        )
 
     def applications_(self, round):
         return round.app_count
@@ -125,8 +136,8 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
 
 @admin.register(models.ApplicationImport)
 class ApplicationImportAdmin(admin.ModelAdmin):
-    list_display = ['application_round', 'created_at', 'status', 'error']
-    list_filter = ['status']
+    list_display = ["application_round", "created_at", "status", "error"]
+    list_filter = ["status"]
 
 
 class ScoreInline(admin.TabularInline):
@@ -139,7 +150,7 @@ def add_evaluating_organization_action(organization):
         for app in queryset.all():
             app.evaluating_organizations.add(organization)
 
-    action.__name__ = f'Allocate to {organization.name}'
+    action.__name__ = f"Allocate to {organization.name}"
     return action
 
 
@@ -160,12 +171,11 @@ class AttachmentInline(admin.TabularInline):
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline, ScoreInline]
-    list_display = ['name', 'organizations', 'score', 'approved', 'scores_', 'attachments_']
-    list_filter = ['application_round', 'evaluating_organizations', 'approved']
+    list_display = ["name", "organizations", "score", "approved", "scores_", "attachments_"]
+    list_filter = ["application_round", "evaluating_organizations", "approved"]
 
     def get_actions(self, request):
-        self.actions = [add_evaluating_organization_action(o)
-                        for o in models.Organization.objects.order_by('name')]
+        self.actions = [add_evaluating_organization_action(o) for o in models.Organization.objects.order_by("name")]
         return super().get_actions(request)
 
     def scores_(self, app):
@@ -175,30 +185,34 @@ class ApplicationAdmin(admin.ModelAdmin):
         return app.attachment_count
 
     def organizations(self, app):
-        return ', '.join(o.name for o in app.evaluating_organizations.all())
+        return ", ".join(o.name for o in app.evaluating_organizations.all())
 
     def get_queryset(self, request):
-        return super().get_queryset(request) \
-            .prefetch_related('scores__evaluator__organizations', 'application_round__criteria',
-                              'evaluating_organizations') \
-            .annotate(attachment_count=Count('attachments'))
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                "scores__evaluator__organizations", "application_round__criteria", "evaluating_organizations"
+            )
+            .annotate(attachment_count=Count("attachments"))
+        )
 
 
 class CriterionScoreInline(ScoreInline):
-    readonly_fields = ['evaluator', 'application']
+    readonly_fields = ["evaluator", "application"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('application', 'evaluator')
+        return super().get_queryset(request).select_related("application", "evaluator")
 
 
 @admin.register(models.Criterion)
 class CriterionAdmin(admin.ModelAdmin):
     inlines = [CriterionScoreInline]
-    actions = ['initialize_scores', 'delete_my_scores']
+    actions = ["initialize_scores", "delete_my_scores"]
 
     def initialize_scores(self, request, queryset):
         for criterion in queryset:
-            for app in criterion.application_round.applications.exclude(scores__criterion=criterion).order_by('name'):
+            for app in criterion.application_round.applications.exclude(scores__criterion=criterion).order_by("name"):
                 app.scores.create(criterion=criterion, evaluator=request.user)
 
     def delete_my_scores(self, request, queryset):
@@ -207,10 +221,10 @@ class CriterionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    filter_horizontal = ['users']
+    filter_horizontal = ["users"]
 
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'action_time', 'user']
-    list_filter = ['user']
+    list_display = ["__str__", "action_time", "user"]
+    list_filter = ["user"]
