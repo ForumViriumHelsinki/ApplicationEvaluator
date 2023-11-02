@@ -1,12 +1,8 @@
 # Create management command to import challenge texts gathered from a web page to Django
-import re
 
+import openpyxl
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-
-# import excel module
-import openpyxl
-
 
 from application_evaluator.models import ApplicationRound
 
@@ -59,45 +55,13 @@ def merge_duplicate_users(users: list) -> list:
             if k in user:
                 del user[k]
         email = user["E-mail"]
+        challenge = [user["Challenge"], user["Evaluation criteria"]]
         if email not in user_dict:
             user_dict[email] = user
-            user_dict[email]["Challenge"] = [user_dict[email]["Challenge"]]
+            user_dict[email]["Challenge"] = [challenge]
         else:
-            if user["Challenge"] not in user_dict[email]["Challenge"]:
-                user_dict[email]["Challenge"].append(user["Challenge"])
-
+            user_dict[email]["Challenge"].append(challenge)
     return list(user_dict.values())
-
-
-x = [
-    "CC-201: How can technology ease the process of setting up a bank account for foreigners",
-    "CC-202: How to support parents in online (sex)education and safety",
-    "CC-203: How to ensure accessible acceptance of a local payment system among "
-    "residents and local entrepreneurs in Amsterdam Nieuw",
-    "CC-204: How to encourage girls in Nieuw-West to take part in sports and " "exercise",
-    "CC-205: How to involve residents in a community savings and credit "
-    "cooperative that supports social initiatives in the city",
-    "CC-206: How to include deaf and hearing impaired in broadcasting information on public transport",
-    "CC-207: How to adapt an existing technological solution for a specific group",
-    "CC-208: How to strengthen the broad, positive health of youth through attractive and playful technology",
-    "CC-209: How can resilient role models help families to develop healthy relationships",
-    "CC-210: Wildcard – Propose any technological solution which contributes to a "
-    "breakthrough in intergenerational problems\t0\t0\tFalse",
-    "CC-211: How to reliably measure the digital skills of long-term unemployed citizens",
-    "CC-212: How to support the recognition of competence with help of a digital tool",
-    "CC-213: How to prevent pressure ulcers of wheelchair patients",
-    "CC-214: How to enhance the quality of life and foster inclusion for citizens "
-    "with severe disabilities through digital innovation",
-    "CC-215: How to collect and generate accessible pedestrian route information "
-    "through participatory data collection methods",
-    "CC-216: How to utilise existing data and data sources for activating " "digitally hard-to-reach residents",
-    "CC-217: How to reduce school absenteeism through an innovative and inclusive " "educational solution",
-    "CC-218: How to improve the thermal comfort and overall health in residential "
-    "buildings, focusing on passive strategies",
-    "CC-219: How to engage the citizens from socially and economically "
-    "disconnected localities in participatory planning",
-    "CC-220: How to better inform the public with limited access to digital tools " "about urban data analysis",
-]
 
 
 class Command(BaseCommand):
@@ -109,17 +73,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         users = read_excel_sheet(options["filename"])
         new_users = merge_duplicate_users(users)
-        # for u in users:
-        #     pprint(u)
-        #     break
         for u in new_users:
-            # pprint(u)
             u["ApplicationRounds"] = []
             for c in u["Challenge"]:
+                name, criteria = c
                 # if "Breda" not in c:
                 #     continue
                 # split challenge name to city and title using ':'
-                city, title = [x.strip() for x in c.split(":")]
+                city, title = [x.strip() for x in name.split(":")]
                 # Search for ApplicationRounds with name containing title's first 4 words
                 # Pick 4 first words from title:
                 words = title.split(" ")
@@ -130,8 +91,6 @@ class Command(BaseCommand):
                 ars = ApplicationRound.objects.filter(name__startswith="CC-2")
                 for w in words:
                     ars = ars.filter(name__icontains=w)
-                # ars = ApplicationRound.objects.filter(name__contains=title.strip("?")[:20])
-                # print(ars)
 
                 if len(ars) != 1:
                     print(f"ApplicationRound not found for {c}")
@@ -140,34 +99,28 @@ class Command(BaseCommand):
                     exit()
                 else:
                     u["ApplicationRounds"].append(ars[0])
-
-                # print(city, title, ars)
-            name, domain = u["E-mail"].lower().split("@")
-            name = re.sub(r"[aeiouAEIOU]", "y", name)
-            name = re.sub(r"[bcdfghjklmnpqrstvxz]", "x", name)
-            # korvaa vokaalit y-kirjaimella ja konsonantit x:llä
-            # name = re.sub(r"[aeiouy]", "y", name, re.IGNORECASE)
-            # name = re.sub(r"[bcdfghjklmnpqrstvxz.]", "x", name, re.IGNORECASE)
-
-            print(f"@{domain}", len(u["ApplicationRounds"]))
-            # if u["E-mail"] == "gd.hollander@breda.nl":
-            #     pprint(u)
-            #     exit()
-            # break
-        # self.stdout.write(self.style.SUCCESS("{} challenges imported".format(len(challenges))))
-        # pprint(new_users)
         # Create users
         for u in new_users:
             user, created = User.objects.get_or_create(username=u["E-mail"].lower())
             if created:  # Set first_name and last_name only if user is created
                 user.first_name = u["First name"]
                 user.last_name = u["Last name"]
+                user.email = u["E-mail"].lower()
                 # Set random password
                 user.set_password(User.objects.make_random_password())
+                user.save()
             # Add ApplicationRounds to user
             for ar in u["ApplicationRounds"]:
                 ar.evaluators.add(user)
-                print(ar.evaluators.all())
-            user.save()
-            print(user, created)
-            exit()
+            print(user)
+            for c in u["Challenge"]:
+                # replace all words (Impact; Excellence; Implementation; Co-creation)
+                # with abbreviations IMP EXC IQE Co-C
+                cri = (
+                    c[1]
+                    .replace("Impact", "IMP")
+                    .replace("Excellence", "EXC")
+                    .replace("Implementation", "IQE")
+                    .replace("Co-creation", "Co-C")
+                )
+                print(f"  {c[0][:60]} ({cri})")

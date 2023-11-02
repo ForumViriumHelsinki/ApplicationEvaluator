@@ -106,7 +106,7 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
         CriterionGroupInline,
         CriterionInline,
     ]
-    list_display = ["name", "city", "applications_", "scores_", "published"]
+    list_display = ["name", "city", "applications_", "evaluators_", "scores_", "published"]
     actions = ["duplicate"]
     form = ApplicationRoundForm
     filter_horizontal = ["evaluators"]
@@ -115,7 +115,11 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .annotate(app_count=Count("applications", distinct=True), score_count=Count("applications__scores"))
+            .annotate(
+                app_count=Count("applications", distinct=True),
+                score_count=Count("applications__scores"),
+                evaluator_count=Count("evaluators"),
+            )
         )
 
     def applications_(self, round):
@@ -123,6 +127,9 @@ class ApplicationRoundAdmin(admin.ModelAdmin):
 
     def scores_(self, round):
         return round.score_count
+
+    def evaluators_(self, round):
+        return int(round.evaluator_count / (round.app_count or 1))
 
     def duplicate(self, request, queryset):
         for round in queryset:
