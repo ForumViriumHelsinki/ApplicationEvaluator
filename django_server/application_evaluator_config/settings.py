@@ -144,7 +144,15 @@ REST_FRAMEWORK = {
     ]
 }
 
-REST_AUTH_SERIALIZERS = {"USER_DETAILS_SERIALIZER": "application_evaluator.rest.UserSerializer"}
+# Appears to be deprecated, can likely be removed:
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'application_evaluator.rest.UserSerializer'
+}
+
+# This version appears to be the correct one for dj-rest-auth:
+REST_AUTH = {
+    'USER_DETAILS_SERIALIZER': 'application_evaluator.rest.UserSerializer'
+}
 
 LOG_DB_QUERIES = False
 
