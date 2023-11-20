@@ -3,6 +3,7 @@
 import openpyxl
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from application_evaluator.models import ApplicationRound
 
@@ -69,10 +70,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--filename", type=str, required=True)
+        parser.add_argument("--dry-run", action="store_true", help="Don't save to database")
+        parser.add_argument("--only-new", action="store_true", help="Only create new users")
 
     def handle(self, *args, **options):
         users = read_excel_sheet(options["filename"])
         new_users = merge_duplicate_users(users)
+        # Do everything in a transaction
         for u in new_users:
             u["ApplicationRounds"] = []
             for c in u["Challenge"]:
@@ -99,28 +103,40 @@ class Command(BaseCommand):
                     exit()
                 else:
                     u["ApplicationRounds"].append(ars[0])
-        # Create users
-        for u in new_users:
-            user, created = User.objects.get_or_create(username=u["E-mail"].lower())
-            if created:  # Set first_name and last_name only if user is created
-                user.first_name = u["First name"]
-                user.last_name = u["Last name"]
-                user.email = u["E-mail"].lower()
-                # Set random password
-                user.set_password(User.objects.make_random_password())
-                user.save()
-            # Add ApplicationRounds to user
-            for ar in u["ApplicationRounds"]:
-                ar.evaluators.add(user)
-            print(user)
-            for c in u["Challenge"]:
-                # replace all words (Impact; Excellence; Implementation; Co-creation)
-                # with abbreviations IMP EXC IQE Co-C
-                cri = (
-                    c[1]
-                    .replace("Impact", "IMP")
-                    .replace("Excellence", "EXC")
-                    .replace("Implementation", "IQE")
-                    .replace("Co-creation", "Co-C")
-                )
-                print(f"  {c[0][:60]} ({cri})")
+        with transaction.atomic():
+            # Create users
+            for u in new_users:
+                # Replace get_or_create with equivalent try/except
+                try:
+                    user = User.objects.get(username=u["E-mail"].lower())
+                    created = False
+                    if options["only_new"]:  # If only_new, skip existing users
+                        continue
+                except User.DoesNotExist:
+                    user = User.objects.create(username=u["E-mail"].lower())
+                    created = True
+                    # Set first_name and last_name only if user is created
+                    user.first_name = u["First name"]
+                    user.last_name = u["Last name"]
+                    user.email = u["E-mail"].lower()
+                    # Set random password
+                    user.set_password(User.objects.make_random_password())
+                    user.save()
+                # Add ApplicationRounds to user
+                for ar in u["ApplicationRounds"]:
+                    ar.evaluators.add(user)
+                print("{} {}".format(user, created))
+                for c in u["Challenge"]:
+                    # replace all words (Impact; Excellence; Implementation; Co-creation)
+                    # with abbreviations IMP EXC IQE Co-C
+                    cri = (
+                        c[1]
+                        .replace("Impact", "IMP")
+                        .replace("Excellence", "EXC")
+                        .replace("Implementation", "IQE")
+                        .replace("Co-creation", "Co-C")
+                    )
+                    print(f"  {c[0][:60]} ({cri})")
+            # Rollback transaction if dry-run
+            if options["dry_run"]:
+                transaction.set_rollback(True)
