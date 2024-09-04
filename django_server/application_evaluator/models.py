@@ -226,6 +226,28 @@ class Application(NamedModel):
                     total += mean([s.score for s in scores]) * criterion.weight
         return total / self.application_round.total_weight()
 
+    def all_scores(self):
+        # Use .all() to force evaluation of the queryset for later:
+        if not len(self.scores.all()):
+            return 0
+
+        mean = lambda scores: sum(scores) / len(scores) if len(scores) else 0  # noqa
+        criterion_scores = []
+        for criterion in self.application_round.criteria.all():
+            scores = [s for s in self.scores.all() if s.criterion_id == criterion.id]
+            if len(scores):
+                if self.application_round.scoring_model == "Organizations average":
+                    raise ValueError("'Organizations average' is not implemented")
+                else:
+                    s = mean([s.score for s in scores])  # * criterion.weight / self.application_round.total_weight()
+                    # print(scores)
+                    # print(s)
+                    # print(criterion.weight, self.application_round.total_weight())
+                    # exit()
+                    criterion_scores.append((criterion.name, s))
+                    print(f"{criterion.name}: {s}")
+        return criterion_scores
+
     def can_be_evaluated_by(self, user):
         return (
             self.evaluating_organizations.filter(users=user).exists()

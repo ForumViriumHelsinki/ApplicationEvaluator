@@ -46,7 +46,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "application_evaluator",
+    #    "django_extensions",
 ]
+
+GRAPH_MODELS = {
+    "all_applications": True,
+    "graph_models": True,
+}
 
 if os.environ.get("ELASTIC_SERVICE", False):
     INSTALLED_APPS.append("elasticapm.contrib.django")
@@ -145,14 +151,10 @@ REST_FRAMEWORK = {
 }
 
 # Appears to be deprecated, can likely be removed:
-REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'application_evaluator.rest.UserSerializer'
-}
+REST_AUTH_SERIALIZERS = {"USER_DETAILS_SERIALIZER": "application_evaluator.rest.UserSerializer"}
 
 # This version appears to be the correct one for dj-rest-auth:
-REST_AUTH = {
-    'USER_DETAILS_SERIALIZER': 'application_evaluator.rest.UserSerializer'
-}
+REST_AUTH = {"USER_DETAILS_SERIALIZER": "application_evaluator.rest.UserSerializer"}
 
 LOG_DB_QUERIES = False
 

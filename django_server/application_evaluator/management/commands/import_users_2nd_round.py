@@ -140,3 +140,4 @@ class Command(BaseCommand):
             # Rollback transaction if dry-run
             if options["dry_run"]:
                 transaction.set_rollback(True)
+                print("Dry-run, rolling back transaction")
