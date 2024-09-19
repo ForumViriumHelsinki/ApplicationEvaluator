@@ -17,3 +17,5 @@ __pycache__
 /postgres_data/
 
 venv
+
+*/scripts/parsed
