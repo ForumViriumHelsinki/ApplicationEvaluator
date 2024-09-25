@@ -87,18 +87,13 @@ def get_application_round_from_challenge_name(challenge_name: str) -> Applicatio
     """
     # split challenge name to city and title using ':'
     city, name = [x.strip() for x in challenge_name.split(":")]
-    # Search for ApplicationRounds with name containing title's first 4 words
-    # Pick 4 first words from title:
-    words = name.split(" ")
-    # remove all words shorter than 3 characters
-    words = [w for w in words if len(w) >= 3][:4]
-    # create qset for filtering ApplicationRounds where name contains all words
+    # first filter 3rd round ApplicationRounds
     ars = ApplicationRound.objects.filter(name__startswith="CC-3")
-    for w in words:
-        ars = ars.filter(name__icontains=w)
+    # in the database titles are like "CC-310: How to do foo bar?", name should exist there as is
+    ars = ars.filter(name__contains=name)
     if len(ars) != 1:
         print(f"ApplicationRound not found for {challenge_name}")
-        print(f"Words: {words}")
+        print(f"Searched for: {name}")
         print(ars.query)
         exit()
     else:
@@ -139,15 +134,19 @@ def read_excel_sheet(filename: str) -> list:
 
 def import_attachments(app: Application, filename: str):
     """Add attachments to Application object."""
+    # Delele old attachments
+    # app.attachments.all().delete()
     filepath = Path(filename)
     # Check if exact filename exists in app.attachments
     # If it does, skip
     # If it doesn't, create ApplicationAttachment object and add it to app.attachments
     for a in app.attachments.all():
-        print(a.attachment.name, filepath.name)
-        if Path(a.attachment.name).name == filepath.name:
+        print(f"ATTACH!\n{a.attachment.name}\n{filepath.name}\n")
+        if Path(a.attachment.name).name.endswith(filepath.name.replace(" ", "_")):
             print(f"Attachment {filepath.name} already exists, skipping")
             return
+        else:
+            print(f"Attachment {filepath.name} not found in {a.attachment.name}")
     with open(filename, "rb") as f:
         attachment = ApplicationAttachment.objects.create(
             application=app,
@@ -155,7 +154,7 @@ def import_attachments(app: Application, filename: str):
             name=filepath.name,
         )
         attachment.save()
-    print(attachment)
+    print("New attachment", attachment)
 
 
 def create_application(application_round: ApplicationRound, app: dict) -> [Application, bool]:
@@ -198,8 +197,8 @@ class Command(BaseCommand):
             # Check if there is a subdirectory with same name as app.other_id
             # If there is, import all files from that directory as attachments
             if options["attachments_dir"]:
-                dirname = options["attachments_dir"]
-                for subdir in glob.glob(f"{dirname}/{app.other_id}/*"):
+                dirname = Path(options["attachments_dir"]) / Path(a["Application ID"])
+                for subdir in glob.glob(f"{dirname}/*"):
                     import_attachments(app, subdir)
                     attachment_cnt += 1
             print("----")
