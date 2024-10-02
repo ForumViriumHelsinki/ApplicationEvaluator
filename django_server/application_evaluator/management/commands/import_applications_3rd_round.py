@@ -55,19 +55,19 @@ fields = [
         4,
         "1. Applicants must declare the MIMs their application is compliant with and explain for each declared MIM "
         "how their applications are compliant (max. 1000 characters with spaces)",
-        "MIM Compliance",
+        "Tech specifications: MIMs Compliance",
     ],
     [
         4,
         "2. Applicants must explain which of the offered tools they will use and how. Or how they would contribute "
         "to the toolbox (max. 1000 characters with spaces)",
-        "Tool Usage",
+        "Tech specifications: Toolbox Usage",
     ],
     [
         4,
         "3. Applicants must explain how they plan to use the Sandbox and for what purpose (max. 1000 characters "
         "with spaces)",
-        "Sandbox Usage",
+        "Tech specifications: Sandbox Usage",
     ],
     [0, "Data privacy", "Data Privacy"],
     [0, "GDPR", "GDPR Compliance"],
