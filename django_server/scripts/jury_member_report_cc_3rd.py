@@ -1,13 +1,84 @@
 import pandas as pd
 import argparse
+import re
 from collections import Counter
+
+"""
+Analyze Excel files for Challenges and Jury members
+
+Jury Excel file format:
+Challenge	            string, "<city>[ / <organisation>]: <challenge text> e.g. "Utrecht / HKU: How can...?"
+Evaluation criteria	    ';' separated list of strings
+First name	            string
+Last name	            string
+Organisation	        string
+E-mail	                email address
+Data security policy	string
+Submit date and time    empty
+"""
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Analyze Excel files for Challenges and Jury members")
     parser.add_argument("--jury-excel", required=True, help="Path to the jury Excel file")
     parser.add_argument("--challenge-excel", required=True, help="Path to the challenge Excel file")
+    parser.add_argument("--city", nargs="*", help="City name")
     return parser.parse_args()
+
+
+def jury_member_report_excel(filename, cities: list[str]) -> list:
+    jury_members = []
+    # Read the Excel file
+    df = pd.read_excel(filename)
+    # Drop unnecessary columns
+    df = df[["Challenge", "Evaluation criteria", "First name", "Last name"]]
+    """
+    The df looks like this:
+                           Challenge                         Evaluation criteria First name             Last name
+    0    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation      Emily            Thompson
+    1    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation     Robert               Parker
+    2    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation     Sophie              Johnson
+    3    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation    Michael               Brown
+    4    Amsterdam: Wildcard - ...  Impact; Implementation; Excellence; Co-creation      Laura               Davis
+    ..                   ...                                              ...        ...                   ...
+    136  Utrecht: How to reduce street harassment?          Impact; Implementation      David               Wilson
+    137  Utrecht / HKU: How can a personalised calendar...  Implementation; Excellence      Sarah               Taylor
+    138  Utrecht / HKU: How can a personalised calendar...  Implementation; Excellence     Daniel               Miller
+    139  Utrecht / HKU: How can a personalised calendar...  Impact; Co-creation      Emma               Anderson
+    140  Utrecht / HKU: How can a personalised calendar...  Impact; Co-creation     Oliver               Martin
+    """
+    # Filter by city string, which is in the start of the string
+    # There can be multiple cities, so we need to filter by each city
+    if cities:
+        # Create a regex pattern to match any of the provided cities at the start of the Challenge
+        city_pattern = "^(" + "|".join(map(re.escape, cities)) + ")"
+        df = df[df["Challenge"].str.match(city_pattern)]
+
+    # Replace multiple whitespaces with a single whitespace in the 'Challenge' column
+    df["Challenge"] = df["Challenge"].str.replace(r"\s+", " ", regex=True)
+
+    # List of all evaluation criteria
+    # Create a list to store jury member dicts
+    jury_members = []
+
+    # Group by First name and Last name
+    grouped = df.groupby(["First name", "Last name"])
+
+    # Iterate through each group
+    for (first_name, last_name), group in grouped:
+        member_dict = {f"{last_name} {first_name}": []}
+
+        # Iterate through each row in the group
+        for _, row in group.iterrows():
+            challenge = row["Challenge"]
+            criteria = row["Evaluation criteria"]
+
+            # Add challenge and criteria to the member's list
+            member_dict[f"{last_name} {first_name}"].append({challenge: criteria})
+
+        # Add the member dict to the jury_members list
+        jury_members.append(member_dict)
+    return jury_members
 
 
 def process_jury_excel(filename):
@@ -18,10 +89,10 @@ def process_jury_excel(filename):
     # df looks like this:
     """
                                                      Challenge                              Evaluation criteria
-    0    Aarhus: How can youth interaction with public ...  Impact; Implementation; Excellence; Co-creation
-    1    Aarhus: How can youth interaction with public ...  Impact; Implementation; Excellence; Co-creation
-    2    Aarhus: How can youth interaction with public ...  Impact; Implementation; Excellence; Co-creation
-    3    Aarhus: How can youth interaction with public ...  Impact; Implementation; Excellence; Co-creation
+    0    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation
+    1    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation
+    2    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation
+    3    Aarhus: How can youth ...  Impact; Implementation; Excellence; Co-creation
     4    Amsterdam: Wildcard - How can an AI solution s...  Impact; Implementation; Excellence; Co-creation
     ..                                                 ...                                              ...
     115          Utrecht: How to reduce street harassment?                           Impact; Implementation
@@ -82,6 +153,22 @@ def find_challenges_without_jury(jury_challenges, all_challenges):
 
 def main():
     args = parse_args()
+
+    if args.city:
+        jury_members = jury_member_report_excel(args.jury_excel, args.city)
+        print(f"Jury members: {len(jury_members)}\n")
+        # print the jury members, their challenges and criteria, in alphabetical order, using the first key
+        for member in sorted(jury_members, key=lambda x: list(x.keys())[0]):
+            # print the member name
+            name = list(member.keys())[0]
+            print(f"{name}")
+            for challenges in member[name]:
+                for challenge in challenges:
+                    print(f"  {challenge}")
+                    # number of criteria
+                    num_criteria = len(challenges[challenge].split(";"))
+                    print(f"    Criteria ({num_criteria}): {challenges[challenge]}")
+        exit(0)
 
     # Process jury Excel
     challenge_counts, output_filename, jury_challenges, missing_criteria = process_jury_excel(args.jury_excel)
