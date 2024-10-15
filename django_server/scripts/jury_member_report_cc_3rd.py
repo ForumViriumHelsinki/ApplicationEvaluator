@@ -4,7 +4,8 @@ import re
 from collections import Counter
 
 """
-Analyze Excel files for Challenges and Jury members
+Analyze Excel files for Challenges and Jury members.
+This is intended to be used for the CommuniCity 3rd round only.
 
 Jury Excel file format:
 Challenge	            string, "<city>[ / <organisation>]: <challenge text> e.g. "Utrecht / HKU: How can...?"
@@ -151,6 +152,26 @@ def find_challenges_without_jury(jury_challenges, all_challenges):
     return challenges_without_jury
 
 
+def analyze_jury_members(filename):
+    # Read the Excel file
+    df = pd.read_excel(filename)
+
+    # Count unique jury members by email
+    unique_jury_members = df["E-mail"].nunique()
+
+    # Count challenges per jury member
+    jury_challenge_counts = df.groupby(["First name", "Last name", "E-mail"])["Challenge"].nunique().reset_index()
+    jury_challenge_counts = jury_challenge_counts.sort_values(["Last name", "First name"])
+
+    # Print results
+    print(f"\nTotal number of unique jury members: {unique_jury_members}\n")
+    print("Jury members and their challenge counts (alphabetically):\n")
+    for _, row in jury_challenge_counts.iterrows():
+        print(f"{row['Last name']}, {row['First name']} ({row['E-mail']}): {row['Challenge']} challenge(s)")
+
+    return unique_jury_members, jury_challenge_counts
+
+
 def main():
     args = parse_args()
 
@@ -168,7 +189,7 @@ def main():
                     # number of criteria
                     num_criteria = len(challenges[challenge].split(";"))
                     print(f"    Criteria ({num_criteria}): {challenges[challenge]}")
-        exit(0)
+        print("\n")
 
     # Process jury Excel
     challenge_counts, output_filename, jury_challenges, missing_criteria = process_jury_excel(args.jury_excel)
@@ -191,6 +212,8 @@ def main():
     print("\nChallenges without any jury members:\n")
     for challenge in challenges_without_jury:
         print(challenge)
+
+    unique_jury_members, jury_challenge_counts = analyze_jury_members(args.jury_excel)
 
 
 if __name__ == "__main__":
