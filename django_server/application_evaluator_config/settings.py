@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "eval.fvh.io"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "eval.fvh.io", "evaluator.fvh.io"]
 
 
 # Application definition
@@ -179,6 +179,28 @@ if LOG_DB_QUERIES:
             }
         },
     }
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {"level": "INFO", "class": "logging.StreamHandler", "stream": sys.stdout, "formatter": "verbose"},
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
+
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
