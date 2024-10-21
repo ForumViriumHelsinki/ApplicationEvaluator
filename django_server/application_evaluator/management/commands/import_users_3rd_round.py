@@ -1,4 +1,4 @@
-# Create management command to import challenge texts gathered from a web page to Django
+# Create management command to import users from Podio excel file to Django
 
 import openpyxl
 from django.contrib.auth.models import User
@@ -83,6 +83,8 @@ class Command(BaseCommand):
                 name, criteria = c
                 # split challenge name to city and title using ':'
                 city, title = [x.strip() for x in name.split(":")]
+                # Replace multiple spaces with single space
+                title = " ".join(title.split())
                 # create qset for filtering ApplicationRounds where name contains all words
                 ars = ApplicationRound.objects.filter(name__startswith="CC-3")
                 ars = ars.filter(name__contains=title)
