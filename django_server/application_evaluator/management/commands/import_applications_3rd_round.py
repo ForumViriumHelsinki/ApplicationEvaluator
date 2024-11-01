@@ -74,7 +74,7 @@ fields = [
     [0, "Ethics", "Ethical Considerations"],
     [0, "I accept storing of personal information", "Accept Storing Personal Information"],
     [0, "Data security policy", "Data Security Policy"],
-    [0, "Application ID", "Application ID"],
+    [4, "Application ID", "Application ID"],
     [0, "Submit date and time", "Submission Time"],
     [0, "Valid", "Valid"],
 ]
@@ -90,6 +90,8 @@ def get_application_round_from_challenge_name(challenge_name: str) -> Applicatio
     # first filter 3rd round ApplicationRounds
     ars = ApplicationRound.objects.filter(name__startswith="CC-3")
     # in the database titles are like "CC-310: How to do foo bar?", name should exist there as is
+    # Remove multiple spaces from name
+    name = " ".join(name.split())
     ars = ars.filter(name__contains=name)
     if len(ars) != 1:
         print(f"ApplicationRound not found for {challenge_name}")
@@ -198,6 +200,7 @@ class Command(BaseCommand):
             # If there is, import all files from that directory as attachments
             if options["attachments_dir"]:
                 dirname = Path(options["attachments_dir"]) / Path(a["Application ID"])
+                print(dirname)
                 for subdir in glob.glob(f"{dirname}/*"):
                     import_attachments(app, subdir)
                     attachment_cnt += 1
