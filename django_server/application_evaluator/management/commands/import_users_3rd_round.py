@@ -76,9 +76,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         users = read_excel_sheet(options["filename"])
         new_users = merge_duplicate_users(users)
+        # Print new users as json
+        # from pprint import pprint
+        # pprint(new_users)
+        # exit()
         # Do everything in a transaction
         for u in new_users:
             u["ApplicationRounds"] = []
+            u["PilotManager"] = []
             for c in u["Challenge"]:
                 name, criteria = c
                 # split challenge name to city and title using ':'
@@ -95,6 +100,8 @@ class Command(BaseCommand):
                     exit()
                 else:
                     u["ApplicationRounds"].append(ars.first())
+                    # if criteria contains "pilot manager", set pilot_manager to True
+                    u["PilotManager"].append("pilot manager" in criteria.lower())
         with transaction.atomic():
             # Create users
             for u in new_users:
@@ -114,9 +121,12 @@ class Command(BaseCommand):
                     # Set random password
                     user.set_password(User.objects.make_random_password())
                     user.save()
-                # Add ApplicationRounds to user
-                for ar in u["ApplicationRounds"]:
+                # Add ApplicationRounds to user and set PilotManager if it is True
+                for ar, pm in zip(u["ApplicationRounds"], u["PilotManager"]):
                     ar.evaluators.add(user)
+                    if pm:
+                        ar.admin = user
+                        ar.save()
                 print("{}, new: {}".format(user, created))
                 for c in u["Challenge"]:
                     # replace all words (Impact; Excellence; Implementation; Co-creation)
