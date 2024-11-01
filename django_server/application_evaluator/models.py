@@ -204,6 +204,7 @@ class Application(NamedModel):
         User, related_name="approved_applications", on_delete=models.SET_NULL, null=True, blank=True
     )
     approved = models.BooleanField(default=False)
+    visibility = models.IntegerField(default=1)  # 0 = not shown, 1 = visible
 
     def score(self):
         # Use .all() to force evaluation of the queryset for later:
