@@ -108,10 +108,11 @@ class Command(BaseCommand):
         if options["dry_run"]:
             exit()
         # Check if emails are limited to certain addresses
+        admin_email = ar_admin.email
         if options["emails"]:
             ar_jury = ar_jury.filter(email__in=options["emails"])
             if ar_admin.email not in options["emails"]:
-                ar_admin = None
+                admin_email = None
         # Send emails
         subject = f"CommuniCity application [{application_round_id}] ready for evaluation"
-        send_emails(subject, ar_admin.email, [u.email for u in ar_jury], pilot_manager_email, jury_email)
+        send_emails(subject, admin_email, [u.email for u in ar_jury], pilot_manager_email, jury_email)
