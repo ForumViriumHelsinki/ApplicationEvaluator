@@ -1,11 +1,15 @@
 # Management command to send emails to users (pilot manager and jury members)
 # of a specific application round.
 
+import datetime
+import pathlib
 import openpyxl
 from django.core import mail
 from django.core.management.base import BaseCommand
 
 from application_evaluator.models import ApplicationRound
+
+from django.conf import settings
 
 
 def read_challenge_doc(filename: str) -> dict:
@@ -46,6 +50,9 @@ def send_emails(
     pilot_manager_email: str,
     jury_email: str,
 ):
+    # use pathlib to create email_logs directory, if it doesn't exist
+    pathlib.Path("email_logs").mkdir(parents=True, exist_ok=True)
+
     connection = mail.get_connection()
     connection.open()
 
@@ -55,7 +62,7 @@ def send_emails(
             mail.EmailMessage(
                 f"Pilot manager: {subject}",
                 pilot_manager_email,
-                "noreply-evaluator-message@mg.forumvirium.fi",
+                settings.DEFAULT_FROM_EMAIL,
                 [pilot_manager_email_address],
                 connection=connection,
             )
@@ -65,11 +72,16 @@ def send_emails(
             mail.EmailMessage(
                 f"Jury member: {subject}",
                 jury_email,
-                "noreply-evaluator-message@mg.forumvirium.fi",
+                settings.DEFAULT_FROM_EMAIL,
                 [email_address],
                 connection=connection,
             )
         )
+    # Loop all emails and log the time, recipient and subject into a file %Y-%m-%d_email_log.txt
+    log_file = datetime.datetime.now().strftime("email_logs/%Y-%m-%d_email_log.txt")
+    with open(log_file, "a") as f:
+        for email in emails:
+            f.write(f"{datetime.datetime.now().isoformat()} {email.to} {email.subject}\n")
 
     connection.send_messages(emails)
     connection.close()
