@@ -108,6 +108,12 @@ class Command(BaseCommand):
             exit(1)
         doc_link = doc_dict[application_round_id]
         ar = ApplicationRound.objects.get(name__startswith=application_round_id)
+        if ar.applications.count() == 0:
+            print(f"Application round {application_round_id} has no applications")
+            exit(1)
+        if ar.admin is None:
+            print(f"Application round {application_round_id} has no admin")
+            exit(1)
         ar_admin = ar.admin
         ar_jury = ar.evaluators.all()
         vars = {
