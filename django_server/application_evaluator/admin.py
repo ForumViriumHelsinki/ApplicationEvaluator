@@ -178,8 +178,9 @@ class AttachmentInline(admin.TabularInline):
 @admin.register(models.Application)
 class ApplicationAdmin(admin.ModelAdmin):
     inlines = [AttachmentInline, ScoreInline]
-    list_display = ["name", "organizations", "score", "approved", "scores_", "attachments_"]
+    list_display = ["name", "score", "approved", "scores_", "attachments_"]
     list_filter = ["application_round", "evaluating_organizations", "approved"]
+    search_fields = ["name", "description"]
 
     def get_actions(self, request):
         self.actions = [add_evaluating_organization_action(o) for o in models.Organization.objects.order_by("name")]
