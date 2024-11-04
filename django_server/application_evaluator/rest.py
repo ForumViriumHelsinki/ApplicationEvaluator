@@ -12,7 +12,7 @@ from application_evaluator import models
 class ModelSerializer(serializers.ModelSerializer):
     def user(self):
         try:
-            return self.context['request'].user
+            return self.context["request"].user
         except KeyError:
             return None
 
@@ -20,13 +20,13 @@ class ModelSerializer(serializers.ModelSerializer):
 class CriterionSerializer(ModelSerializer):
     class Meta:
         model = models.Criterion
-        fields = ['name', 'group', 'id', 'weight']
+        fields = ["name", "group", "id", "weight"]
 
 
 class CriterionGroupSerializer(ModelSerializer):
     class Meta:
         model = models.CriterionGroup
-        fields = ['name', 'abbr', 'parent', 'id', 'threshold']
+        fields = ["name", "abbr", "parent", "id", "threshold"]
 
 
 class EvaluatorSerializer(ModelSerializer):
@@ -34,7 +34,7 @@ class EvaluatorSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'organization']
+        fields = ["id", "first_name", "last_name", "username", "organization"]
 
     def get_organization(self, user):
         return user.organization.name if user.organization else None
@@ -43,13 +43,13 @@ class EvaluatorSerializer(ModelSerializer):
 class UserSerializer(EvaluatorSerializer):
     class Meta:
         model = User
-        fields = EvaluatorSerializer.Meta.fields + ['is_superuser']
+        fields = EvaluatorSerializer.Meta.fields + ["is_superuser"]
 
 
 class BaseScoreSerializer(ModelSerializer):
     class Meta:
         model = models.Score
-        fields = ['score', 'evaluator', 'criterion', 'application', 'id']
+        fields = ["score", "evaluator", "criterion", "application", "id"]
 
 
 class ScoreSerializer(BaseScoreSerializer):
@@ -59,7 +59,7 @@ class ScoreSerializer(BaseScoreSerializer):
 class BaseCommentSerializer(ModelSerializer):
     class Meta:
         model = models.Comment
-        fields = ['comment', 'evaluator', 'criterion_group', 'application', 'id', 'created_at']
+        fields = ["comment", "evaluator", "criterion_group", "application", "id", "created_at"]
 
 
 class CommentSerializer(BaseCommentSerializer):
@@ -69,25 +69,36 @@ class CommentSerializer(BaseCommentSerializer):
 class AttachmentSerializer(ModelSerializer):
     class Meta:
         model = models.ApplicationAttachment
-        fields = ['name', 'attachment']
+        fields = ["name", "attachment"]
 
 
 class ApplicationSerializer(ModelSerializer):
     scores = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
-    evaluating_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    evaluating_organizations = serializers.SlugRelatedField(slug_field="name", read_only=True, many=True)
     attachments = AttachmentSerializer(many=True, read_only=True)
 
     prefetch_related = [
-        'evaluating_organizations',
-        'scores__evaluator__organizations',
-        'comments__evaluator__organizations',
-        'attachments']
+        "evaluating_organizations",
+        "scores__evaluator__organizations",
+        "comments__evaluator__organizations",
+        "attachments",
+    ]
 
     class Meta:
         model = models.Application
-        fields = ['name', 'application_id', 'description', 'scores', 'comments', 'id', 'evaluating_organizations', 'attachments',
-                  'approved', 'approved_by']
+        fields = [
+            "name",
+            "application_id",
+            "description",
+            "scores",
+            "comments",
+            "id",
+            "evaluating_organizations",
+            "attachments",
+            "approved",
+            "approved_by",
+        ]
 
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
@@ -103,7 +114,7 @@ class ApplicationSerializer(ModelSerializer):
 class ApplicationRoundAttachmentSerializer(ModelSerializer):
     class Meta:
         model = models.ApplicationRoundAttachment
-        fields = ['name', 'attachment']
+        fields = ["name", "attachment"]
 
 
 class ApplicationRoundSerializer(ModelSerializer):
@@ -111,20 +122,22 @@ class ApplicationRoundSerializer(ModelSerializer):
     criteria = serializers.SerializerMethodField()
     criterion_groups = CriterionGroupSerializer(many=True, read_only=True)
     attachments = ApplicationRoundAttachmentSerializer(many=True, read_only=True)
-    submitted_organizations = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+    submitted_organizations = serializers.SlugRelatedField(slug_field="name", read_only=True, many=True)
 
     class Meta:
         model = models.ApplicationRound
-        exclude = ['published']
+        exclude = ["published"]
 
     def _get_applications(self, application_round):
         user = self.user()
         return application_round.applications_for_evaluator(user)
 
     def get_applications(self, application_round):
-        applications = self._get_applications(application_round) \
-            .prefetch_related(*ApplicationSerializer.prefetch_related) \
-            .order_by('name')
+        applications = (
+            self._get_applications(application_round)
+            .prefetch_related(*ApplicationSerializer.prefetch_related)
+            .order_by("name")
+        )
         return ApplicationSerializer(applications, many=True, context=self.context).data
 
     def _get_criteria(self, application_round):
@@ -146,17 +159,19 @@ class UnfilteredApplicationRoundSerializer(ApplicationRoundSerializer):
         return application_round.criteria.all()
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class ApplicationRoundViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ApplicationRoundSerializer
 
     def get_queryset(self):
-        return models.ApplicationRound.rounds_for_evaluator(self.request.user) \
-            .prefetch_related('criterion_groups', 'attachments', 'submitted_organizations') \
-            .order_by('name')
+        return (
+            models.ApplicationRound.rounds_for_evaluator(self.request.user)
+            .prefetch_related("criterion_groups", "attachments", "submitted_organizations")
+            .order_by("name")
+        )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def submit(self, request, pk=None):
         instance = get_object_or_404(models.ApplicationRound.rounds_for_evaluator(self.request.user), id=pk)
         try:
@@ -171,20 +186,18 @@ class EvaluationModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qset = self.queryset.filter(evaluator=self.request.user).exclude(
-            application__application_round__scoring_completed=True)
+            application__application_round__scoring_completed=True
+        )
         if self.request.user.organization:
-            qset = qset.exclude(
-                application__application_round__submitted_organizations=self.request.user.organization)
+            qset = qset.exclude(application__application_round__submitted_organizations=self.request.user.organization)
         return qset
 
     def create(self, request, *args, **kwargs):
-        qset = models.Application.objects.exclude(
-            application_round__scoring_completed=True)
+        qset = models.Application.objects.exclude(application_round__scoring_completed=True)
         if self.request.user.organization:
-            qset = qset.exclude(
-                application_round__submitted_organizations=self.request.user.organization)
-        get_object_or_404(qset, id=request.data['application'])
-        request.data['evaluator'] = request.user.id
+            qset = qset.exclude(application_round__submitted_organizations=self.request.user.organization)
+        get_object_or_404(qset, id=request.data["application"])
+        request.data["evaluator"] = request.user.id
         return super().create(request, *args, **kwargs)
 
 
@@ -203,16 +216,17 @@ class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ApplicationSerializer
 
     def get_queryset(self):
-        return models.Application.applications_for_evaluator(self.request.user) \
-            .prefetch_related(*ApplicationSerializer.prefetch_related)
+        return models.Application.applications_for_evaluator(self.request.user).prefetch_related(
+            *ApplicationSerializer.prefetch_related
+        )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
         instance = get_object_or_404(models.Application.applications_for_evaluator(self.request.user), id=pk)
         instance.approve_by_user(request.user)
         return self.retrieve(request, pk=pk)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def unapprove(self, request, pk=None):
         instance = get_object_or_404(models.Application.applications_for_evaluator(self.request.user), id=pk)
         instance.unapprove()
@@ -220,7 +234,7 @@ class ApplicationViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 router = routers.DefaultRouter()
-router.register('application_rounds', ApplicationRoundViewSet, 'application_round')
-router.register('scores', ScoreViewSet, 'score')
-router.register('comments', CommentViewSet, 'comment')
-router.register('applications', ApplicationViewSet, 'application')
+router.register("application_rounds", ApplicationRoundViewSet, "application_round")
+router.register("scores", ScoreViewSet, "score")
+router.register("comments", CommentViewSet, "comment")
+router.register("applications", ApplicationViewSet, "application")
