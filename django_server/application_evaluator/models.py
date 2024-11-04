@@ -89,12 +89,18 @@ class ApplicationRound(NamedModel):
 
     def applications_for_evaluator(self, user):
         if user.is_staff or self.evaluators.filter(id=user.id).exists() or user.id == self.admin_id:
-            return self.applications.all()
+            applications = self.applications.all()
+            # If the user is not staff or challenge admin, show only applications that have visibility=1
+            if not user.is_staff and user.id != self.admin_id:
+                applications = applications.filter(visibility=1)
+            return applications
         if user.organization in self.submitted_organizations.all():
-            return self.applications.filter(
-                scores__evaluator__organizations__in=self.submitted_organizations.all()
-            ).distinct()
-        return self.applications.filter(evaluating_organizations__users=user).distinct()
+            return (
+                self.applications.filter(scores__evaluator__organizations__in=self.submitted_organizations.all())
+                .distinct()
+                .filter(visibility=1)
+            )
+        return self.applications.filter(evaluating_organizations__users=user).distinct().filter(visibility=1)
 
     def clone(self):
         copy = ApplicationRound.objects.create(name=f"Copy of {self.name}")
@@ -204,7 +210,7 @@ class Application(NamedModel):
         User, related_name="approved_applications", on_delete=models.SET_NULL, null=True, blank=True
     )
     approved = models.BooleanField(default=False)
-    visibility = models.IntegerField(default=1)  # 0 = not shown, 1 = visible
+    visibility = models.IntegerField(default=1, choices=((0, "Not shown"), (1, "Visible")))
 
     def score(self):
         # Use .all() to force evaluation of the queryset for later:
@@ -265,11 +271,15 @@ class Application(NamedModel):
     def applications_for_evaluator(cls, user):
         if user.is_staff:
             return cls.objects.all()
-        return cls.objects.filter(
-            models.Q(evaluating_organizations__users=user)
-            | models.Q(application_round__evaluators=user)
-            | models.Q(application_round__admin=user)
-        ).distinct()
+        return (
+            cls.objects.filter(
+                models.Q(evaluating_organizations__users=user)
+                | models.Q(application_round__evaluators=user)
+                | models.Q(application_round__admin=user)
+            )
+            .distinct()
+            .filter(visibility=1)
+        )
 
     def approve_by_user(self, user):
         self.approved_by = user
