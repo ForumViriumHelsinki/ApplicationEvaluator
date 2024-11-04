@@ -90,9 +90,10 @@ class ApplicationRound(NamedModel):
     def applications_for_evaluator(self, user):
         if user.is_staff or self.evaluators.filter(id=user.id).exists() or user.id == self.admin_id:
             applications = self.applications.all()
-            # If the user is not staff or challenge admin, show only applications that have visibility=1
-            if not user.is_staff and user.id != self.admin_id:
+            # If the user is not staff, show only applications that have visibility=1
+            if not user.is_staff:
                 applications = applications.filter(visibility=1)
+
             return applications
         if user.organization in self.submitted_organizations.all():
             return (
