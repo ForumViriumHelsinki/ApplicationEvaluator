@@ -96,6 +96,7 @@ class Command(BaseCommand):
         parser.add_argument("--emails", nargs="+", type=str, help="Limit sending to these email addresses")
         parser.add_argument("--pilot-manager-template", type=str, help="Pilot manager's email template file")
         parser.add_argument("--jury-template", type=str, help="Jury member's email template file")
+        parser.add_argument("--publish", action="store_true", help="Publish the application round")
         parser.add_argument("--dry-run", action="store_true", help="Don't save to database")
 
     def handle(self, *args, **options):
@@ -113,12 +114,21 @@ class Command(BaseCommand):
             "challenge_id": application_round_id,
             "challenge_name": ar.name,
             "doc_link": doc_link,
+            "number_of_applications": ar.applications.count(),
         }
         pilot_manager_email, jury_email = read_templates(
             options["pilot_manager_template"], options["jury_template"], vars
         )
         if options["dry_run"]:
             exit()
+        # Publish the application round
+        if options["publish"]:
+            ar.published = True
+            ar.save()
+        if ar.published is False:
+            print(f"Application round {application_round_id} is not published")
+            print("Emails not sent. Use --publish to publish the application round.")
+            exit(1)
         # Check if emails are limited to certain addresses
         admin_email = ar_admin.email
         if options["emails"]:
