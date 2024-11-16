@@ -57,7 +57,7 @@ def send_emails(
     connection.open()
 
     emails = []
-    if pilot_manager_email_address:
+    if pilot_manager_email_address and pilot_manager_email:
         emails.append(
             mail.EmailMessage(
                 f"Pilot manager: {subject}",
@@ -101,7 +101,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         application_round_id = options["application_round"]
-        # Read excel file containing challenge document links
+        # Read Excel file containing challenge document links
         doc_dict = read_challenge_doc(options["challenge_doc"])
         if application_round_id not in doc_dict:
             print(f"Application round {application_round_id} not found in challenge document links")
@@ -142,5 +142,5 @@ class Command(BaseCommand):
             if ar_admin.email not in options["emails"]:
                 admin_email = None
         # Send emails
-        subject = f"CommuniCity application [{application_round_id}] ready for evaluation"
+        subject = f"CommuniCity applications [{application_round_id}] ready for evaluation"
         send_emails(subject, admin_email, [u.email for u in ar_jury], pilot_manager_email, jury_email)
