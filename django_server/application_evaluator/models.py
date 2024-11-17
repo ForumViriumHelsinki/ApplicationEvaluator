@@ -344,12 +344,21 @@ class Score(EvaluationModel):
     criterion = models.ForeignKey(Criterion, related_name="scores", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Score(score={self.score}, application={self.application_id}, criterion={self.criterion_id})"
+        return (
+            f"Score(user={self.evaluator.username} score={self.score}, application={self.application_id}, "
+            f"criterion={self.criterion_id})"
+        )
 
 
 class Comment(EvaluationModel):
     comment = models.TextField(blank=True)
     criterion_group = models.ForeignKey(CriterionGroup, related_name="comments", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return (
+            f"Comment(user={self.evaluator.username}, application={self.application_id}, "
+            f"group={self.criterion_group_id})"
+        )
 
 
 class ApplicationRoundSubmittal(Model):
