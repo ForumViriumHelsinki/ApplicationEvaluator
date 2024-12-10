@@ -43,7 +43,7 @@ class EvaluatorSerializer(ModelSerializer):
 class UserSerializer(EvaluatorSerializer):
     class Meta:
         model = User
-        fields = EvaluatorSerializer.Meta.fields + ["is_superuser"]
+        fields = EvaluatorSerializer.Meta.fields + ["is_superuser", "is_staff"]
 
 
 class BaseScoreSerializer(ModelSerializer):
