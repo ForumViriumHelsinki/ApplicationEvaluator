@@ -292,6 +292,44 @@ class Application(NamedModel):
         self.approved = False
         self.save()
 
+    def all_scores_detailed(self):
+        """
+        Returns a dictionary containing detailed scoring information including:
+        - Total weighted average score
+        - Per-criterion details including average, weight, threshold and threshold status
+        """
+        if not len(self.scores.all()):
+            return {"TOTAL": 0}
+
+        mean = lambda scores: sum(scores) / len(scores) if len(scores) else 0  # noqa
+        result = {}
+        total_score = 0
+        total_weight = self.application_round.total_weight()
+
+        for criterion in self.application_round.criteria.all():
+            scores = [s for s in self.scores.all() if s.criterion_id == criterion.id]
+            if len(scores):
+                if self.application_round.scoring_model == "Organizations average":
+                    raise ValueError("'Organizations average' is not implemented")
+
+                avg_score = mean([s.score for s in scores])
+                threshold = criterion.group.threshold if criterion.group else None
+
+                # Use group abbreviation if available, otherwise first 3 chars of criterion name
+                key = criterion.group.abbr if criterion.group and criterion.group.abbr else criterion.name[:3].upper()
+
+                result[key] = {
+                    "average": avg_score,
+                    "weight": criterion.weight / total_weight,
+                    "threshold": threshold,
+                    "over_threshold": threshold is None or avg_score >= threshold,
+                }
+
+                total_score += avg_score * (criterion.weight / total_weight)
+
+        result["TOTAL"] = round(total_score, 2)
+        return result
+
 
 def upload_attachment_to(instance, filename):
     return f"application_attachments/{secrets.token_hex(32)}/{filename}"
