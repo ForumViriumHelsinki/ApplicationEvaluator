@@ -35,6 +35,7 @@ dev = [
   "autoflake",
   "black",
   "pep8-naming",
+  "pip-tools",
   "pre-commit",
   "pytest",
   "pytest-asyncio",
