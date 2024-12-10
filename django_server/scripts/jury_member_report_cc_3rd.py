@@ -1,6 +1,7 @@
 import pandas as pd
 import argparse
 import re
+import logging
 from collections import Counter
 
 """
@@ -24,15 +25,66 @@ def parse_args():
     parser.add_argument("--jury-excel", required=True, help="Path to the jury Excel file")
     parser.add_argument("--challenge-excel", required=True, help="Path to the challenge Excel file")
     parser.add_argument("--city", nargs="*", help="City name")
-    return parser.parse_args()
+    parser.add_argument("--list-emails", action="store_true", help="List all unique email addresses")
+    parser.add_argument("--pilot-managers", action="store_true", help="List all pilot managers")
+    # no pilot manager argument
+    parser.add_argument(
+        "--no-pilot-manager",
+        action="store_true",
+        help="List the challenges without pilot managers",
+    )
+    # Multiple pilot managers argument
+    parser.add_argument(
+        "--multiple-pilot-managers",
+        action="store_true",
+        help="List the challenges with multiple pilot managers",
+    )
+    parser.add_argument("--list-duplicates", action="store_true", help="List duplicate jury members")
+    parser.add_argument(
+        "--list-challenges",
+        action="store_true",
+        help="List all challenges and their jury members",
+    )
+    # Log level
+    parser.add_argument("--log", default="INFO", help="Log level")
+    args = parser.parse_args()
+    # Set log level
+    logging.basicConfig(level=args.log)
+    return args
 
 
-def jury_member_report_excel(filename, cities: list[str]) -> list:
-    jury_members = []
+def read_and_clean_jury_excel(filename: str, sort_by: str = None) -> pd.DataFrame:
     # Read the Excel file
     df = pd.read_excel(filename)
     # Drop unnecessary columns
-    df = df[["Challenge", "Evaluation criteria", "First name", "Last name"]]
+    df = df[["Challenge", "Evaluation criteria", "E-mail", "First name", "Last name"]]
+
+    # Drop duplicates and log the number of dropped rows
+    initial_rows = len(df)
+    df = df.drop_duplicates()
+    dropped_rows = initial_rows - len(df)
+    if dropped_rows > 0:
+        logging.info(f"Dropped {dropped_rows} duplicate rows")
+
+    if sort_by:
+        df = df.sort_values(sort_by)
+
+    return df
+
+
+def jury_member_report_excel(filename, cities: list[str]) -> list:
+    df = read_and_clean_jury_excel(filename)
+
+    # Filter by city string, which is in the start of the string
+    # There can be multiple cities, so we need to filter by each city
+    if cities:
+        # Create a regex pattern to match any of the provided cities at the start of the Challenge
+        city_pattern = "^(" + "|".join(map(re.escape, cities)) + ")"
+        df = df[df["Challenge"].str.match(city_pattern)]
+
+    # Replace multiple whitespaces with a single whitespace in the 'Challenge' column
+    df["Challenge"] = df["Challenge"].str.replace(r"\s+", " ", regex=True)
+
     """
     The df looks like this:
                            Challenge                         Evaluation criteria First name             Last name
@@ -48,15 +100,6 @@ def jury_member_report_excel(filename, cities: list[str]) -> list:
     139  Utrecht / HKU: How can a personalised calendar...  Impact; Co-creation      Emma               Anderson
     140  Utrecht / HKU: How can a personalised calendar...  Impact; Co-creation     Oliver               Martin
     """
-    # Filter by city string, which is in the start of the string
-    # There can be multiple cities, so we need to filter by each city
-    if cities:
-        # Create a regex pattern to match any of the provided cities at the start of the Challenge
-        city_pattern = "^(" + "|".join(map(re.escape, cities)) + ")"
-        df = df[df["Challenge"].str.match(city_pattern)]
-
-    # Replace multiple whitespaces with a single whitespace in the 'Challenge' column
-    df["Challenge"] = df["Challenge"].str.replace(r"\s+", " ", regex=True)
 
     # List of all evaluation criteria
     # Create a list to store jury member dicts
@@ -172,8 +215,197 @@ def analyze_jury_members(filename):
     return unique_jury_members, jury_challenge_counts
 
 
+def list_duplicates(filename: str):
+    df = pd.read_excel(filename)
+    # Drop all columns except E-mail and Challenge and Evaluation criteria
+    df = df[["E-mail", "Challenge", "Evaluation criteria"]]
+    # Count duplicates by E-mail and Challenge and Evaluation criteria
+    duplicate_counts = df.groupby(["E-mail", "Challenge", "Evaluation criteria"]).size().reset_index(name="count")
+    # Filter duplicates
+    duplicates = duplicate_counts[duplicate_counts["count"] > 1]
+    print(duplicates)
+    exit()
+
+
+def list_pilot_managers(filename: str):
+    df = pd.read_excel(filename)
+    # Keep only the rows where Evaluation criteria contains "pilot manager"
+    df = df[df["Evaluation criteria"].str.contains("pilot manager")]
+    # Sort by Challenge
+    df = df.sort_values("Challenge")
+    # Drop all columns except Challenge and E-mail
+    df = df[["Challenge", "E-mail"]]
+    # Print Challenge, newline and E-mail
+    for _, row in df.iterrows():
+        print(f"{row['Challenge'][:60]}\t{row['E-mail']}")
+    exit()
+
+
+def find_challenges_without_pilot_manager(filename: str):
+    # Read the Excel file
+    df = pd.read_excel(filename)
+
+    # Get all unique challenges
+    all_challenges = set(df["Challenge"])
+
+    # Filter challenges with pilot manager
+    challenges_with_pilot_manager = set(
+        df[df["Evaluation criteria"].str.contains("pilot manager", case=False, na=False)]["Challenge"]
+    )
+
+    # Find challenges without pilot manager
+    challenges_without_pilot_manager = all_challenges - challenges_with_pilot_manager
+
+    # Sort the challenges alphabetically
+    challenges_without_pilot_manager = sorted(challenges_without_pilot_manager)
+
+    print("\nChallenges without a pilot manager:\n")
+    for challenge in challenges_without_pilot_manager:
+        print(challenge)
+
+
+def list_multiple_pilot_managers(df: pd.DataFrame):
+    # Keep only the rows where Evaluation criteria contains "pilot manager"
+    df = df[df["Evaluation criteria"].str.contains("pilot manager", case=False, na=False)]
+
+    # Group by Challenge and count occurrences
+    challenge_counts = df.groupby("Challenge").size()
+
+    # Get challenges with multiple pilot managers
+    multiple_managers = challenge_counts[challenge_counts > 1].index
+
+    # Filter original dataframe to show only challenges with multiple managers
+    result = df[df["Challenge"].isin(multiple_managers)]
+
+    # Sort by Challenge for better readability
+    result = result.sort_values("Challenge")
+
+    print("\nChallenges with multiple pilot managers:\n")
+    for challenge in result["Challenge"].unique():
+        print(f"\n{challenge}:")
+        managers = result[result["Challenge"] == challenge]["E-mail"].tolist()
+        for manager in managers:
+            print(f"  - {manager}")
+
+
+def get_challenges_dict(filename: str) -> dict:
+    df = read_and_clean_jury_excel(filename)
+    df = df.sort_values("Challenge")
+    # Convert DataFrame to dictionary with Challenge as key
+    challenges_dict = {}
+    for _, row in df.iterrows():
+        challenge = row["Challenge"]
+        criteria = [criteria.strip() for criteria in row["Evaluation criteria"].split(";")]
+        pilot_manager = any("pilot manager" in c.lower() for c in criteria)
+        # Remove any criteria containing "pilot manager"
+        criteria = [c for c in criteria if "pilot manager" not in c.lower()]
+        jury_member = {
+            row["E-mail"]: {
+                "first_name": row["First name"],
+                "last_name": row["Last name"],
+                "criteria": criteria,
+                "pilot_manager": pilot_manager,
+            }
+        }
+
+        if challenge not in challenges_dict:
+            challenges_dict[challenge] = {}
+
+        email = list(jury_member.keys())[0]
+        if email in challenges_dict[challenge]:
+            # Update existing jury member
+            existing_member = challenges_dict[challenge][email]
+            # Add any new criteria
+            existing_member["criteria"].extend(
+                c for c in jury_member[email]["criteria"] if c not in existing_member["criteria"]
+            )
+            # Update pilot manager status
+            existing_member["pilot_manager"] |= jury_member[email]["pilot_manager"]
+        else:
+            # Add new jury member
+            challenges_dict[challenge].update(jury_member)
+
+    return challenges_dict
+
+
+def list_challenges(
+    filename: str,
+    without_pilot_manager: bool = False,
+    multiple_pilot_managers: bool = False,
+    challenge_regex: str = None,
+):
+    challenges_dict = get_challenges_dict(filename)
+
+    # Print all challenges in alphabetical order
+    for challenge in sorted(challenges_dict.keys()):
+        # Get jury members for this challenge
+        jury_members = challenges_dict[challenge]
+
+        # Count pilot managers
+        pilot_managers = [m for m in jury_members.values() if m["pilot_manager"]]
+        num_pilot_managers = len(pilot_managers)
+
+        # Skip based on pilot manager filters
+        if without_pilot_manager and num_pilot_managers > 0:
+            continue
+        if multiple_pilot_managers and num_pilot_managers <= 1:
+            continue
+
+        # Skip if challenge doesn't match regex
+        if challenge_regex and not re.search(challenge_regex, challenge, re.IGNORECASE):
+            continue
+
+        print(f"\n{challenge}")
+
+        # Print pilot manager status
+        if num_pilot_managers == 0:
+            print("NO PILOT MANAGER")
+        elif num_pilot_managers > 1:
+            print(f"MULTIPLE ({num_pilot_managers}) PILOT MANAGERS")
+
+        # Sort and print pilot managers first, then regular jury members
+        sorted_members = sorted(
+            jury_members.items(), key=lambda x: (not x[1]["pilot_manager"], x[1]["last_name"], x[1]["first_name"])
+        )
+
+        for email, member in sorted_members:
+            pilot_manager_text = " [PILOT MANAGER]" if member["pilot_manager"] else ""
+            criteria_text = "; ".join(member["criteria"])
+            print(f"  {member['last_name']} {member['first_name']} ({email}):{pilot_manager_text} {criteria_text}")
+    exit()
+
+
 def main():
     args = parse_args()
+    df = read_and_clean_jury_excel(args.jury_excel, sort_by="Challenge")
+    # Reset index
+    df = df.reset_index(drop=True)
+    print(df)
+    if args.multiple_pilot_managers:
+        list_multiple_pilot_managers(df)
+        return
+    if args.list_emails:
+        _, df = analyze_jury_members(args.jury_excel)
+        print("List of unique jury members:\n===============================")
+        print("\n".join(sorted(df["E-mail"].unique())))
+        return
+
+    if args.list_challenges:
+        list_challenges(args.jury_excel, challenge_regex="^Porto")
+        # list_challenges(args.jury_excel, without_pilot_manager=True)
+        return
+
+    if args.pilot_managers:
+        list_pilot_managers(args.jury_excel)
+        return
+
+    if args.no_pilot_manager:
+        find_challenges_without_pilot_manager(args.jury_excel)
+        return
+
+    if args.list_duplicates:
+        list_duplicates(args.jury_excel)
+        return
 
     if args.city:
         jury_members = jury_member_report_excel(args.jury_excel, args.city)
@@ -206,12 +438,14 @@ def main():
     # Process challenge Excel
     all_challenges = process_challenge_excel(args.challenge_excel)
 
-    # Find challenges without jury
-    challenges_without_jury = find_challenges_without_jury(jury_challenges, all_challenges)
-
     print("\nChallenges without any jury members:\n")
+    challenges_without_jury = find_challenges_without_jury(jury_challenges, all_challenges)
     for challenge in challenges_without_jury:
         print(challenge)
+
+    # challenges_without_pilot_manager = find_challenges_without_pilot_manager(
+    #     jury_challenges, all_challenges
+    # )
 
     unique_jury_members, jury_challenge_counts = analyze_jury_members(args.jury_excel)
 
