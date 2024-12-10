@@ -41,6 +41,11 @@ dev = [
   "pytest-cov",
   "ruff",
 ]
+report = [
+  "pandas",
+  "reportlab",
+  "unidecode",
+]
 
 [tool.black]
 line-length = 120
