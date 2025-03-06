@@ -107,7 +107,7 @@ def create_criteria_hierarchy(criteria_list):
                 raise ValueError("Criterion found without a group")
 
             criterion = {
-                "name": item["Criterion"],
+                "name": f"{item['Criterion']}: {item['Short name']}",
                 "abbr": item["abbr"] if item["abbr"] else item["Criterion"],
                 "weight": item["Weight / max score"],
             }
@@ -137,8 +137,16 @@ def read_criteria_from_xlsx(file_path):
     # Lue Excel-tiedoston toinen välilehti DataFrameen ja valitse vain tarvittavat sarakkeet
     df = pd.read_excel(
         file_path,
-        sheet_name=1,
-        usecols=["Criterion group", "Criterion subgroup", "Criterion", "abbr", "Weight / max score", "Threshold"],
+        sheet_name=3,
+        usecols=[
+            "Criterion group",
+            "Criterion subgroup",
+            "Criterion",
+            "abbr",
+            "Short name",
+            "Weight / max score",
+            "Threshold",
+        ],
     )
     # Drop all rows where all values are NaN
     df = df.dropna(how="all")
