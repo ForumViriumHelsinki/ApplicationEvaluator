@@ -95,7 +95,7 @@ def create_criteria_hierarchy(criteria_list):
             current_subgroup = {
                 "name": item["Criterion subgroup"],
                 "abbr": item["abbr"] if item["abbr"] else item["Criterion subgroup"],
-                "max_points": item["Weight / max score"],
+                # "max_points": item["Weight / max score"],
                 "threshold": item["Threshold"],
                 "criteria": [],
             }
@@ -109,7 +109,7 @@ def create_criteria_hierarchy(criteria_list):
             criterion = {
                 "name": f"{item['Criterion']}: {item['Short name']}",
                 "abbr": item["abbr"] if item["abbr"] else item["Criterion"],
-                "weight": item["Weight / max score"],
+                "weight": item["Weight"],
             }
 
             # Add to subgroup if exists, otherwise directly to group
@@ -137,14 +137,14 @@ def read_criteria_from_xlsx(file_path):
     # Lue Excel-tiedoston toinen välilehti DataFrameen ja valitse vain tarvittavat sarakkeet
     df = pd.read_excel(
         file_path,
-        sheet_name=3,
+        sheet_name=1,
         usecols=[
             "Criterion group",
             "Criterion subgroup",
             "Criterion",
             "abbr",
             "Short name",
-            "Weight / max score",
+            "Weight",
             "Threshold",
         ],
     )
@@ -187,6 +187,7 @@ def setup_criterion_groups_and_criteria(application_rounds, criteria_json):
                 defaults={
                     "order": group_order,
                     "abbr": group_info["name"][:8],  # Use first 8 chars as abbreviation if not provided
+                    "threshold": group_info.get("threshold", None),
                 },
             )
             main_group.order = group_order
