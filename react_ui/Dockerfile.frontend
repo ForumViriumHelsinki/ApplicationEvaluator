@@ -1,0 +1,14 @@
+FROM node:23-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+RUN npx vite build
+
+FROM nginx:1.27-alpine
+
+COPY --link --from=build /app/build/ /usr/share/nginx/html

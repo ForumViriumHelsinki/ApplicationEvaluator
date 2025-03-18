@@ -1,0 +1,35 @@
+FROM python:3.11-alpine
+
+ENV SQL_ENGINE="django.db.backends.postgresql"
+ENV POSTGRES_DB="application_evaluator"
+ENV POSTGRES_USER="application_evaluator"
+ENV POSTGRES_PASSWORD="application_evaluator"
+ENV SQL_HOST="localhost"
+ENV SQL_PORT="5432"
+
+ENV SECRET_KEY="(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)p%vcizdc0%_qv"
+ENV DEBUG=False
+
+ENV ELASTIC_SERVICE="citylogistiikka_prod"
+ENV ELASTIC_TOKEN=""
+ENV ELASTIC_URL=""
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN addgroup -S app && adduser -S app -G app
+WORKDIR /home/app
+
+# Copy and install requirements only first to cache the dependency layer
+COPY --chown=app:app requirements.txt .
+RUN pip install --no-cache-dir --no-compile --upgrade -r requirements.txt
+
+COPY --chown=app:app . .
+
+# Support Arbitrary User IDs
+RUN chgrp -R 0 /home/app && \
+  chmod -R g+rwX /home/app
+
+USER app
+
+CMD ["gunicorn", "application_evaluator_config.wsgi:application", "--bind", "0.0.0.0:8000"]

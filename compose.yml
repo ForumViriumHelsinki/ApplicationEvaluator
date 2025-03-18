@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: ./django_server
+      dockerfile: Dockerfile.backend
+    image: ghcr.io/forumviriumhelsinki/applicationevaluator-backend
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./react_ui
+      dockerfile: Dockerfile.frontend
+    image: ghcr.io/forumviriumhelsinki/applicationevaluator-frontend
+    ports:
+      - 8080:80
+    restart: unless-stopped

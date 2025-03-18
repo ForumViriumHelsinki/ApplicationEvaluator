@@ -1,0 +1,71 @@
+name: "Build container: frontend"
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'containers-applicationevaluator-frontend-v*.*.*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: forumviriumhelsinki/applicationevaluator-frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+            # match release-please manifest driven release tag format
+            # https://github.com/googleapis/release-please/blob/main/docs/manifest-releaser.md
+            type=match,pattern=.*-v(\d+.\d+.\d+),group=1
+            type=match,pattern=.*-v(\d+.\d+),group=1
+            type=match,pattern=.*-v(\d+),group=1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: react_ui
+          push: ${{ github.event_name != 'pull_request' }}
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+            type=gha
+          cache-to: |
+            type=registry,ref=${{ env.REGISTRY }}/${{ inputs.IMAGE_NAME }}:buildcache,mode=max
+            type=gha,mode=max
+          provenance: mode=max
+          sbom: true

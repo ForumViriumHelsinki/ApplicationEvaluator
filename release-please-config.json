@@ -1,0 +1,17 @@
+{
+  "packages": {
+    "django_server": {
+      "release-type": "python"
+    },
+    "react_ui": {
+      "release-type": "node"
+    }
+  },
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "groupName": "applicationevaluator",
+      "components": ["django_server", "react_ui"]
+    }
+  ]
+}
