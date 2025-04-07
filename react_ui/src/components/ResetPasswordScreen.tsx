@@ -23,7 +23,7 @@ export default class ResetPasswordScreen extends React.Component<ResetPasswordSc
         </div>
         <div className="p-4">
           <div className="text-center">
-            <h3>FVH Application Evaluator</h3>
+            <h3>SPACE4Cities Tenders Evaluator</h3>
             <p className="lead">Reset password</p>
           </div>
           <ResetPasswordForm changePasswordUrl={changePasswordUrl} token={token} uid={uid}/>

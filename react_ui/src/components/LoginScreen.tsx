@@ -26,7 +26,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
         </div>
         <div className="p-4">
           <div className="text-center">
-            <h3>FVH Application Evaluator</h3>
+            <h3>SPACE4Cities Tenders Evaluator</h3>
             <p className="lead text-primary">Sign in</p>
           </div>
           <LoginForm loginUrl={loginUrl} onLogin={onLogin} passwordResetUrl={passwordResetUrl}/>

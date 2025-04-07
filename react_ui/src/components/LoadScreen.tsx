@@ -8,7 +8,7 @@ export default class LoadScreen extends React.Component {
         <div className="p-4 bg-primary mb-4">
           <img className="w-50" src="images/Space4Cities_logo.png" alt="logo"/>
         </div>
-        <h3>FVH Application Evaluator</h3>
+        <h3>SPACE4Cities Tenders Evaluator</h3>
         <CenteredSpinner/>
       </div>
     </div>;

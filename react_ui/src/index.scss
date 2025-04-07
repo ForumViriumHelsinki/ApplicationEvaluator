@@ -23,27 +23,27 @@ $green: #28a745;
 $teal: #009E92;
 $cyan: #00a4cc;
 
-// Override with CommuniCity colors:
-$blue: #5438e0;
+// Override with Space4Cities colors:
+$blue: #2d0050;
 $cyan: #59c4ce;
 $red: #ff3915;
-$yellow: #ffc93e;
+$yellow: #ecff9d;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $colors: (
-        "blue": $blue,
-        "indigo": $indigo,
-        "purple": $purple,
-        "pink": $pink,
-        "red": $red,
-        "orange": $orange,
-        "yellow": $yellow,
-        "green": $green,
-        "teal": $teal,
-        "cyan": $cyan,
-        "white": $white,
-        "gray": $gray-600,
-        "gray-dark": $gray-800
+  "blue": $blue,
+  "indigo": $indigo,
+  "purple": $purple,
+  "pink": $pink,
+  "red": $red,
+  "orange": $orange,
+  "yellow": $yellow,
+  "green": $green,
+  "teal": $teal,
+  "cyan": $cyan,
+  "white": $white,
+  "gray": $gray-600,
+  "gray-dark": $gray-800
 );
 
 $primary: $orange;
@@ -61,21 +61,22 @@ $primary: $blue;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $theme-colors: (
-        "primary": $primary,
-        "secondary": $secondary,
-        "success": $success,
-        "info": $info,
-        "warning": $warning,
-        "danger": $danger,
-        "light": $light,
-        "dark": $dark
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "dark": $dark
 );
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 
 // Misc style corrections for our use cases:
-a, button {
+a,
+button {
   background: none;
   border: none;
   cursor: pointer;
