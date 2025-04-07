@@ -79,7 +79,7 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
       <NavBar onIconClick={() => this.setState({showLogout: true})}
               icon="account_circle"
               iconText={user?.username || ''}>
-        <h5 className="m-2">CommuniCity Application Evaluator</h5>
+        <h5 className="m-2">SPACE4Cities Tenders Evaluator</h5>
       </NavBar>
       <ApplicationRounds user={user as User} request={this.request}/>
       {showLogout &&

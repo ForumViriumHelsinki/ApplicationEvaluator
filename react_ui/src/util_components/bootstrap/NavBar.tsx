@@ -17,7 +17,7 @@ export default class NavBar extends React.Component<NavBarProps> {
       </div>
       <div className="w-50 text-center">{children}</div>
       <div className="w-25 d-flex justify-content-end">
-        <img style={{maxHeight: 48}} src="images/CommuniCity-logo-blue.png"/>
+        <img style={{maxHeight: 48}} src="images/Space4Cities_logo.png"/>
       </div>
     </nav>;
   }

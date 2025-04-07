@@ -110,7 +110,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             </div>
             <div className="form-check d-inline-block mr-3"
                onClick={() => this.setState({showEvaluators: !showEvaluators})}>
-            <input className="form-check-input" type="checkbox" checked={showEvaluators} readOnly/>
+            <input className="form-check-input" type="checkbox" checked={showEvaluators}/>
             <label className="form-check-label">Show evaluators</label>
           </div>
           {settings.showScoresFromOtherUsers && !submitted &&
@@ -118,7 +118,7 @@ export default class ApplicationRoundCard extends React.Component<ApplicationRou
             applicationRound.scoring_model !== 'Evaluators average' &&
             <div className="form-check d-inline-block mr-3"
                  onClick={() => this.setState({showScores: !showScores})}>
-              <input className="form-check-input" type="checkbox" checked={showScores} readOnly/>
+              <input className="form-check-input" type="checkbox" checked={showScores}/>
               <label className="form-check-label">Show scores from other evaluators</label>
             </div>
           }
