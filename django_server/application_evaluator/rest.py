@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import serializers, routers, viewsets, permissions
+from rest_framework import permissions, routers, serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 
@@ -103,7 +103,12 @@ class ApplicationSerializer(ModelSerializer):
     def get_scores(self, application):
         return ScoreSerializer(application.scores_for_evaluator(self.user()), many=True).data
 
-    def get_comments(self, application, show_all=True):
+    # FIXME: Depending on the ApplicationRound, we may want to show all comments or
+    # only the comments for the current user. Unfortunately, the
+    # default behavior of the serializer is to call this method with the default
+    # value of show_all. There is no way to pass additional context to the
+    # serializer method.
+    def get_comments(self, application, show_all=False):
         if show_all:
             comments = application.comments.all()
         else:
