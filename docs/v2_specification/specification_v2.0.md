@@ -1,0 +1,635 @@
+# Application Evaluator 2.0 Spesifikaatio
+
+## 1. Tavoitteet
+
+*Kuvaa version 2.0 päätavoitteet ja parannukset verrattuna versioon 1.0.*
+
+## 2. Toiminnalliset vaatimukset
+
+*Listaa järjestelmän ominaisuudet ja toiminnot. Käyttötapaukset tai käyttäjätarinat voivat olla hyödyllisiä tässä.*
+
+### 2.1. Olemassaolevat ominaisuudet (Muutokset/Poistot)
+*Kuvaa muutokset tai poistot version 1.0 ominaisuuksiin.*
+
+### 2.2. Uudet ominaisuudet
+*Kuvaa täysin uudet ominaisuudet versiolle 2.0.*
+
+## 3. Ei-toiminnalliset vaatimukset
+
+*Kuvaa vaatimukset liittyen suorituskykyyn, tietoturvaan, käytettävyyteen, ylläpidettävyyteen jne.*
+
+## 4. Arkkitehtuuri
+
+*Kuvaa suunniteltu tekninen arkkitehtuuri, mukaan lukien backend, frontend, tietokanta ja muut keskeiset komponentit tai muutokset versiosta 1.0.*
+
+## 5. Tietomalli
+
+*Kuvaa tietokantaskeeman.*
+
+### Kampanja (Campaign)
+
+Kampanja edustaa ylätason arviointikierrosta tai -projektia (esim. tietty rahoitushaku, kilpailutus), jonka jokin taho (organisaatio, projekti) järjestää. Kampanja kokoaa yhteen yhteen tai useamman Haasteen (Challenge) ja hallinnoi yleisiä asetuksia sekä käyttäjärooleja kyseiselle kierrokselle. Kampanja luodaan aina uutena järjestelmään.
+
+**Tietokentät:**
+
+*   `nimi` (CharField): Kampanjan yksilöivä nimi (esim. "AI4Cities Rahoitushaku 2025").
+*   `kuvaus` (TextField, valinnainen): Tarkempi kuvaus kampanjasta.
+*   `jarjestaja_taho` (CharField): Kampanjan järjestävän tahon nimi (voi olla organisaatio, projekti tms.). *Huom: Harkitaan myöhemmin, tarvitaanko tähän erillinen `Organisaatio`-objekti.*
+*   `alkamisaika` (DateTimeField, valinnainen): Kampanjan alkamisaika.
+*   `paattymisaika` (DateTimeField, valinnainen): Kampanjan päättymisaika.
+*   `tila` (CharField, choices): Kampanjan tila (esim. Suunnitteilla, Avoinna hakemuksille, Arvioinnissa, Päättynyt, Arkistoitu).
+*   `ulkoasu_kustomointi` (JSONField/TextField, valinnainen): Mahdollistaa kampanjakohtaisen ulkoasun määrittelyn (esim. CSS). Toteutus avoin.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `omistaja_kayttaja` (ForeignKey -> User): Viittaus käyttäjään, joka loi kampanjan ja hallinnoi sitä ensisijaisesti.
+*   `salli_keskustelut` (BooleanField, default=False): Määrittää, onko hakemuksiin liittyvä keskustelu oletusarvoisesti sallittu tämän kampanjan kaikissa haasteissa.
+
+**Suhteet muihin objekteihin:**
+
+*   **Haaste (Challenge):** Yksi kampanja sisältää yhden tai monta haastetta (OneToMany `Kampanja` -> `Haaste`).
+*   **Käyttäjä (User):** Monta käyttäjää voi olla liitettynä kampanjaan eri rooleissa (ManyToMany `Kampanja` <-> `User` kautta esim. `KampanjaKayttaja`-välikappalemallin, joka määrittelee roolin kuten 'admin', 'arvioija').
+    *   Kampanja-adminit voivat hallinnoida kampanjan asetuksia ja haasteita.
+    *   Arvioijat voidaan liittää koko kampanjaan tai tarkemmin yksittäisiin haasteisiin (käsitellään `Haaste`-objektin yhteydessä).
+
+**Toiminnallisuus:**
+
+*   Käyttäjäroolien hallinta: Mahdollisuus määritellä kampanjalle admin-oikeudet omaavia käyttäjiä omistajan lisäksi.
+
+**Avoimia kysymyksiä:**
+
+*   Tarvitaanko `jarjestaja_taho`-kentän sijaan/lisäksi erillinen `Organisaatio`-objekti? (Todennäköisesti kyllä).
+*   Miten ulkoasun kustomointi tarkalleen toteutetaan ja periytyy/vaikuttaa haasteisiin?
+
+### Haaste (Challenge)
+
+Haaste edustaa spesifistä arviointikokonaisuutta Kampanjan sisällä, johon kohdistuu tietty joukko arviointikriteereitä ja johon liitetään arvioitavat hakemukset tai tarjoukset. Yksi Kampanja voi sisältää useita Haasteita. Haaste voidaan kloonata Kampanjan sisällä, mikä helpottaa uusien, samankaltaisten haasteiden luomista (esim. oletuskriteerien kopiointi).
+
+**Tietokentät (ehdotus):**
+
+*   `nimi` (CharField): Haasteen yksilöivä nimi kampanjan sisällä (esim. "Ratkaisut liikenteen päästövähennykseen").
+*   `kuvaus` (TextField, valinnainen): Tarkempi kuvaus haasteesta.
+*   `kampanja` (ForeignKey -> Kampanja, on_delete=models.CASCADE, related_name="haasteet"): Viittaus Kampanjaan, johon haaste kuuluu.
+*   `hakemusten_alkamisaika` (DateTimeField, valinnainen): Aika, jolloin hakemusten jättäminen alkaa.
+*   `hakemusten_paattymisaika` (DateTimeField, valinnainen): Aika, jolloin hakemusten jättäminen päättyy.
+*   `arvioinnin_alkamisaika` (DateTimeField, valinnainen): Aika, jolloin arviointi alkaa.
+*   `arvioinnin_paattymisaika` (DateTimeField, valinnainen): Aika, jolloin arviointi päättyy.
+*   `tila` (CharField, choices): Haasteen tila (esim. Valmistelussa, Avoinna hakemuksille, Hakemukset arvioitavana, Arviointi päättynyt, Suljettu).
+*   `kloonattu_haasteesta` (ForeignKey -> Haaste, null=True, blank=True, on_delete=models.SET_NULL, related_name="kloonit"): Viittaus alkuperäiseen haasteeseen, jos tämä haaste on klooni.
+*   `nayta_pisteet_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat pisteet arvioinnin ollessa kesken.
+*   `nayta_kommentit_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat kommentit arvioinnin ollessa kesken.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+
+**Suhteet muihin objekteihin:**
+
+*   **Kampanja (Campaign):** Monta haastetta kuuluu yhteen kampanjaan (ManyToOne `Haaste` -> `Kampanja`).
+*   **Hakemus (Application/Proposal):** Yksi haaste sisältää monta hakemusta (OneToMany `Haaste` -> `Hakemus`). *Huom: `Hakemus`-objekti määritellään myöhemmin.*
+*   **Arviointikriteeri (EvaluationCriterion):** Yksi haaste sisältää monta arviointikriteeriä (tai kriteeriryhmää) (OneToMany `Haaste` -> `Arviointikriteeri`). *Huom: `Arviointikriteeri`-objekti ja sen rakenne (mahdolliset ryhmät) määritellään myöhemmin.*
+*   **Käyttäjä (User):** Monta käyttäjää (arvioijaa, haasteen adminia) voidaan liittää haasteeseen (ManyToMany `Haaste` <-> `User` kautta esim. `HaasteKayttaja`-välikappalemallin, joka määrittelee roolin).
+    *   Haaste-adminit voivat hallinnoida haasteen asetuksia (esim. aikoja, tilaa) ja arvioijia.
+    *   Arvioijat arvioivat haasteeseen liitettyjä hakemuksia määriteltyjen kriteerien mukaisesti.
+
+**Toiminnallisuus:**
+
+*   Haasteen kloonaus kampanjan sisällä (kopioi asetukset ja mahdollisesti kriteeristön).
+*   Arviointikriteerien määrittely ja hallinta haastekohtaisesti.
+*   Arvioijien ja haaste-adminien liittäminen haasteeseen.
+*   Mahdollisuus ladata haasteeseen liittyvät hakemukset (tiedostot ja/tai data).
+
+**Avoimia kysymyksiä:**
+
+*   Miten arviointikriteerien rakenne (yksi taso, monta tasoa, ryhmät) tarkalleen mallinnetaan ja liitetään haasteeseen? (Ks. suunnittelumuistion pohdinta eri projektien tarpeista).
+*   Tarvitaanko tarkempaa tilanhallintaa (esim. erilliset tilat hakemusten vastaanotolle ja arvioinnille)? (Lisätty ehdotukseen).
+*   Miten haastekohtaiset admin-roolit ja kampanja-admin-roolit eroavat oikeuksiltaan?
+
+### Arviointikriteeri (EvaluationCriterion)
+
+Arviointikriteeri edustaa joko arvioinnin osa-aluetta (ryhmää) tai konkreettista mittaria (kriteeriä), jolle annetaan pisteet hakemuksia arvioitaessa. Kriteerit ja ryhmät muodostavat hierarkkisen rakenteen Haasteen sisällä, mahdollistaen monimutkaistenkin arviointimallien määrittelyn (esim. pääryhmä -> alaryhmä -> kriteeri).
+
+**Tietokentät (ehdotus):**
+
+*   `haaste` (ForeignKey -> Haaste, on_delete=models.CASCADE, related_name="kriteeristö"): Viittaus Haasteeseen, johon kriteeri/ryhmä kuuluu.
+*   `nimi` (CharField): Kriteerin tai ryhmän nimi (esim. "FR1.1 Challenge Fit", "Functional Requirements (FR)").
+*   `koodi` (CharField, valinnainen): Kriteerin tai ryhmän koodi (esim. "FR1.1").
+*   `lyhenne` (CharField, valinnainen): Kriteerin tai ryhmän lyhenne (esim. "C-FIT").
+*   `kuvaus` (TextField, valinnainen): Tarkempi kuvaus kriteeristä tai ryhmästä.
+*   `tyyppi` (CharField, choices=['RYHMÄ', 'KRITEERI']): Määrittää, onko kyseessä ryhmä (joka sisältää muita kriteereitä/ryhmiä) vai pisteillä arvioitava kriteeri.
+*   `parent` (ForeignKey -> 'self', null=True, blank=True, on_delete=models.CASCADE, related_name="children"): Viittaus ylempään tasoon hierarkiassa (toiseen `Arviointikriteeri`-objektiin, jonka `tyyppi` on 'RYHMÄ'). Juuritason elementeillä tämä on `NULL`.
+*   `painokerroin` (DecimalField, valinnainen): Kriteerin tai ryhmän painoarvo kokonaispisteitä laskettaessa. Miten painokertoimet tarkalleen toimivat hierarkiassa, pitää määritellä tarkemmin.
+*   `maksimipisteet` (IntegerField, valinnainen): Suurin mahdollinen pistemäärä, joka voidaan antaa `KRITEERI`-tyyppiselle objektille.
+*   `kynnysarvo` (IntegerField, valinnainen): Pistemäärä, joka `KRITEERI`-tyyppisen objektin on vähintään saavutettava (jos määritelty). Alitus voi johtaa hakemuksen hylkäämiseen.
+*   `järjestysnumero` (IntegerField, default=0): Määrittää kriteerien/ryhmien järjestyksen saman `parent`-elementin alla.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+
+**Suhteet muihin objekteihin:**
+
+*   **Haaste (Challenge):** Monta kriteeriä/ryhmää kuuluu yhteen haasteeseen (ManyToOne `Arviointikriteeri` -> `Haaste`).
+*   **Arviointikriteeri (EvaluationCriterion):** Monta kriteeriä/ryhmää voi kuulua yhteen ylempään ryhmään (ManyToOne `Arviointikriteeri` -> `Arviointikriteeri` [`parent`]). Yksi ryhmä voi sisältää monta alikriteeriä/ryhmää (OneToMany `Arviointikriteeri` -> `Arviointikriteeri` [`children`]).
+*   **Arviointi (Evaluation/Score):** Arvioijat antavat pisteitä ja kommentteja `KRITEERI`-tyyppisiin objekteihin liittyen. Tämä yhteys todennäköisesti toteutetaan erillisellä `Arviointi`-objektilla (määritellään myöhemmin), joka viittaa `Hakemukseen`, `Arviointikriteeriin` ja `Arvioijaan`.
+
+**Toiminnallisuus:**
+
+*   Mahdollistaa monitasoisen kriteerihierarkian luomisen haastekohtaisesti.
+*   Sallii painokertoimien, maksimipisteiden ja kynnysarvojen määrittelyn.
+*   Määrittää rakenteen, johon arvioinnit (pisteet, kommentit) voidaan liittää.
+
+**Avoimia kysymyksiä:**
+
+*   Miten painokertoimet lasketaan ja vaikuttavat hierarkian eri tasoilla? Periikö aliryhmä/kriteeri yläryhmän painokertoimen vai lasketaanko painotus suhteessa sisaruksiin? (Tärkeä määrittely laskentalogiikkaa varten).
+*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisiin objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
+*   Tarvitaanko lisäkenttiä ohjeistamaan arvioijaa kriteerin osalta?
+*   Miten varmistetaan, että vain `KRITEERI`-tyyppisillä objekteilla on `maksimipisteet` ja `kynnysarvo`? (Voidaan validoida mallin tasolla).
+
+### Arviointi (Evaluation/Score)
+
+Arviointi edustaa yhden arvioijan antamaa pistemäärää ja/tai kommenttia yhdelle hakemukselle tietyn arviointikriteerin osalta. Jokaista hakemuksen ja arviointikriteerin paria kohden yksi arvioija voi luoda vain yhden arviointiobjektin.
+
+**Tietokentät (ehdotus):**
+
+*   `hakemus` (ForeignKey -> Hakemus, on_delete=models.CASCADE, related_name="arvioinnit"): Viittaus arvioitavaan Hakemukseen. *Huom: `Hakemus`-objekti määritellään myöhemmin.*
+*   `kriteeri` (ForeignKey -> Arviointikriteeri, on_delete=models.CASCADE, related_name="arvioinnit"): Viittaus Arviointikriteeriin, johon tämä arviointi liittyy. Tämän kriteerin `tyyppi` on oltava 'KRITEERI'.
+*   `arvioija` (ForeignKey -> User, on_delete=models.PROTECT, related_name="arvioinnit"): Viittaus arvioinnin tehneeseen käyttäjään.
+*   `pisteet` (IntegerField, null=True, blank=True): Arvioijan antama numeerinen pistemäärä. Arvo on `NULL`, jos arvioija ei ole vielä antanut pisteitä tai jos kriteeri ei vaadi pisteitä (vaikka yleensä vaatii). Validoidaan `kriteeri.maksimipisteet` -arvoa vastaan.
+*   `kommentti` (TextField, null=True, blank=True): Arvioijan antama sanallinen kommentti tai perustelu pisteille.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+
+**Suhteet muihin objekteihin:**
+
+*   **Hakemus (Application/Tender/Proposal/Offer):** Monta arviointia liittyy yhteen hakemukseen (ManyToOne `Arviointi` -> `Hakemus`).
+*   **Arviointikriteeri (EvaluationCriterion):** Monta arviointia liittyy yhteen kriteeriin (ManyToOne `Arviointi` -> `Arviointikriteeri`).
+*   **Käyttäjä (User):** Monta arviointia liittyy yhteen käyttäjään (arvioijaan) (ManyToOne `Arviointi` -> `User`).
+
+**Toiminnallisuus:**
+
+*   Tallentaa yksittäisen arvioijan näkemyksen hakemuksesta tietyn kriteerin osalta.
+*   Mahdollistaa pisteiden ja/tai kommenttien antamisen.
+*   Toimii perustana kokonaispisteiden laskennalle ja arviointien yhteenvedoille.
+*   Arvioinnin näkyvyyttä muiden arvioijien kesken hallitaan `Haaste`-objektin `nayta_pisteet_arvioinnin_aikana` ja `nayta_kommentit_arvioinnin_aikana` -kenttien kautta.
+
+**Avoimia kysymyksiä:**
+
+*   Miten käsitellään tilanne, jos arviointikriteeriä muokataan (esim. `maksimipisteet` muuttuu) sen jälkeen, kun arviointeja on jo annettu? (Vaatii validointia/logiikkaa).
+*   Tarvitaanko erillinen tila arvioinnille (esim. 'Luonnos', 'Valmis')? (Mahdollisesti hyödyllinen).
+*   Miten mahdolliset kynnysarvon (`kriteeri.kynnysarvo`) alitukset merkitään tai raportoidaan?
+*   Pitäisikö kommentointi olla mahdollista myös 'RYHMÄ'-tyyppisille kriteereille, kuten vanhassa mallissa mainittiin? Jos kyllä, pitäisikö `kriteeri`-kentän viitata myös ryhmiin, ja miten `pisteet` tällöin käsitellään? (Tämä lisäisi kompleksisuutta, harkitaan tarkkaan tarvetta).
+
+### Hakemus (Application/Tender/Proposal/Offer)
+
+Hakemus edustaa Haasteeseen jätettyä ehdotusta, tarjousta tai muuta vastaavaa dokumenttikokonaisuutta, joka arvioidaan määriteltyjen kriteerien mukaisesti.
+
+**Tietokentät (ehdotus):**
+
+*   `haaste` (ForeignKey -> Haaste, on_delete=models.CASCADE, related_name="hakemukset"): Viittaus Haasteeseen, johon hakemus kuuluu.
+*   `otsikko` (CharField): Hakemuksen otsikko tai nimi.
+*   `tiivistelmä` (TextField, valinnainen): Lyhyt kuvaus tai tiivistelmä hakemuksesta.
+*   `hakija_nimi` (CharField): Hakemuksen jättäneen tahon (henkilö, tiimi, organisaatio) nimi.
+*   `hakija_email` (EmailField, valinnainen): Hakijan sähköpostiosoite yhteydenottoa varten.
+*   `hakija_lisätiedot` (JSONField/TextField, valinnainen): Muita hakijaan liittyviä tietoja strukturoidussa tai vapaamuotoisessa muodossa (esim. puhelinnumero, organisaation y-tunnus).
+*   `sisältö_data` (JSONField/TextField, valinnainen): Hakemuksen strukturoitu sisältö, jos se ei ole pelkästään liitetiedostoissa (esim. vastaukset kysymyslomakkeeseen).
+*   `tila` (CharField, choices): Hakemuksen tila (esim. Luonnos, Lähetetty, Arvioinnissa, Vaatii lisätietoja, Hyväksytty, Hylätty).
+*   `lähetysaika` (DateTimeField, null=True, blank=True): Aika, jolloin hakemus virallisesti lähetettiin.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `jättäjä_käyttäjä` (ForeignKey -> User, null=True, blank=True, on_delete=models.SET_NULL, related_name="jätetyt_hakemukset"): Viittaus järjestelmän käyttäjään, joka jätti hakemuksen (jos relevantti ja mahdollista).
+*   `vastuu_admin` (ForeignKey -> User, null=True, blank=True, on_delete=models.SET_NULL, related_name="vastuuhakemukset"): Viittaus järjestelmän käyttäjään (todennäköisesti kampanja- tai haasteadmin), joka toimii ensisijaisena yhteyshenkilönä tai vastuuhenkilönä tälle hakemukselle järjestäjän puolelta.
+*   `kloonattu_haasteesta` (ForeignKey -> Haaste, null=True, blank=True, on_delete=models.SET_NULL, related_name="kloonit"): Viittaus alkuperäiseen haasteeseen, jos tämä haaste on klooni.
+*   `nayta_pisteet_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat pisteet arvioinnin ollessa kesken.
+*   `nayta_kommentit_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat kommentit arvioinnin ollessa kesken.
+*   `salli_keskustelut` (BooleanField, null=True, blank=True, default=None): Määrittää, onko hakemuksiin liittyvä keskustelu sallittu tässä haasteessa. `None` perii asetuksen kampanjalta, `True` sallii, `False` kieltää.
+
+**Suhteet muihin objekteihin:**
+
+*   **Haaste (Challenge):** Monta hakemusta kuuluu yhteen haasteeseen (ManyToOne `Hakemus` -> `Haaste`).
+*   **Arviointi (Evaluation/Score):** Yksi hakemus saa monta arviointia (yksi per arvioija per kriteeri) (OneToMany `Hakemus` -> `Arviointi`).
+*   **Liitetiedosto (Attachment):** Yksi hakemus voi sisältää monta liitetiedostoa (OneToMany `Hakemus` -> `Liitetiedosto`). *Huom: `Liitetiedosto`-objekti määritellään erikseen.*
+*   **Käyttäjä (User):** Yksi käyttäjä voi jättää monta hakemusta (jos `jättäjä_käyttäjä`-kenttää käytetään).
+
+**Toiminnallisuus:**
+
+*   Tallentaa hakemuksen perustiedot ja sisällön (tai viittaukset siihen).
+*   Seuraa hakemuksen tilaa sen elinkaaren ajan.
+*   Linkittää hakemuksen oikeaan haasteeseen ja mahdollistaa sen arvioinnin.
+
+**Avoimia kysymyksiä:**
+
+*   Miten liitetiedostot tarkalleen mallinnetaan ja tallennetaan (`Liitetiedosto`-objekti)? Tarvitaanko metatietoja (tiedostonimi, tyyppi, koko)?
+*   Miten hallitaan tilannetta, jossa hakemuksen voi jättää sekä rekisteröitynyt käyttäjä että ulkopuolinen taho? Onko `jättäjä_käyttäjä` ja `hakija_*`-kentät riittävä yhdistelmä?
+*   Tarvitaanko tarkempia kenttiä hakemuksen sisältöön liittyen (esim. budjetti, avainsanat) vai riittääkö `sisältö_data` ja liitteet?
+*   Miten hakemuspohjia tai -lomakkeita hallitaan ja linkitetään haasteeseen? (Tämä voi olla osa Haasteen määrittelyä).
+
+### Liitetiedosto (Attachment)
+
+Liitetiedosto edustaa yksittäistä tiedostoa, joka on liitetty Hakemukseen. Yksi hakemus voi sisältää useita liitetiedostoja.
+
+**Tietokentät (ehdotus):**
+
+*   `hakemus` (ForeignKey -> Hakemus, on_delete=models.CASCADE, related_name="liitetiedostot"): Viittaus Hakemukseen, johon liitetiedosto kuuluu.
+*   `tiedosto` (FileField): Viittaus tallennettuun tiedostoon (esim. Django `FileField` tai vastaava, joka hallinnoi tallennusta).
+*   `tiedostonimi` (CharField): Alkuperäinen tiedostonimi, jolla tiedosto ladattiin.
+*   `tiedostotyyppi` (CharField): Tiedoston MIME-tyyppi (esim. 'application/pdf', 'image/jpeg'). Tämä auttaa käyttöliittymää näyttämään tiedoston oikein.
+*   `koko` (IntegerField): Tiedoston koko tavuina.
+*   `kuvaus` (TextField, valinnainen): Lyhyt kuvaus liitetiedoston sisällöstä.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima (milloin tietue luotiin).
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+
+**Suhteet muihin objekteihin:**
+
+*   **Hakemus (Application/Tender/Proposal/Offer):** Monta liitetiedostoa kuuluu yhteen hakemukseen (ManyToOne `Liitetiedosto` -> `Hakemus`).
+
+**Toiminnallisuus:**
+
+*   Tallentaa viittauksen tiedostoon ja sen keskeiset metatiedot (nimi, tyyppi, koko).
+*   Mahdollistaa tiedostojen liittämisen hakemuksiin.
+
+**Avoimia kysymyksiä:**
+
+*   Missä ja miten tiedostot fyysisesti tallennetaan (esim. paikallinen tiedostojärjestelmä, pilvitallennus kuten S3)? Tämä vaikuttaa `tiedosto`-kentän toteutukseen.
+*   Tarvitaanko tarkempia pääsynhallintasääntöjä liitetiedostoille (esim. kuka voi ladata/poistaa)?
+*   Miten käsitellään tiedostojen versiointia, jos hakemusta päivitetään?
+
+### HakemusViesti (ApplicationMessage)
+
+HakemusViesti edustaa yksittäistä viestiä, joka on lähetetty tietyn hakemuksen yhteydessä käytävään keskusteluun. Keskustelun näkyvyys ja salliminen määritellään Kampanja- ja Haastetasolla.
+
+**Tietokentät (ehdotus):**
+
+*   `hakemus` (ForeignKey -> Hakemus, on_delete=models.CASCADE, related_name="viestit"): Viittaus Hakemukseen, johon viesti liittyy.
+*   `kayttaja` (ForeignKey -> User, on_delete=models.SET_NULL, null=True, related_name="hakemusviestit"): Viittaus viestin lähettäneeseen käyttäjään. Jos käyttäjä poistetaan, viesti säilyy ilman lähettäjätietoa.
+*   `viesti` (TextField): Viestin sisältö.
+*   `luotu_aika` (DateTimeField, auto_now_add): Viestin lähetysaika.
+*   `parent` (ForeignKey -> 'self', null=True, blank=True, on_delete=models.CASCADE, related_name="vastaukset"): Viittaus alkuperäiseen viestiin, jos tämä on vastaus (mahdollistaa ketjutuksen). Juuriviesteillä tämä on `NULL`.
+
+**Suhteet muihin objekteihin:**
+
+*   **Hakemus (Application):** Monta viestiä liittyy yhteen hakemukseen (ManyToOne `HakemusViesti` -> `Hakemus`).
+*   **Käyttäjä (User):** Yksi käyttäjä voi lähettää monta viestiä (ManyToOne `HakemusViesti` -> `User`).
+*   **HakemusViesti (ApplicationMessage):** Yksi viesti voi saada monta vastausta (OneToMany `HakemusViesti` -> `HakemusViesti` [`vastaukset`]). Monta vastausta voi liittyä yhteen parent-viestiin (ManyToOne `HakemusViesti` -> `HakemusViesti` [`parent`]).
+
+**Toiminnallisuus:**
+
+*   Tallentaa hakemuskohtaisen keskustelun viestit.
+*   Mahdollistaa ketjutettujen keskustelujen muodostamisen.
+*   Keskustelun saatavuutta ja näkyvyyttä ohjataan `Kampanja.salli_keskustelut` ja `Haaste.salli_keskustelut` -kentillä.
+
+**Avoimia kysymyksiä:**
+
+*   Ketkä käyttäjät (mitkä roolit) tarkalleen voivat nähdä keskustelun ja lähettää viestejä kuhunkin hakemukseen? (Todennäköisesti ne, joilla on pääsy hakemukseen roolien perusteella).
+*   Tarvitaanko viesteille muokkaus- tai poistotoimintoa? Jos kyllä, millä ehdoilla ja kenen toimesta?
+*   Miten uusista viesteistä ilmoitetaan käyttäjille (esim. sähköposti-ilmoitukset)?
+
+### Kampanjan Käyttäjä (CampaignUser)
+
+Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Kampanjaan ja määrittelee käyttäjän roolin kyseisessä kampanjassa.
+
+**Tietokentät (ehdotus):**
+
+*   `kampanja` (ForeignKey -> Kampanja, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Kampanjaan.
+*   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="kampanja_roolit"): Viittaus Käyttäjään.
+*   `rooli` (CharField, choices=['admin', 'arvioija']): Käyttäjän rooli kampanjassa. *Huom: Roolivaihtoehtoja voidaan laajentaa tarvittaessa.*
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+
+**Rajoitteet:**
+
+*   Yksi käyttäjä voi olla liitettynä yhteen kampanjaan vain yhdellä roolilla (`unique_together = ('kampanja', 'kayttaja')`). Jos käyttäjällä on useita rooleja, ne on käsiteltävä sovelluslogiikassa tai roolimallia laajentamalla.
+
+**Suhteet muihin objekteihin:**
+
+*   Linkittää `Kampanja`- ja `User`-objektit (ManyToMany-suhteen toteutus).
+
+**Toiminnallisuus:**
+
+*   Määrittää kampanjakohtaiset oikeudet (admin, arvioija).
+*   Mahdollistaa käyttäjien hallinnan kampanjatasolla. Kampanja-adminit voivat lisätä/poistaa muita admineita ja arvioijia kampanjaan.
+*   Kampanjaan 'arvioija'-roolilla liitetyt käyttäjät voivat oletusarvoisesti nähdä ja arvioida kaikkia kampanjan haasteita ja niiden hakemuksia, ellei `HaasteKayttaja`-tasolla ole tarkempia määrityksiä.
+
+**Avoimia kysymyksiä:**
+
+*   Tarvitaanko tarkempia rooleja kampanjatasolla?
+*   Miten varmistetaan, että kampanjalla on aina vähintään yksi admin (esim. `omistaja_kayttaja` automaattisesti admin-roolilla)?
+
+### Haasteen Käyttäjä (ChallengeUser)
+
+Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja määrittelee käyttäjän roolin kyseisessä haasteessa. Tämä mahdollistaa tarkemman oikeuksien hallinnan kuin pelkkä kampanjatason rooli.
+
+**Tietokentät (ehdotus):**
+
+*   `haaste` (ForeignKey -> Haaste, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Haasteeseen.
+*   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="haaste_roolit"): Viittaus Käyttäjään.
+*   `rooli` (CharField, choices=['admin', 'arvioija']): Käyttäjän rooli haasteessa. *Huom: Roolivaihtoehtoja voidaan laajentaa tarvittaessa.*
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+
+**Rajoitteet:**
+
+*   Yksi käyttäjä voi olla liitettynä yhteen haasteeseen vain yhdellä roolilla (`unique_together = ('haaste', 'kayttaja')`).
+
+**Suhteet muihin objekteihin:**
+
+*   Linkittää `Haaste`- ja `User`-objektit (ManyToMany-suhteen toteutus).
+
+**Toiminnallisuus:**
+
+*   Määrittää haastekohtaiset oikeudet (admin, arvioija).
+*   Haaste-adminit voivat hallinnoida haasteen asetuksia ja lisätä/poistaa arvioijia *kyseiseen* haasteeseen.
+*   Jos käyttäjä on määritelty arvioijaksi `HaasteKayttaja`-tasolla, hän voi arvioida vain kyseisen haasteen hakemuksia, vaikka hänellä olisi laajempi 'arvioija'-rooli `KampanjaKayttaja`-tasolla. Tämä mahdollistaa arvioijien kohdentamisen tiettyihin haasteisiin.
+*   Jos käyttäjää ei ole erikseen liitetty haasteeseen `HaasteKayttaja`-mallilla, mutta hänellä on 'arvioija'-rooli kampanjatasolla (`KampanjaKayttaja`), hän voi oletusarvoisesti arvioida haasteen hakemuksia.
+
+**Avoimia kysymyksiä:**
+
+*   Tarvitaanko tarkempia rooleja haastetasolla?
+*   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
+
+### Organisaatio (Organisation)
+
+Organisaatio edustaa tahoa (yritys, julkinen toimija, projekti tms.), joka voi järjestää Kampanjoita tai johon käyttäjät voivat kuulua.
+
+**Tietokentät (ehdotus):**
+
+*   `nimi` (CharField, unique=True): Organisaation täydellinen nimi.
+*   `lyhenne` (CharField, unique=True, null=True, blank=True, db_index=True): Organisaation lyhenne tai koodi.
+*   `kuvaus` (TextField, null=True, blank=True): Vapaamuotoinen kuvaus organisaatiosta.
+*   `verkkosivusto` (URLField, null=True, blank=True): Organisaation verkkosivun osoite.
+*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+
+**Suhteet muihin objekteihin:**
+
+*   **Kampanja (Campaign):** Yksi organisaatio voi järjestää monta kampanjaa (OneToMany `Organisaatio` -> `Kampanja`).
+*   **Käyttäjä (User):** Monta käyttäjää voi kuulua yhteen organisaatioon ja yksi käyttäjä voi kuulua moneen organisaatioon (ManyToMany `Organisaatio` <-> `User` kautta `OrganisaatioKayttaja`-välimallin).
+
+**Toiminnallisuus:**
+
+*   Tarjoaa keskitetyn paikan organisaatiotietojen hallintaan.
+*   Mahdollistaa kampanjoiden liittämisen tiettyyn järjestäjään.
+*   Mahdollistaa käyttäjien liittämisen organisaatioihin.
+
+**Avoimia kysymyksiä:**
+
+*   Tarvitaanko tarkempia rooleja tai tietoja käyttäjän ja organisaation väliseen suhteeseen (`OrganisaatioKayttaja`)? (Tässä vaiheessa oletetaan pelkkä jäsenyys).
+*   Kuka hallinnoi organisaatiotietoja? (Todennäköisesti ylläpitäjät).
+
+### Organisaation Käyttäjä (OrganisationUser)
+
+Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Organisaatioon.
+
+**Tietokentät (ehdotus):**
+
+*   `organisaatio` (ForeignKey -> Organisaatio, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Organisaatioon.
+*   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="organisaatio_jasenyydet"): Viittaus Käyttäjään.
+*   `luotu_aika` (DateTimeField, auto_now_add): Liittymisen aikaleima.
+
+**Rajoitteet:**
+
+*   Yksi käyttäjä voi olla liitettynä yhteen organisaatioon vain kerran (`unique_together = ('organisaatio', 'kayttaja')`).
+
+**Suhteet muihin objekteihin:**
+
+*   Linkittää `Organisaatio`- ja `User`-objektit (ManyToMany-suhteen toteutus).
+
+**Toiminnallisuus:**
+
+*   Mahdollistaa käyttäjien liittämisen organisaatioihin.
+*   Voidaan tulevaisuudessa laajentaa rooleilla tai muilla tiedoilla tarvittaessa.
+
+**Avoimia kysymyksiä:**
+
+*   Riittääkö pelkkä jäsenyys vai tarvitaanko rooleja tai muita tietoja? (Ks. `Organisaatio`-mallin avoimet kysymykset).
+
+## 6. Käyttöliittymä (UI) / Käyttäjäkokemus (UX)
+
+*Kuvaa merkittävät muutokset tai uudet suunnitelmat käyttöliittymälle.*
+
+### 6.1. Ylläpitäjän Käyttöliittymä (Admin UI)
+
+Tässä osiossa kuvaillaan ylläpitäjän (admin) käyttöliittymän suunnitelma, hyödyntäen valitun taustajärjestelmän tarjoamia sisäänrakennettuja ylläpitotoimintoja mahdollisimman pitkälle. Ylläpitäjät koulutetaan käyttämään näitä toimintoja.
+
+**Yleistä:**
+
+*   Valtuutettujen ylläpitäjien (esim. `KampanjaKayttaja`-roolin 'admin' kautta) tulee pystyä hallinnoimaan kaikkia keskeisiä tietoja järjestelmässä.
+*   Käyttöliittymän tulisi tarjota selkeät listanäkymät ja muokkausnäkymät kullekin tietorakenteelle.
+
+**Kampanja (Campaign):**
+
+*   **Listanäkymä:** Näyttää keskeiset tiedot, kuten `nimi`, `jarjestaja_taho`, `tila`, `alkamisaika`, `paattymisaika`. Mahdollistaa suodatuksen `tila`-kentän mukaan ja haun `nimi`-kentällä.
+*   **Muokkausnäkymä:**
+    *   Sallii kaikkien kampanjan kenttien muokkauksen (`nimi`, `kuvaus`, `jarjestaja_taho`, ajat, `tila` jne.).
+    *   Tarjoaa tavan hallinnoida kampanjaan liittyviä käyttäjiä (`KampanjaKayttaja`): käyttäjien lisääminen/poistaminen ja roolien (`admin`, `arvioija`) määrittäminen. `omistaja_kayttaja` voisi olla vain luku -tyyppinen tai automaattisesti asetettu.
+    *   Mahdollistaa `ulkoasu_kustomointi`-kentän muokkauksen (esim. tekstikenttä CSS/JSON-määrittelyille).
+    *   Näyttää linkitetyt `Haaste`-objektit ja mahdollistaa siirtymisen niiden hallintaan.
+
+**Haaste (Challenge):**
+
+*   **Listanäkymä:** Usein käytettävissä `Kampanja`-näkymän kautta. Näyttää `nimi`, `tila` ja keskeiset päivämäärät (`hakemusten_*`, `arvioinnin_*`). Mahdollistaa suodatuksen `tila`-kentän mukaan.
+*   **Muokkausnäkymä:**
+    *   Sallii kaikkien haasteen kenttien muokkauksen.
+    *   Tarjoaa tavan hallinnoida haasteeseen liittyviä käyttäjiä (`HaasteKayttaja`): arvioijien ja haaste-adminien lisääminen/poistaminen *tähän* haasteeseen.
+    *   Tarjoaa tavan hallinnoida haasteen arviointikriteerejä (`Arviointikriteeri`), mukaan lukien hierarkian luominen ja muokkaaminen.
+    *   Sisältää toiminnallisuuden haasteen kloonaamiseksi kampanjan sisällä ("Kloonaa haaste").
+    *   Näyttää linkin alkuperäiseen haasteeseen (`kloonattu_haasteesta`), jos kyseessä on klooni.
+    *   Näyttää linkitetyt `Hakemus`-objektit ja mahdollistaa siirtymisen niiden hallintaan.
+
+**Arviointikriteeri (EvaluationCriterion):**
+
+*   **Hallinta:** Todennäköisesti upotettuna `Haaste`-muokkausnäkymään.
+*   **Hierarkia:** Käyttöliittymän tulee tukea hierarkian (`parent`/`children`) luomista ja muokkaamista (esim. sisäkkäinen muokkaus, puunäkymä).
+*   **Kentät:** `maksimipisteet` ja `kynnysarvo` tulee olla muokattavissa vain, kun `tyyppi` on 'KRITEERI'. `painokerroin`-kentän toimintalogiikka tulee selventää käyttöliittymässä (perustuen avoimeen kysymykseen spesifikaatiossa). Järjestystä (`järjestysnumero`) tulee voida muuttaa helposti (esim. raahaamalla tai nuolipainikkeilla).
+*   **Rajoitukset:** Varmistetaan, että vain `KRITEERI`-tyyppisille kohteille voi antaa `maksimipisteet`.
+
+**Hakemus (Application/Tender/Proposal/Offer):**
+
+*   **Listanäkymä:** Usein käytettävissä `Haaste`-näkymän kautta. Näyttää `otsikko`, `hakija_nimi`, `tila`, `lähetysaika`. Mahdollistaa suodatuksen `tila`-kentän mukaan ja haun `otsikko` tai `hakija_nimi` -kentillä.
+*   **Muokkausnäkymä:**
+    *   Ylläpitäjä voi muokata lähinnä tilatietoja (`tila`) tai asettaa `vastuu_admin`:in. Hakijan tiedot (`hakija_*`, `sisältö_data`) ovat pääasiassa vain luku -muodossa.
+    *   Näyttää liittyvät `Liitetiedosto`-objektit (latausmahdollisuus). Ylläpitäjä voi tarvittaessa poistaa tai lisätä liitteitä.
+    *   Tarjoaa näkymän hakemukseen liittyviin arviointeihin (`Arviointi`), mahdollisesti yhteenvetona (esim. keskiarvot, arviointien tila per arvioija).
+    *   Tarjoaa pääsyn hakemukseen liittyvään keskusteluun (`HakemusViesti`).
+
+**Arviointi (Evaluation/Score):**
+
+*   **Hallinta:** Ylläpitäjä ei yleensä luo tai muokkaa arviointeja suoraan.
+*   **Näkymä:** Arvioinnit ovat nähtävissä `Hakemus`-näkymän kautta tai mahdollisesti omassa listanäkymässään, jossa voi suodattaa esim. `Arvioija`- tai `Hakemus`-tiedon perusteella. Ylläpitäjän tulee voida tarkastella yksittäisen arvioinnin tietoja (`pisteet`, `kommentti`) valvontaa tai ongelmanratkaisua varten.
+
+**Liitetiedosto (Attachment):**
+
+*   **Hallinta:** Pääasiassa `Hakemus`-muokkausnäkymän kautta.
+*   **Toiminnot:** Mahdollistaa liitteiden tarkastelun (nimi, tyyppi, koko) ja lataamisen. Ylläpitäjä voi tarvittaessa poistaa liitteitä tai lisätä uusia.
+
+**HakemusViesti (ApplicationMessage):**
+
+*   **Hallinta:** Nähtävissä `Hakemus`-näkymän kautta, näyttäen viestiketjun rakenteen.
+*   **Moderaatio:** Ylläpitäjillä tulisi olla mahdollisuus moderoida keskustelua tarvittaessa (esim. poistaa viestejä).
+
+**KampanjaKayttaja (CampaignUser) & HaasteKayttaja (ChallengeUser):**
+
+*   **Hallinta:** Käyttäjien ja roolien hallinta tapahtuu vastaavien `Kampanja`- ja `Haaste`-muokkausnäkymien kautta (inline-muokkaus).
+*   **Käyttöliittymä:** Tarvitaan selkeä tapa valita käyttäjä (esim. pudotusvalikko tai haku) ja määrittää rooli ('admin'/'arvioija'). `HaasteKayttaja`-näkymässä käyttäjälista voitaisiin rajata kampanjan käyttäjiin.
+
+**Käyttäjien hallinta (User Management):**
+
+*   Taustajärjestelmän oletuskäyttäjähallintaa voidaan hyödyntää. Sitä voidaan laajentaa näyttämään, mihin kampanjoihin ja haasteisiin käyttäjä liittyy rooleineen.
+
+### 6.2. Arvioijan Käyttöliittymä (Evaluator UI/UX)
+
+Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arviointiprosessista mahdollisimman sujuva ja intuitiivinen:
+
+**1. Kojelauta / Etusivu (Dashboard/Homepage):**
+
+*   **Tarkoitus:** Tarjota arvioijalle nopea yleiskatsaus hänen tehtävistään ja edistymisestään.
+*   **Sisältö:**
+    *   Lista kampanjoista ja haasteista, joihin arvioija on liitetty ja joissa on aktiivisia arviointitehtäviä (`Haaste.tila` = 'Hakemukset arvioitavana').
+    *   Kullekin haasteelle näytetään:
+        *   Haasteen nimi (`Haaste.nimi`).
+        *   Arvioitavien hakemusten kokonaismäärä.
+        *   Arvioijan itse arvioimien hakemusten määrä (ja/tai prosenttiosuus).
+        *   Haasteen arvioinnin määräaika (`Haaste.arvioinnin_paattymisaika`), jos asetettu.
+    *   Pikakuvakkeet/linkit siirtyä suoraan arvioimaan tietyn haasteen hakemuksia.
+    *   Mahdollisesti ilmoitukset (esim. uudet viestit keskusteluissa, lähestyvät määräajat).
+
+**2. Haasteen Arviointinäkymä (Challenge Evaluation View):**
+
+*   **Tarkoitus:** Listata kaikki haasteeseen liittyvät hakemukset ja näyttää niiden arviointistatus.
+*   **Sisältö:**
+    *   Haasteen perustiedot (nimi, kuvaus).
+    *   Lista haasteeseen saapuneista hakemuksista (`Hakemus`). Kullekin hakemukselle näytetään:
+        *   Hakemuksen tunniste/otsikko (`Hakemus.otsikko`).
+        *   Hakijan nimi (`Hakemus.hakija_nimi`).
+        *   Arvioijan oma arviointistatus tälle hakemukselle (esim. "Aloittamatta", "Kesken", "Valmis"). Tilatieto voidaan päätellä `Arviointi`-objektien olemassaolosta ja tilasta (jos lisätään tilakenttä `Arviointi`-malliin).
+        *   Mahdollisesti linkki hakemuksen keskusteluun (`HakemusViesti`), jos `salli_keskustelut` on tosi.
+    *   **Suodatus ja Järjestely:** Mahdollisuus suodattaa hakemuksia oman arviointistatuksen mukaan (esim. näytä vain arvioimattomat) ja järjestää listaa (esim. hakijan nimen tai lähetysajan mukaan).
+    *   Linkki siirtyä yksittäisen hakemuksen arviointinäkymään.
+
+**3. Hakemuksen Arviointinäkymä (Application Evaluation View):**
+
+*   **Tarkoitus:** Mahdollistaa yhden hakemuksen arviointi kriteerien perusteella. Tämä on arvioijan pääasiallinen työnäkymä.
+*   **Layout:** Usein kaksipalstainen:
+    *   **Vasen/Yläosa:** Hakemuksen tiedot ja liitteet.
+        *   Hakemuksen perustiedot (`otsikko`, `tiivistelmä`, `hakija_*`).
+        *   Linkit liitetiedostoihin (`Liitetiedosto`), jotka avautuvat helposti (esim. upotettu PDF-lukija, linkki uuteen välilehteen).
+        *   Mahdollinen strukturoitu sisältö (`sisältö_data`).
+    *   **Oikea/Alaosa:** Arviointilomake.
+        *   Näyttää haasteen `Arviointikriteeri`-hierarkian selkeästi (esim. sisennetyllä listalla tai laajennettavilla osioilla).
+        *   Kullekin `KRITEERI`-tyyppiselle kriteerille:
+            *   Kriteerin nimi (`nimi`), koodi (`koodi`), kuvaus (`kuvaus`).
+            *   Ilmoitus maksimipisteistä (`maksimipisteet`) ja mahdollisesta kynnysarvosta (`kynnysarvo`).
+            *   Syöttökenttä pisteille (`Arviointi.pisteet`) - esim. numerokenttä, liukusäädin, tai valintanapit (riippuen `maksimipisteet`-arvosta). Validointi suhteessa maksimipisteisiin.
+            *   Tekstikenttä kommenteille (`Arviointi.kommentti`).
+        *   Mahdollisuus lisätä kommentteja myös `RYHMÄ`-tason kriteereille (jos tämä toiminnallisuus päätetään toteuttaa).
+        *   **Tallennus:** Automaattinen tallennus (autosave) tai selkeä "Tallenna luonnos" / "Merkitse valmiiksi" -painike. Jos `Arviointi`-malliin lisätään tila, tämä painike päivittäisi sen.
+*   **Muut Arvioijat (Valinnainen Näkyvyys):**
+    *   Jos `Haaste.nayta_pisteet_arvioinnin_aikana` on `True`, näytetään (mahdollisesti anonyymisti) muiden arvioijien antamat pisteet *sen jälkeen kun* oma arvio on tallennettu tai vaihtoehtoisesti kun Haasteen tai Hakemuksen arvioinnin tila muuttuu 'Valmis'.
+    *   Jos `Haaste.nayta_kommentit_arvioinnin_aikana` on `True`, näytetään muiden kommentit vastaavasti. Tämä voi olla erillinen välilehti tai osio.
+*   **Navigointi:** Helppo siirtyminen edelliseen/seuraavaan hakemukseen haasteen sisällä.
+*   **Keskustelu:** Jos sallittu, linkki tai upotettu näkymä hakemuksen keskusteluun (`HakemusViesti`).
+
+**4. Hakemuksen Keskustelunäkymä (Application Discussion View):**
+
+*   **Tarkoitus:** Käydä keskustelua tietystä hakemuksesta (jos sallittu).
+*   **Sisältö:**
+    *   Näyttää viestiketjun (`HakemusViesti`).
+    *   Mahdollisuus uusien viestien kirjoittamisen ja vastaamisen olemassaoleviin (`parent`-linkki).
+    *   Näkyvyys riippuu rooleista ja pääsyoikeuksista hakemukseen. Arvioijat näkevät yleensä toistensa ja adminien viestit.
+
+**Yleiset UX-periaatteet arvioijalle:**
+
+*   **Selkeys:** Näkymien tulee olla selkeitä ja johdonmukaisia. Arvioijan tulee aina tietää, missä kohtaa prosessia hän on.
+*   **Tehokkuus:** Minimoidaan klikkausten määrä. Automaattinen tallennus ja sujuva navigointi hakemusten välillä ovat tärkeitä.
+*   **Konteksti:** Hakemuksen tiedot ja arviointilomake näkyvät samanaikaisesti, jotta tietoihin ei tarvitse jatkuvasti hyppiä edestakaisin.
+*   **Visuaalinen Palaute:** Selkeä indikaatio arviointien tilasta (aloittamatta, kesken, valmis). Värimerkkejä tai ikoneita voidaan hyödyntää.
+*   **Ohjeistus:** Kriteerien kuvaukset ja mahdolliset lisäohjeet tulee olla helposti saatavilla arviointinäkymässä.
+
+### 6.3 Ylläpitäjän Seurantanäkymä (Admin Monitoring Dashboard)
+
+**Tarkoitus:** Tarjota ylläpitäjille (admin-tasoiset käyttäjät) reaaliaikainen yleiskuva arviointien etenemisestä kaikissa kampanjoissa ja haasteissa, joihin heillä on pääsy. Auttaa tunnistamaan pullonkauloja ja seuraamaan prosessin aikataulua.
+
+**Sijainti:** Voi olla oma pääsivunsa ylläpitäjän käyttöliittymässä tai osio yleisessä kojelaudassa.
+
+**Sisältö ja Toiminnallisuudet:**
+
+1.  **Kampanja-tason Yleiskatsaus:**
+    *   Lista aktiivisista kampanjoista (`Kampanja.tila` esim. 'Arvioinnissa', 'Avoinna hakemuksille').
+    *   Kullekin kampanjalle näytetään:
+        *   Nimi (`Kampanja.nimi`).
+        *   Tila (`Kampanja.tila`).
+        *   Haasteiden lukumäärä kampanjassa.
+        *   Yleinen arvioinnin eteneminen kampanjassa (esim. prosenttiosuus haasteista, joissa arviointi on valmis, tai keskimääräinen eteneminen haasteissa).
+        *   Linkki kampanjan tarkempiin tietoihin (ylläpitonäkymä tai alla kuvattu haastetason näkymä).
+
+2.  **Haaste-tason Yleiskatsaus (voidaan näyttää kampanjakohtaisesti tai kaikki yhdessä listassa):**
+    *   Lista haasteista, joissa arviointi on käynnissä tai päättynyt (`Haaste.tila` esim. 'Hakemukset arvioitavana', 'Arviointi päättynyt').
+    *   Kullekin haasteelle näytetään:
+        *   Haasteen nimi (`Haaste.nimi`) ja linkki kampanjaan.
+        *   Haasteen tila (`Haaste.tila`).
+        *   Hakemusten kokonaismäärä (`Haaste.hakemukset.count()`).
+        *   **Arvioinnin eteneminen:**
+            *   Kuinka moni hakemus on arvioitu kaikkien siihen määriteltyjen arvioijien toimesta (esim. "15 / 50 hakemusta valmiina").
+            *   Prosentuaalinen eteneminen (esim. perustuen siihen, kuinka monta `Arviointi`-objektia on luotu suhteessa odotettuun maksimimäärään = hakemukset \* kriteerit \* arvioijat).
+            *   Visuaalinen etenemispalkki.
+        *   Määriteltyjen arvioijien lukumäärä.
+        *   Arvioinnin määräaika (`Haaste.arvioinnin_paattymisaika`).
+        *   Linkki haasteen tarkempiin tietoihin (ylläpitonäkymä tai alla kuvattu arvioijakohtainen näkymä).
+
+3.  **Arvioijakohtainen Eteneminen (Haasteen sisällä, valinnainen mutta hyödyllinen):**
+    *   Klikkaamalla haastetta voisi avautua näkymä, joka listaa haasteeseen liitetyt arvioijat (`HaasteKayttaja`, rooli='arvioija').
+    *   Kullekin arvioijalle näytetään:
+        *   Arvioijan nimi.
+        *   Kuinka monta hakemusta kyseinen arvioija on arvioinut valmiiksi / aloittanut tässä haasteessa.
+        *   Mahdollisesti viimeisimmän arvioinnin ajankohta.
+
+4.  **Suodatus ja Järjestely:**
+    *   Mahdollisuus suodattaa näkymää kampanjan tai haasteen tilan, määräaikojen tai nimen perusteella.
+    *   Mahdollisuus järjestää listoja eri sarakkeiden mukaan (esim. eteneminen, määräaika).
+
+5.  **Huomiota vaativat kohteet:**
+    *   Näkymä voisi korostaa haasteita, joiden määräaika lähestyy tai joissa eteneminen on hidasta verrattuna muihin.
+
+## 7. Avoimet kysymykset
+
+*Listaa asiat, jotka vaativat vielä keskustelua tai selvennystä.*
+
+**Kampanja (Campaign):**
+*   Tarvitaanko `jarjestaja_taho`-kentän sijaan/lisäksi erillinen `Organisaatio`-objekti? (Todennäköisesti kyllä).
+*   Miten ulkoasun kustomointi tarkalleen toteutetaan ja periytyy/vaikuttaa haasteisiin?
+
+**Haaste (Challenge):**
+*   Miten arviointikriteerien rakenne (yksi taso, monta tasoa, ryhmät) tarkalleen mallinnetaan ja liitetään haasteeseen? (Ks. suunnittelumuistion pohdinta eri projektien tarpeista).
+*   Tarvitaanko tarkempaa tilanhallintaa (esim. erilliset tilat hakemusten vastaanotolle ja arvioinnille)? (Lisätty ehdotukseen).
+*   Miten haastekohtaiset admin-roolit ja kampanja-admin-roolit eroavat oikeuksiltaan?
+
+**Arviointikriteeri (EvaluationCriterion):**
+*   Miten painokertoimet lasketaan ja vaikuttavat hierarkian eri tasoilla? Periikö aliryhmä/kriteeri yläryhmän painokertoimen vai lasketaanko painotus suhteessa sisaruksiin? (Tärkeä määrittely laskentalogiikkaa varten).
+*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisiin objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
+*   Tarvitaanko lisäkenttiä ohjeistamaan arvioijaa kriteerin osalta?
+*   Miten varmistetaan, että vain `KRITEERI`-tyyppisillä objekteilla on `maksimipisteet` ja `kynnysarvo`? (Voidaan validoida mallin tasolla).
+
+**Arviointi (Evaluation/Score):**
+*   Miten käsitellään tilanne, jos arviointikriteeriä muokataan (esim. `maksimipisteet` muuttuu) sen jälkeen, kun arviointeja on jo annettu? (Vaatii validointia/logiikkaa).
+*   Tarvitaanko erillinen tila arvioinnille (esim. 'Luonnos', 'Valmis')? (Mahdollisesti hyödyllinen).
+*   Miten mahdolliset kynnysarvon (`kriteeri.kynnysarvo`) alitukset merkitään tai raportoidaan?
+*   Pitäisikö kommentointi olla mahdollista myös 'RYHMÄ'-tyyppisille kriteereille, kuten vanhassa mallissa mainittiin? Jos kyllä, pitäisikö `kriteeri`-kentän viitata myös ryhmiin, ja miten `pisteet` tällöin käsitellään? (Tämä lisäisi kompleksisuutta, harkitaan tarkkaan tarvetta).
+
+**Hakemus (Application/Tender/Proposal/Offer):**
+*   Miten liitetiedostot tarkalleen mallinnetaan ja tallennetaan (`Liitetiedosto`-objekti)? Tarvitaanko metatietoja (tiedostonimi, tyyppi, koko)?
+*   Miten hallitaan tilannetta, jossa hakemuksen voi jättää sekä rekisteröitynyt käyttäjä että ulkopuolinen taho? Onko `jättäjä_käyttäjä` ja `hakija_*`-kentät riittävä yhdistelmä?
+*   Tarvitaanko tarkempia kenttiä hakemuksen sisältöön liittyen (esim. budjetti, avainsanat) vai riittääkö `sisältö_data` ja liitteet?
+*   Miten hakemuspohjia tai -lomakkeita hallitaan ja linkitetään haasteeseen? (Tämä voi olla osa Haasteen määrittelyä).
+
+**Liitetiedosto (Attachment):**
+*   Missä ja miten tiedostot fyysisesti tallennetaan (esim. paikallinen tiedostojärjestelmä, pilvitallennus kuten S3)? Tämä vaikuttaa `tiedosto`-kentän toteutukseen.
+*   Tarvitaanko tarkempia pääsynhallintasääntöjä liitetiedostoille (esim. kuka voi ladata/poistaa)?
+*   Miten käsitellään tiedostojen versiointia, jos hakemusta päivitetään?
+
+**Kampanjan Käyttäjä (CampaignUser):**
+*   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
+
+**Haasteen Käyttäjä (ChallengeUser):**
+*   Tarvitaanko tarkempia rooleja haastetasolla?
+*   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
+
+**HakemusViesti (ApplicationMessage):**
+*   Ketkä käyttäjät (mitkä roolit) tarkalleen voivat nähdä keskustelun ja lähettää viestejä kuhunkin hakemukseen? (Todennäköisesti ne, joilla on pääsy hakemukseen roolien perusteella).
+*   Tarvitaanko viesteille muokkaus- tai poistotoimintoa? Jos kyllä, millä ehdoilla ja kenen toimesta?
+*   Miten uusista viesteistä ilmoitetaan käyttäjille (esim. sähköposti-ilmoitukset)?
+
+**Kampanjan Käyttäjä (CampaignUser):**
+*   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
