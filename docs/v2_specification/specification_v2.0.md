@@ -304,6 +304,9 @@ Hakemus edustaa Haasteeseen jätettyä ehdotusta, tarjousta tai muuta vastaavaa 
 *   Miten hallitaan tilannetta, jossa hakemuksen voi jättää sekä rekisteröitynyt käyttäjä että ulkopuolinen taho? Onko `jättäjä_käyttäjä` ja `hakija_*`-kentät riittävä yhdistelmä?
 *   Tarvitaanko tarkempia kenttiä hakemuksen sisältöön liittyen (esim. budjetti, avainsanat) vai riittääkö `sisältö_data` ja liitteet?
 *   Miten hakemuspohjia tai -lomakkeita hallitaan ja linkitetään haasteeseen? (Tämä voi olla osa Haasteen määrittelyä).
+*   **Hakemuksen siirtyminen haasteiden välillä:** Miten mallinnetaan ja hallitaan tilanne, jossa hakemus voi siirtyä haasteesta toiseen (esim. esikarsinnasta jatkoarviointiin)?
+    *   Vaikka arvioinnit säilyvät, tarvitaanko erillinen mekanismi (kuten `HakemusHistoria`-malli) seuraamaan, missä haasteessa hakemus on ollut milloinkin?
+    *   Miten varmistetaan, että arvioijalle näytetään oikeat ja relevantit hakemuksen tiedot kussakin arviointivaiheessa (haasteessa)? Esimerkiksi esikarsinnassa voidaan näyttää vain tiivistelmä, kun taas jatkoarvioinnissa kaikki tiedot ja liitteet. Pitääkö `Hakemus`-mallia laajentaa vai riittääkö käyttöliittymälogiikka ohjaamaan näytettävää dataa `Haaste`-kontekstin perusteella? Vai kannattaisiko Hakemuksesta tallentaa uusi versio jokaiseen arviointivaiheeseen? (Tämä vaatii tarkempaa suunnittelua, koska Application ID olisi eri haasteissa sama.)
 
 ### Liitetiedosto (Attachment)
 
@@ -704,6 +707,9 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   Miten hallitaan tilannetta, jossa hakemuksen voi jättää sekä rekisteröitynyt käyttäjä että ulkopuolinen taho? Onko `jättäjä_käyttäjä` ja `hakija_*`-kentät riittävä yhdistelmä?
 *   Tarvitaanko tarkempia kenttiä hakemuksen sisältöön liittyen (esim. budjetti, avainsanat) vai riittääkö `sisältö_data` ja liitteet?
 *   Miten hakemuspohjia tai -lomakkeita hallitaan ja linkitetään haasteeseen? (Tämä voi olla osa Haasteen määrittelyä).
+*   **Hakemuksen siirtyminen haasteiden välillä:** Miten mallinnetaan ja hallitaan tilanne, jossa hakemus voi siirtyä haasteesta toiseen (esim. esikarsinnasta jatkoarviointiin)?
+    *   Vaikka arvioinnit säilyvät, tarvitaanko erillinen mekanismi (kuten `HakemusHistoria`-malli) seuraamaan, missä haasteessa hakemus on ollut milloinkin?
+    *   Miten varmistetaan, että arvioijalle näytetään oikeat ja relevantit hakemuksen tiedot kussakin arviointivaiheessa (haasteessa)? Esimerkiksi esikarsinnassa voidaan näyttää vain tiivistelmä, kun taas jatkoarvioinnissa kaikki tiedot ja liitteet. Pitääkö `Hakemus`-mallia laajentaa vai riittääkö käyttöliittymälogiikka ohjaamaan näytettävää dataa `Haaste`-kontekstin perusteella? Vai kannattaisiko Hakemuksesta tallentaa uusi versio jokaiseen arviointivaiheeseen? (Tämä vaatii tarkempaa suunnittelua, koska Application ID olisi eri haasteissa sama.)
 
 **Liitetiedosto (Attachment):**
 *   Missä ja miten tiedostot fyysisesti tallennetaan (esim. paikallinen tiedostojärjestelmä, pilvitallennus kuten S3)? Tämä vaikuttaa `tiedosto`-kentän toteutukseen.
