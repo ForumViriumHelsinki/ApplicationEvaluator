@@ -2,31 +2,116 @@
 
 ## 1. Tavoitteet
 
-*Kuvaa version 2.0 päätavoitteet ja parannukset verrattuna versioon 1.0.*
+*   **Modernisointi ja Joustavuus:** Korvataan vanhentunut versio 1.0 uudella, joustavammalla ja helpommin ylläpidettävällä järjestelmällä. Tavoitteena on tukea erilaisia arviointiprosesseja, kuten erilaisia painotuksia, kriteerirakenteita ja näkyvyysasetuksia.
+*   **Parempi Käyttökokemus:** Parannetaan sekä ylläpitäjien että arvioijien käyttöliittymiä. Tarjotaan ylläpitäjille selkeämmät hallintatyökalut (hyödyntäen esimerkiksi Djangon admin-käyttöliittymää) ja arvioijille intuitiivisempi sekä tehokkaampi arviointinäkymä. Jos käyttäjän ei tarvitse luoda kampanjoita, haasteita tai arvioijia, järjestelmää tulee voida käyttää pelkästään varsinaisen käyttöliitymän kautta.
+*   **Laajennettu Toiminnallisuus:**
+    *   Tavoitteena tuoda hakemusten kerääminen osaksi järjestelmää (vaiheittainen toteutus).
+    *   Mahdollistetaan monitasoiset arviointikriteerit (ryhmät ja alikriteerit).
+    *   Lisätään kampanjataso hallinnoinnin helpottamiseksi.
+    *   Mahdollistetaan kampanja- ja haastekohtainen käyttäjä- ja oikeushallinta.
+    *   Lisätään tuki keskusteluille hakemusten yhteydessä.
+    *   Parannetaan raportointia ja arviointiprosessin seurantaa.
+*   **Tekniset Parannukset:**
+    *   Siirretään laskenta palvelimelle eli laskenta suoritetaan ainoastaan yhdessä paikassa.
+    *   Mitään ei kovakoodata käyttöliittymän osaksi, kaikki määrittelyt tehdään backendin kautta.
+    *   Tarjotaan kattava REST-rajapinta.
+    *   Varmistetaan tietokannan eheys ja auditointi aikaleimojen ja lokien avulla.
+    *   Pidetään järjestelmä avoimena lähdekoodina (Open Source) ja mahdollistetaan sekä oma asennus että SaaS-malli.
+*   **Objektiivisuus ja Läpinäkyvyys:** Parannetaan arviointiprosessin objektiivisuutta ja läpinäkyvyyttä yhtenäistämällä kriteereitä ja tarjoamalla selkeät työkalut.
+*   **Tehokkuus:** Lyhennetään arviointiaikaa ja vähennetään manuaalista työtä sekä virheitä.
+
 
 ## 2. Toiminnalliset vaatimukset
 
-*Listaa järjestelmän ominaisuudet ja toiminnot. Käyttötapaukset tai käyttäjätarinat voivat olla hyödyllisiä tässä.*
+Application Evaluator 2.0:n tavoitteena on laajentaa version 1.0 toiminnallisuutta siirtymällä puhtaasta arviointityökalusta kattavammaksi järjestelmäksi, joka hallinnoi koko hakemusten elinkaarta aina niiden keräämisestä arviointiin ja raportointiin. Tämä laajennus voidaan toteuttaa vaiheittain tärkeimpien arviointiominaisuuksien valmistuttua. Versio 2.0 esittää jäsennellymmän tavan organisoida arviointiprosesseja kampanjoiden ja haasteiden avulla, sekä mahdollistaa monipuolisemman kriteeristön ja käyttäjäroolien hallinnan.
 
 ### 2.1. Olemassaolevat ominaisuudet (Muutokset/Poistot)
-*Kuvaa muutokset tai poistot version 1.0 ominaisuuksiin.*
+*   **Laajennus arvioinnista hakemusten hallintaan:** Järjestelmä ei ole enää pelkkä erillinen arviointityökalu, vaan sen on tarkoitus kattaa myös hakemusten (tai tarjousten, ehdotusten) vastaanottaminen ja hallinnointi osana kampanjoita ja haasteita (vaiheittainen toteutus).
+*   **Arviointikriteerien rakenne:** Aiemmasta mallista, jossa oli `KriteeriRyhmä`-objekteja (jotka saattoivat muodostaa monitasoisen hierarkian) ja niihin liitettyjä `Kriteeri`-objekteja, siirrytään malliin, jossa on ainoastaan hierarkkisesti järjestettyjä `Arviointikriteeri`-objekteja (`tyyppi='RYHMÄ'` tai `tyyppi='KRITEERI'`). Tämä mahdollistaa joustavamman ja monitasoisen kriteeristön luomisen.
+*   **Laskentalogiikan siirto:** Kaikki pisteiden laskenta (esim. painotukset, keskiarvot) siirretään käyttöliittymästä palvelinpäähän (backend), mikä parantaa suorituskykyä ja ylläpidettävyyttä.
+*   **Raportointinäkymien uudistus:** Vanhentuneet tai vaikeasti tulkittavat visualisoinnit (kuten v1.0:n mahdollinen tutkakaavio) korvataan selkeämmillä esitystavoilla (esim. pylväsdiagrammit).
+*   **Käyttöliittymän modernisointi:** Vanhentuneet käyttöliittymäkomponentit päivitetään moderneihin vastineisiin parantaen yleistä käyttökokemusta.
 
 ### 2.2. Uudet ominaisuudet
-*Kuvaa täysin uudet ominaisuudet versiolle 2.0.*
+*   **Kampanja- ja Haastehallinta:**
+    *   Mahdollisuus luoda ja hallinnoida ylätason Kampanjoita (Haastekierroksia), jotka kokoavat yhteen useita Haasteita.
+    *   Kampanja- ja haastekohtaiset asetukset (nimet, kuvaukset, aikataulut, tilat, arvioijien näkyvyysasetukset).
+    *   Haasteiden kloonaus kampanjan sisällä asetusten ja kriteeristön kopioimiseksi.
+*   **Hakemusten Hallinta:**
+    *   Hakemusten vastaanotto ja tallennus järjestelmään (perustiedot, sisältödata, liitetiedostot).
+    *   Hakemusten tilan seuranta (esim. Luonnos, Lähetetty, Arvioinnissa, Hyväksytty, Hylätty).
+    *   Mahdollisuus liittää hakemuksia tiettyihin haasteisiin.
+*   **Liitetiedostojen Käsittely:** Mahdollisuus liittää useita tiedostoja kuhunkin hakemukseen ja hallinnoida niitä.
+*   **Hierarkkinen Arviointikriteeristö:**
+    *   Monitasoisten kriteerien ja kriteeriryhmien määrittely haastekohtaisesti.
+    *   Kriteerikohtaiset asetukset (painokerroin, maksimipisteet, kynnysarvo).
+*   **Arviointiprosessi:**
+    *   Arvioijat voivat antaa pisteitä ja kommentteja spesifisille kriteereille hakemuskohtaisesti.
+    *   Järjestelmä laskee painotetut kokonaispisteet automaattisesti.
+*   **Granulaarinen Käyttäjä- ja Roolihallinta:**
+    *   Useita käyttäjärooleja (esim. Ylläpitäjä, Kampanja-admin, Haaste-admin, Arvioija).
+    *   Oikeuksien hallinta kampanja- ja haastetasolla (`KampanjaKayttaja`, `HaasteKayttaja`).
+*   **Hakemuskohtainen Keskustelu:** Mahdollisuus käydä ketjutettua keskustelua yksittäisten hakemusten yhteydessä (roolien ja asetusten mukaisesti).
+*   **Raportointi ja Seuranta:** Ylläpitäjän seurantanäkymä arviointiprosessin etenemiselle kampanjoittain, haasteittain ja arvioijoittain. Yhteenvedot tuloksista.
+*   **REST API:** Kattava ohjelmointirajapinta (API) järjestelmän toimintojen käyttämiseksi ja integroimiseksi muihin järjestelmiin.
+*   **Organisaatioiden Hallinta (Nice-to-have):** Mahdollisuus linkittää kampanjoita ja käyttäjiä organisaatioihin.
 
 ## 3. Ei-toiminnalliset vaatimukset
 
 *Kuvaa vaatimukset liittyen suorituskykyyn, tietoturvaan, käytettävyyteen, ylläpidettävyyteen jne.*
 
+### 3.1 Auditointiloki (Audit Log)
+
+Järjestelmään toteutetaan auditointiloki-toiminnallisuus, joka tallentaa tiedot käyttäjien tekemistä merkittävistä muutoksista järjestelmän tietoihin. Tämän tarkoituksena on parantaa järjestelmän läpinäkyvyyttä, jäljitettävyyttä ja luotettavuutta.
+
+*   **Tallennettavat tiedot:** Lokiin kirjataan vähintään seuraavat tiedot kustakin merkittävästä muutostapahtumasta:
+    *   Muutoksen tehnyt käyttäjä (`User`).
+    *   Muutoksen tarkka ajankohta (timestamp).
+    *   Muutoksen kohde (esim. viittaus muutettuun `Arviointi`-objektiin, `Hakemus`-objektiin tai muuhun relevanttiin tietueeseen).
+    *   Tehty toimenpide (esim. 'LUONTI', 'MUOKKAUS', 'POISTO').
+    *   Muutetut kentät ja niiden arvot (sekä vanha että uusi arvo, jos mahdollista ja tarkoituksenmukaista).
+*   **Seurattavat kohteet:** Erityisen tärkeää on seurata muutoksia, jotka liittyvät:
+    *   Arviointeihin (`Arviointi`-objektit): pisteiden (`pisteet`) ja kommenttien (`kommentti`) antaminen ja muokkaaminen.
+    *   Hakemusten tiloihin (`Hakemus.tila`).
+    *   Kampanja- ja haasteasetuksiin, jotka vaikuttavat arviointiprosessiin (esim. `Haaste.tila`, `Haaste.nayta_pisteet_arvioinnin_aikana`).
+    *   Käyttäjärooleihin (`KampanjaKayttaja`, `HaasteKayttaja`).
+*   **Käyttöliittymä:** Valtuutetuilla ylläpitäjillä tulee olla pääsy lokitietoihin käyttöliittymän kautta. Näkymän tulee mahdollistaa lokitietojen selaaminen ja suodattaminen esimerkiksi käyttäjän, ajankohdan tai muutoksen kohteen perusteella.
+*   **Säilytys:** Lokitietojen säilytysaika määritellään erikseen (esim. tietosuojakäytäntöjen mukaisesti).
+
 ## 4. Arkkitehtuuri
 
 *Kuvaa suunniteltu tekninen arkkitehtuuri, mukaan lukien backend, frontend, tietokanta ja muut keskeiset komponentit tai muutokset versiosta 1.0.*
+
+Ehdotettu arkkitehtuuri perustuu moderneihin ja skaalautuviin teknologioihin, jotka tukevat järjestelmän joustavuutta, ylläpidettävyyttä ja laajennettavuutta.
+
+*   **Backend (Taustajärjestelmä):**
+    *   Tarvitaan vankka **web-ohjelmistokehys (framework)**, joka tarjoaa hyvän tietokantatuen (ORM) ja mahdollisuuden toteuttaa ylläpitäjän käyttöliittymä tehokkaasti.
+    *   Kehyksen päälle toteutetaan standardoitu **REST API -kerros**, joka toimii rajapintana frontendin ja mahdollisten ulkoisten integraatioiden kanssa.
+    *   Tarvittaessa voidaan hyödyntää erillistä **asynkronisten tehtävien käsittelyjärjestelmää** pidempikestoisiin operaatioihin, kuten raportointiin tai ilmoitusten lähetykseen.
+    *   Mahdollisia teknologioita näiden toteuttamiseen ovat esimerkiksi Python-pohjaiset kehykset kuten Django (Django REST Frameworkin ja Celeryn kanssa) tai Flask (sopivilla laajennoksilla).
+
+*   **Frontend (Käyttöliittymä):**
+    *   **Arvioijan Käyttöliittymä:** Moderni JavaScript-framework, kuten React, Vue tai Svelte. Nämä mahdollistavat interaktiivisen ja dynaamisen käyttökokemuksen arvioijille, joka kommunikoi backendin kanssa REST API:n kautta.
+    *   **Ylläpitäjän Käyttöliittymä:** Hyödynnetään ensisijaisesti valitun backend-kehyksen tarjoamia ylläpitotoimintoja, joita voidaan tarvittaessa laajentaa ja kustomoida.
+
+*   **Tietokanta:**
+    *   PostgreSQL. Tehokas, luotettava ja avoimen lähdekoodin relaatiotietokanta, jolla on erinomainen tuki yleisimmille backend-kehysille, JSON-tietotyypeille ja skaalautuvuudelle.
+
+*   **Tiedostojen Tallennus:**
+    *   Hakemusten liitetiedostot tallennetaan erilliseen tallennusratkaisuun. Kehitysvaiheessa ja pienemmissä asennuksissa tämä voi olla paikallinen tiedostojärjestelmä. Suuremmissa tai SaaS-ympäristöissä suositellaan pilvitallennusta (esim. AWS S3, Google Cloud Storage) skaalautuvuuden ja luotettavuuden varmistamiseksi.
+
+*   **Auditointiloki:**
+    *   Toteutetaan käyttäen joko valmista kirjastoa valitulle backend-kehykselle tai omalla toteutuksella, joka kirjaa muutokset tietokantaan tai erilliseen lokijärjestelmään.
+
+Tämä arkkitehtuuri erottaa selvästi käyttöliittymälogiikan ja datanhallinnan, mikä helpottaa kehitystä ja ylläpitoa. REST API toimii keskeisenä rajapintana eri osien välillä.
 
 ## 5. Tietomalli
 
 *Kuvaa tietokantaskeeman.*
 
 ### Kampanja (Campaign)
+
+HUOM: muutetaan tämän objektityypin nimeksi "Haastekierros"
 
 Kampanja edustaa ylätason arviointikierrosta tai -projektia (esim. tietty rahoitushaku, kilpailutus), jonka jokin taho (organisaatio, projekti) järjestää. Kampanja kokoaa yhteen yhteen tai useamman Haasteen (Challenge) ja hallinnoi yleisiä asetuksia sekä käyttäjärooleja kyseiselle kierrokselle. Kampanja luodaan aina uutena järjestelmään.
 
@@ -39,8 +124,8 @@ Kampanja edustaa ylätason arviointikierrosta tai -projektia (esim. tietty rahoi
 *   `paattymisaika` (DateTimeField, valinnainen): Kampanjan päättymisaika.
 *   `tila` (CharField, choices): Kampanjan tila (esim. Suunnitteilla, Avoinna hakemuksille, Arvioinnissa, Päättynyt, Arkistoitu).
 *   `ulkoasu_kustomointi` (JSONField/TextField, valinnainen): Mahdollistaa kampanjakohtaisen ulkoasun määrittelyn (esim. CSS). Toteutus avoin.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 *   `omistaja_kayttaja` (ForeignKey -> User): Viittaus käyttäjään, joka loi kampanjan ja hallinnoi sitä ensisijaisesti.
 *   `salli_keskustelut` (BooleanField, default=False): Määrittää, onko hakemuksiin liittyvä keskustelu oletusarvoisesti sallittu tämän kampanjan kaikissa haasteissa.
 
@@ -57,7 +142,7 @@ Kampanja edustaa ylätason arviointikierrosta tai -projektia (esim. tietty rahoi
 
 **Avoimia kysymyksiä:**
 
-*   Tarvitaanko `jarjestaja_taho`-kentän sijaan/lisäksi erillinen `Organisaatio`-objekti? (Todennäköisesti kyllä).
+*   Tarvitaanko `jarjestaja_taho`-kentän sijaan/lisäksi erillinen `Organisaatio`-objekti? (Tämä on erittäin nice to have, mutta ei välttämätöntä ainakaan tällä hetkellä).
 *   Miten ulkoasun kustomointi tarkalleen toteutetaan ja periytyy/vaikuttaa haasteisiin?
 
 ### Haaste (Challenge)
@@ -77,8 +162,9 @@ Haaste edustaa spesifistä arviointikokonaisuutta Kampanjan sisällä, johon koh
 *   `kloonattu_haasteesta` (ForeignKey -> Haaste, null=True, blank=True, on_delete=models.SET_NULL, related_name="kloonit"): Viittaus alkuperäiseen haasteeseen, jos tämä haaste on klooni.
 *   `nayta_pisteet_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat pisteet arvioinnin ollessa kesken.
 *   `nayta_kommentit_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat kommentit arvioinnin ollessa kesken.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `salli_keskustelut` (BooleanField, null=True, blank=True, default=None): Määrittää, onko hakemuksiin liittyvä keskustelu sallittu tässä haasteessa. `None` perii asetuksen kampanjalta, `True` sallii, `False` kieltää.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 
 **Suhteet muihin objekteihin:**
 
@@ -111,7 +197,7 @@ Arviointikriteeri edustaa joko arvioinnin osa-aluetta (ryhmää) tai konkreettis
 *   `haaste` (ForeignKey -> Haaste, on_delete=models.CASCADE, related_name="kriteeristö"): Viittaus Haasteeseen, johon kriteeri/ryhmä kuuluu.
 *   `nimi` (CharField): Kriteerin tai ryhmän nimi (esim. "FR1.1 Challenge Fit", "Functional Requirements (FR)").
 *   `koodi` (CharField, valinnainen): Kriteerin tai ryhmän koodi (esim. "FR1.1").
-*   `lyhenne` (CharField, valinnainen): Kriteerin tai ryhmän lyhenne (esim. "C-FIT").
+*   `lyhenne` (CharField, valinnainen): Kriteerin tai ryhmän lyhenne (esim. "C-FIT"). Tämä ehkä voidaan hoitaa yhdellä `koodi`-kentällä.
 *   `kuvaus` (TextField, valinnainen): Tarkempi kuvaus kriteeristä tai ryhmästä.
 *   `tyyppi` (CharField, choices=['RYHMÄ', 'KRITEERI']): Määrittää, onko kyseessä ryhmä (joka sisältää muita kriteereitä/ryhmiä) vai pisteillä arvioitava kriteeri.
 *   `parent` (ForeignKey -> 'self', null=True, blank=True, on_delete=models.CASCADE, related_name="children"): Viittaus ylempään tasoon hierarkiassa (toiseen `Arviointikriteeri`-objektiin, jonka `tyyppi` on 'RYHMÄ'). Juuritason elementeillä tämä on `NULL`.
@@ -119,27 +205,32 @@ Arviointikriteeri edustaa joko arvioinnin osa-aluetta (ryhmää) tai konkreettis
 *   `maksimipisteet` (IntegerField, valinnainen): Suurin mahdollinen pistemäärä, joka voidaan antaa `KRITEERI`-tyyppiselle objektille.
 *   `kynnysarvo` (IntegerField, valinnainen): Pistemäärä, joka `KRITEERI`-tyyppisen objektin on vähintään saavutettava (jos määritelty). Alitus voi johtaa hakemuksen hylkäämiseen.
 *   `järjestysnumero` (IntegerField, default=0): Määrittää kriteerien/ryhmien järjestyksen saman `parent`-elementin alla.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `admin_vain` (BooleanField, default=False): Jos `True`, vain kampanja- ja haaste-adminit näkevät ja voivat asettaa arvon (`Arviointi`-objektin) tälle kriteerille. Hyödyllinen esim. hinta-kriteereille, joiden arvo lasketaan ulkoisesti ja syötetään järjestelmään adminin toimesta.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 
 **Suhteet muihin objekteihin:**
 
 *   **Haaste (Challenge):** Monta kriteeriä/ryhmää kuuluu yhteen haasteeseen (ManyToOne `Arviointikriteeri` -> `Haaste`).
 *   **Arviointikriteeri (EvaluationCriterion):** Monta kriteeriä/ryhmää voi kuulua yhteen ylempään ryhmään (ManyToOne `Arviointikriteeri` -> `Arviointikriteeri` [`parent`]). Yksi ryhmä voi sisältää monta alikriteeriä/ryhmää (OneToMany `Arviointikriteeri` -> `Arviointikriteeri` [`children`]).
-*   **Arviointi (Evaluation/Score):** Arvioijat antavat pisteitä ja kommentteja `KRITEERI`-tyyppisiin objekteihin liittyen. Tämä yhteys todennäköisesti toteutetaan erillisellä `Arviointi`-objektilla (määritellään myöhemmin), joka viittaa `Hakemukseen`, `Arviointikriteeriin` ja `Arvioijaan`.
+*   **Arviointi (Evaluation/Score):** Arvioijat antavat pisteitä ja kommentteja `KRITEERI`-tyyppisille objekteille liittyen. Tämä yhteys todennäköisesti toteutetaan erillisellä `Arviointi`-objektilla (määritellään myöhemmin), joka viittaa `Hakemukseen`, `Arviointikriteeriin` ja `Arvioijaan`.
+*   **KriteeriArvioija (CriterionEvaluatorAssignment):** Yksi kriteeri voi olla liitettynä useaan `KriteeriArvioija`-tietueeseen (OneToMany `Arviointikriteeri` -> `KriteeriArvioija`). *Nice-to-have.*
 
 **Toiminnallisuus:**
 
 *   Mahdollistaa monitasoisen kriteerihierarkian luomisen haastekohtaisesti.
 *   Sallii painokertoimien, maksimipisteiden ja kynnysarvojen määrittelyn.
 *   Määrittää rakenteen, johon arvioinnit (pisteet, kommentit) voidaan liittää.
+*   Mahdollistaa tiettyjen kriteerien rajaamisen vain admin-käyttäjille (`admin_vain`).
+*   Mahdollistaa kriteerien kohdentamisen tietyille arvioijille (`KriteeriArvioija`-mallin kautta).
 
 **Avoimia kysymyksiä:**
 
 *   Miten painokertoimet lasketaan ja vaikuttavat hierarkian eri tasoilla? Periikö aliryhmä/kriteeri yläryhmän painokertoimen vai lasketaanko painotus suhteessa sisaruksiin? (Tärkeä määrittely laskentalogiikkaa varten).
-*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisiin objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
+*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisille objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
 *   Tarvitaanko lisäkenttiä ohjeistamaan arvioijaa kriteerin osalta?
 *   Miten varmistetaan, että vain `KRITEERI`-tyyppisillä objekteilla on `maksimipisteet` ja `kynnysarvo`? (Voidaan validoida mallin tasolla).
+*   Miten varmistetaan, että `admin_vain`-kriteereille voivat luoda `Arviointi`-objekteja vain käyttäjät, joilla on admin-rooli kyseisessä haasteessa tai kampanjassa?
 
 ### Arviointi (Evaluation/Score)
 
@@ -152,8 +243,8 @@ Arviointi edustaa yhden arvioijan antamaa pistemäärää ja/tai kommenttia yhde
 *   `arvioija` (ForeignKey -> User, on_delete=models.PROTECT, related_name="arvioinnit"): Viittaus arvioinnin tehneeseen käyttäjään.
 *   `pisteet` (IntegerField, null=True, blank=True): Arvioijan antama numeerinen pistemäärä. Arvo on `NULL`, jos arvioija ei ole vielä antanut pisteitä tai jos kriteeri ei vaadi pisteitä (vaikka yleensä vaatii). Validoidaan `kriteeri.maksimipisteet` -arvoa vastaan.
 *   `kommentti` (TextField, null=True, blank=True): Arvioijan antama sanallinen kommentti tai perustelu pisteille.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 
 **Suhteet muihin objekteihin:**
 
@@ -190,14 +281,10 @@ Hakemus edustaa Haasteeseen jätettyä ehdotusta, tarjousta tai muuta vastaavaa 
 *   `sisältö_data` (JSONField/TextField, valinnainen): Hakemuksen strukturoitu sisältö, jos se ei ole pelkästään liitetiedostoissa (esim. vastaukset kysymyslomakkeeseen).
 *   `tila` (CharField, choices): Hakemuksen tila (esim. Luonnos, Lähetetty, Arvioinnissa, Vaatii lisätietoja, Hyväksytty, Hylätty).
 *   `lähetysaika` (DateTimeField, null=True, blank=True): Aika, jolloin hakemus virallisesti lähetettiin.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 *   `jättäjä_käyttäjä` (ForeignKey -> User, null=True, blank=True, on_delete=models.SET_NULL, related_name="jätetyt_hakemukset"): Viittaus järjestelmän käyttäjään, joka jätti hakemuksen (jos relevantti ja mahdollista).
 *   `vastuu_admin` (ForeignKey -> User, null=True, blank=True, on_delete=models.SET_NULL, related_name="vastuuhakemukset"): Viittaus järjestelmän käyttäjään (todennäköisesti kampanja- tai haasteadmin), joka toimii ensisijaisena yhteyshenkilönä tai vastuuhenkilönä tälle hakemukselle järjestäjän puolelta.
-*   `kloonattu_haasteesta` (ForeignKey -> Haaste, null=True, blank=True, on_delete=models.SET_NULL, related_name="kloonit"): Viittaus alkuperäiseen haasteeseen, jos tämä haaste on klooni.
-*   `nayta_pisteet_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat pisteet arvioinnin ollessa kesken.
-*   `nayta_kommentit_arvioinnin_aikana` (BooleanField, default=False): Määrittää, näkevätkö arvioijat toistensa antamat kommentit arvioinnin ollessa kesken.
-*   `salli_keskustelut` (BooleanField, null=True, blank=True, default=None): Määrittää, onko hakemuksiin liittyvä keskustelu sallittu tässä haasteessa. `None` perii asetuksen kampanjalta, `True` sallii, `False` kieltää.
 
 **Suhteet muihin objekteihin:**
 
@@ -214,7 +301,6 @@ Hakemus edustaa Haasteeseen jätettyä ehdotusta, tarjousta tai muuta vastaavaa 
 
 **Avoimia kysymyksiä:**
 
-*   Miten liitetiedostot tarkalleen mallinnetaan ja tallennetaan (`Liitetiedosto`-objekti)? Tarvitaanko metatietoja (tiedostonimi, tyyppi, koko)?
 *   Miten hallitaan tilannetta, jossa hakemuksen voi jättää sekä rekisteröitynyt käyttäjä että ulkopuolinen taho? Onko `jättäjä_käyttäjä` ja `hakija_*`-kentät riittävä yhdistelmä?
 *   Tarvitaanko tarkempia kenttiä hakemuksen sisältöön liittyen (esim. budjetti, avainsanat) vai riittääkö `sisältö_data` ja liitteet?
 *   Miten hakemuspohjia tai -lomakkeita hallitaan ja linkitetään haasteeseen? (Tämä voi olla osa Haasteen määrittelyä).
@@ -231,8 +317,8 @@ Liitetiedosto edustaa yksittäistä tiedostoa, joka on liitetty Hakemukseen. Yks
 *   `tiedostotyyppi` (CharField): Tiedoston MIME-tyyppi (esim. 'application/pdf', 'image/jpeg'). Tämä auttaa käyttöliittymää näyttämään tiedoston oikein.
 *   `koko` (IntegerField): Tiedoston koko tavuina.
 *   `kuvaus` (TextField, valinnainen): Lyhyt kuvaus liitetiedoston sisällöstä.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima (milloin tietue luotiin).
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima (milloin tietue luotiin).
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 
 **Suhteet muihin objekteihin:**
 
@@ -258,7 +344,7 @@ HakemusViesti edustaa yksittäistä viestiä, joka on lähetetty tietyn hakemuks
 *   `hakemus` (ForeignKey -> Hakemus, on_delete=models.CASCADE, related_name="viestit"): Viittaus Hakemukseen, johon viesti liittyy.
 *   `kayttaja` (ForeignKey -> User, on_delete=models.SET_NULL, null=True, related_name="hakemusviestit"): Viittaus viestin lähettäneeseen käyttäjään. Jos käyttäjä poistetaan, viesti säilyy ilman lähettäjätietoa.
 *   `viesti` (TextField): Viestin sisältö.
-*   `luotu_aika` (DateTimeField, auto_now_add): Viestin lähetysaika.
+*   `created_at` (DateTimeField, auto_now_add): Viestin lähetysaika.
 *   `parent` (ForeignKey -> 'self', null=True, blank=True, on_delete=models.CASCADE, related_name="vastaukset"): Viittaus alkuperäiseen viestiin, jos tämä on vastaus (mahdollistaa ketjutuksen). Juuriviesteillä tämä on `NULL`.
 
 **Suhteet muihin objekteihin:**
@@ -281,14 +367,14 @@ HakemusViesti edustaa yksittäistä viestiä, joka on lähetetty tietyn hakemuks
 
 ### Kampanjan Käyttäjä (CampaignUser)
 
-Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Kampanjaan ja määrittelee käyttäjän roolin kyseisessä kampanjassa.
+Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Kampanjaan ja määrittää käyttäjän roolin kyseisessä kampanjassa.
 
 **Tietokentät (ehdotus):**
 
 *   `kampanja` (ForeignKey -> Kampanja, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Kampanjaan.
 *   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="kampanja_roolit"): Viittaus Käyttäjään.
 *   `rooli` (CharField, choices=['admin', 'arvioija']): Käyttäjän rooli kampanjassa. *Huom: Roolivaihtoehtoja voidaan laajentaa tarvittaessa.*
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
 
 **Rajoitteet:**
 
@@ -311,14 +397,14 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Kampanjaan ja m
 
 ### Haasteen Käyttäjä (ChallengeUser)
 
-Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja määrittelee käyttäjän roolin kyseisessä haasteessa. Tämä mahdollistaa tarkemman oikeuksien hallinnan kuin pelkkä kampanjatason rooli.
+Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja määrittää käyttäjän roolin kyseisessä haasteessa. Tämä mahdollistaa tarkemman oikeuksien hallinnan kuin pelkkä kampanjatason rooli.
 
 **Tietokentät (ehdotus):**
 
 *   `haaste` (ForeignKey -> Haaste, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Haasteeseen.
 *   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="haaste_roolit"): Viittaus Käyttäjään.
 *   `rooli` (CharField, choices=['admin', 'arvioija']): Käyttäjän rooli haasteessa. *Huom: Roolivaihtoehtoja voidaan laajentaa tarvittaessa.*
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
 
 **Rajoitteet:**
 
@@ -333,14 +419,18 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja 
 *   Määrittää haastekohtaiset oikeudet (admin, arvioija).
 *   Haaste-adminit voivat hallinnoida haasteen asetuksia ja lisätä/poistaa arvioijia *kyseiseen* haasteeseen.
 *   Jos käyttäjä on määritelty arvioijaksi `HaasteKayttaja`-tasolla, hän voi arvioida vain kyseisen haasteen hakemuksia, vaikka hänellä olisi laajempi 'arvioija'-rooli `KampanjaKayttaja`-tasolla. Tämä mahdollistaa arvioijien kohdentamisen tiettyihin haasteisiin.
-*   Jos käyttäjää ei ole erikseen liitetty haasteeseen `HaasteKayttaja`-mallilla, mutta hänellä on 'arvioija'-rooli kampanjatasolla (`KampanjaKayttaja`), hän voi oletusarvoisesti arvioida haasteen hakemuksia.
+*   Jos käyttäjää ei ole erikseen liitetty haasteeseen `HaasteKayttaja`-mallilla, mutta hänellä on 'arvioija'-rooli kampanjatasolla (`KampanjaKayttaja`), hän voi oletusarvoisesti arvioida haasteen hakemuksia (pois lukien `admin_vain`-kriteerit).
+*   *(Nice-to-have):* Jos `KriteeriArvioija`-määrityksiä on tehty tälle käyttäjälle tässä haasteessa, hän voi arvioida vain ne kriteerit, jotka hänelle on erikseen määritelty.
 
 **Avoimia kysymyksiä:**
 
 *   Tarvitaanko tarkempia rooleja haastetasolla?
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
+*   *(Nice-to-have):* Miten `KriteeriArvioija`-määritysten hallinta toteutetaan ylläpitäjän käyttöliittymässä?
 
 ### Organisaatio (Organisation)
+
+Nice to have.
 
 Organisaatio edustaa tahoa (yritys, julkinen toimija, projekti tms.), joka voi järjestää Kampanjoita tai johon käyttäjät voivat kuulua.
 
@@ -350,8 +440,8 @@ Organisaatio edustaa tahoa (yritys, julkinen toimija, projekti tms.), joka voi j
 *   `lyhenne` (CharField, unique=True, null=True, blank=True, db_index=True): Organisaation lyhenne tai koodi.
 *   `kuvaus` (TextField, null=True, blank=True): Vapaamuotoinen kuvaus organisaatiosta.
 *   `verkkosivusto` (URLField, null=True, blank=True): Organisaation verkkosivun osoite.
-*   `luotu_aika` (DateTimeField, auto_now_add): Luoja-aikaleima.
-*   `muokattu_aika` (DateTimeField, auto_now): Muokkausaikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Luoja-aikaleima.
+*   `modified_at` (DateTimeField, auto_now): Muokkausaikaleima.
 
 **Suhteet muihin objekteihin:**
 
@@ -377,7 +467,7 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Organisaatioon.
 
 *   `organisaatio` (ForeignKey -> Organisaatio, on_delete=models.CASCADE, related_name="kayttajat"): Viittaus Organisaatioon.
 *   `kayttaja` (ForeignKey -> User, on_delete=models.CASCADE, related_name="organisaatio_jasenyydet"): Viittaus Käyttäjään.
-*   `luotu_aika` (DateTimeField, auto_now_add): Liittymisen aikaleima.
+*   `created_at` (DateTimeField, auto_now_add): Liittymisen aikaleima.
 
 **Rajoitteet:**
 
@@ -424,7 +514,7 @@ Tässä osiossa kuvaillaan ylläpitäjän (admin) käyttöliittymän suunnitelma
 *   **Muokkausnäkymä:**
     *   Sallii kaikkien haasteen kenttien muokkauksen.
     *   Tarjoaa tavan hallinnoida haasteeseen liittyviä käyttäjiä (`HaasteKayttaja`): arvioijien ja haaste-adminien lisääminen/poistaminen *tähän* haasteeseen.
-    *   Tarjoaa tavan hallinnoida haasteen arviointikriteerejä (`Arviointikriteeri`), mukaan lukien hierarkian luominen ja muokkaaminen.
+    *   Tarjoaa tavan hallinnoida haasteen arviointikriteerejä (`Arviointikriteeri`), mukaan lukien hierarkian luomisen ja muokkaamisen.
     *   Sisältää toiminnallisuuden haasteen kloonaamiseksi kampanjan sisällä ("Kloonaa haaste").
     *   Näyttää linkin alkuperäiseen haasteeseen (`kloonattu_haasteesta`), jos kyseessä on klooni.
     *   Näyttää linkitetyt `Hakemus`-objektit ja mahdollistaa siirtymisen niiden hallintaan.
@@ -508,8 +598,8 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
         *   Linkit liitetiedostoihin (`Liitetiedosto`), jotka avautuvat helposti (esim. upotettu PDF-lukija, linkki uuteen välilehteen).
         *   Mahdollinen strukturoitu sisältö (`sisältö_data`).
     *   **Oikea/Alaosa:** Arviointilomake.
-        *   Näyttää haasteen `Arviointikriteeri`-hierarkian selkeästi (esim. sisennetyllä listalla tai laajennettavilla osioilla).
-        *   Kullekin `KRITEERI`-tyyppiselle kriteerille:
+        *   Näyttää haasteen `Arviointikriteeri`-hierarkian selkeästi (esim. sisennetyllä listalla tai laajennettavilla osioilla). **Arvioija näkee vain ne kriteerit, jotka eivät ole `admin_vain=True`, ellei hänelle ole erikseen määritelty tiettyjä kriteereitä `KriteeriArvioija`-mallin kautta (nice-to-have), jolloin hän näkee vain määritellyt kriteerit.**
+        *   Kullekin näytettävälle `KRITEERI`-tyyppiselle kriteerille:
             *   Kriteerin nimi (`nimi`), koodi (`koodi`), kuvaus (`kuvaus`).
             *   Ilmoitus maksimipisteistä (`maksimipisteet`) ja mahdollisesta kynnysarvosta (`kynnysarvo`).
             *   Syöttökenttä pisteille (`Arviointi.pisteet`) - esim. numerokenttä, liukusäädin, tai valintanapit (riippuen `maksimipisteet`-arvosta). Validointi suhteessa maksimipisteisiin.
@@ -597,13 +687,14 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   Miten haastekohtaiset admin-roolit ja kampanja-admin-roolit eroavat oikeuksiltaan?
 
 **Arviointikriteeri (EvaluationCriterion):**
-*   Miten painokertoimet lasketaan ja vaikuttavat hierarkian eri tasoilla? Periikö aliryhmä/kriteeri yläryhmän painokertoimen vai lasketaanko painotus suhteessa sisaruksiin? (Tärkeä määrittely laskentalogiikkaa varten).
-*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisiin objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
+*   Miten painokertoimet lasketaan ja vaikuttavat hierarkian eri tasoilla? Periikö aliryhmä/kriteeri yläryhmän painokertoimen vai lasketaanko painotus suhteessa sisaruksiin? (Tärkeä määrittely laskentalogiikkaa varten‼️)
+*   Miten kommentointi tarkalleen toimii? Voiko kommentteja liittää myös 'RYHMÄ'-tyyppisille objekteihin, kuten vanhassa mallissa mainittiin? (Todennäköisesti kyllä, `Arviointi`-objektin kautta).
 *   Tarvitaanko lisäkenttiä ohjeistamaan arvioijaa kriteerin osalta?
-*   Miten varmistetaan, että vain `KRITEERI`-tyyppisillä objekteilla on `maksimipisteet` ja `kynnysarvo`? (Voidaan validoida mallin tasolla).
+*   Miten varmistetaan, että vain `KRITEERI`-tyyppisillä objekteilla on `maksimipisteet` ja `kynnysarvo`? (Voidaan validoida mallin tasolla). Vai voivatko ne olla myös `RYHMÄ`-tyyppisille kriteereille?
 
 **Arviointi (Evaluation/Score):**
 *   Miten käsitellään tilanne, jos arviointikriteeriä muokataan (esim. `maksimipisteet` muuttuu) sen jälkeen, kun arviointeja on jo annettu? (Vaatii validointia/logiikkaa).
+*   Haaste pitää voidan lukita Haaste-adminin toimesta, jotta sen arviointikriteerejä ei voi enää muuttaa.
 *   Tarvitaanko erillinen tila arvioinnille (esim. 'Luonnos', 'Valmis')? (Mahdollisesti hyödyllinen).
 *   Miten mahdolliset kynnysarvon (`kriteeri.kynnysarvo`) alitukset merkitään tai raportoidaan?
 *   Pitäisikö kommentointi olla mahdollista myös 'RYHMÄ'-tyyppisille kriteereille, kuten vanhassa mallissa mainittiin? Jos kyllä, pitäisikö `kriteeri`-kentän viitata myös ryhmiin, ja miten `pisteet` tällöin käsitellään? (Tämä lisäisi kompleksisuutta, harkitaan tarkkaan tarvetta).
@@ -633,3 +724,7 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 
 **Kampanjan Käyttäjä (CampaignUser):**
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
+
+**KriteeriArvioija (CriterionEvaluatorAssignment):**
+*   Miten tämän ominaisuuden hallinta integroidaan ylläpitäjän käyttöliittymään (esim. `Haaste`- tai `HaasteKayttaja`-näkymään)?
+*   Onko tämä ominaisuus todella tarpeellinen ensimmäisessä vaiheessa, vai voidaanko se jättää myöhempään kehitykseen?
