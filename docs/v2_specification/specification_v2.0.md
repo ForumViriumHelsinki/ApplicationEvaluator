@@ -1,4 +1,4 @@
-# Application Evaluator 2.0 Spesifikaatio
+# Application Evaluator 2.0 -spesifikaatio
 
 ## 1. Tavoitteet
 
@@ -432,6 +432,7 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja 
 *   *(Nice-to-have):* Miten `KriteeriArvioija`-määritysten hallinta toteutetaan ylläpitäjän käyttöliittymässä?
 
 <harkittava poistettavaksi>
+
 ### Organisaatio (Organisation)
 
 Nice to have.
@@ -465,6 +466,7 @@ Organisaatio edustaa tahoa (yritys, julkinen toimija, projekti tms.), joka voi j
 </harkittava poistettavaksi>
 
 <harkittava poistettavaksi>
+
 ### Organisaation käyttäjä (OrganisationUser)
 
 Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Organisaatioon.
