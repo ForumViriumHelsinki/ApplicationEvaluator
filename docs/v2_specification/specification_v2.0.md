@@ -2,22 +2,22 @@
 
 ## 1. Tavoitteet
 
-*   **Modernisointi ja Joustavuus:** Korvataan vanhentunut versio 1.0 uudella, joustavammalla ja helpommin ylläpidettävällä järjestelmällä. Tavoitteena on tukea erilaisia arviointiprosesseja, kuten erilaisia painotuksia, kriteerirakenteita ja näkyvyysasetuksia.
-*   **Parempi Käyttökokemus:** Parannetaan sekä ylläpitäjien että arvioijien käyttöliittymiä. Tarjotaan ylläpitäjille selkeämmät hallintatyökalut (hyödyntäen esimerkiksi Djangon admin-käyttöliittymää) ja arvioijille intuitiivisempi sekä tehokkaampi arviointinäkymä. Jos käyttäjän ei tarvitse luoda kampanjoita, haasteita tai arvioijia, järjestelmää tulee voida käyttää pelkästään varsinaisen käyttöliitymän kautta.
-*   **Laajennettu Toiminnallisuus:**
+*   **Modernisointi ja joustavuus:** Korvataan vanhentunut versio 1.0 uudella, joustavammalla ja helpommin ylläpidettävällä järjestelmällä. Tavoitteena on tukea erilaisia arviointiprosesseja, kuten erilaisia painotuksia, kriteerirakenteita ja näkyvyysasetuksia. Samalla työkalu laajennetaan kattamaan pelkän arvioinnin lisäksi hakemusten keruu ja raportointi.
+*   **Parempi käyttökokemus:** Parannetaan sekä ylläpitäjien että arvioijien käyttöliittymiä. Tarjotaan ylläpitäjille selkeämmät hallintatyökalut (hyödyntäen esimerkiksi Djangon admin-käyttöliittymää) ja arvioijille intuitiivisempi sekä tehokkaampi arviointinäkymä. Jos käyttäjän ei tarvitse luoda kampanjoita, haasteita tai arvioijia, järjestelmää tulee voida käyttää pelkästään varsinaisen frontend-käyttöliitymän kautta.
+*   **Laajennettu toiminnallisuus:**
     *   Tavoitteena tuoda hakemusten kerääminen osaksi järjestelmää (vaiheittainen toteutus).
     *   Mahdollistetaan monitasoiset arviointikriteerit (ryhmät ja alikriteerit).
     *   Lisätään kampanjataso hallinnoinnin helpottamiseksi.
     *   Mahdollistetaan kampanja- ja haastekohtainen käyttäjä- ja oikeushallinta.
     *   Lisätään tuki keskusteluille hakemusten yhteydessä.
     *   Parannetaan raportointia ja arviointiprosessin seurantaa.
-*   **Tekniset Parannukset:**
+*   **Tekniset parannukset:**
     *   Siirretään laskenta palvelimelle eli laskenta suoritetaan ainoastaan yhdessä paikassa.
     *   Mitään ei kovakoodata käyttöliittymän osaksi, kaikki määrittelyt tehdään backendin kautta.
-    *   Tarjotaan kattava REST-rajapinta.
+    *   Tarjotaan kattava REST-rajapinta dataan.
     *   Varmistetaan tietokannan eheys ja auditointi aikaleimojen ja lokien avulla.
     *   Pidetään järjestelmä avoimena lähdekoodina (Open Source) ja mahdollistetaan sekä oma asennus että SaaS-malli.
-*   **Objektiivisuus ja Läpinäkyvyys:** Parannetaan arviointiprosessin objektiivisuutta ja läpinäkyvyyttä yhtenäistämällä kriteereitä ja tarjoamalla selkeät työkalut.
+*   **Objektiivisuus ja läpinäkyvyys:** Parannetaan arviointiprosessin objektiivisuutta ja läpinäkyvyyttä yhtenäistämällä kriteereitä ja tarjoamalla selkeät työkalut.
 *   **Tehokkuus:** Lyhennetään arviointiaikaa ja vähennetään manuaalista työtä sekä virheitä.
 
 
@@ -25,36 +25,36 @@
 
 Application Evaluator 2.0:n tavoitteena on laajentaa version 1.0 toiminnallisuutta siirtymällä puhtaasta arviointityökalusta kattavammaksi järjestelmäksi, joka hallinnoi koko hakemusten elinkaarta aina niiden keräämisestä arviointiin ja raportointiin. Tämä laajennus voidaan toteuttaa vaiheittain tärkeimpien arviointiominaisuuksien valmistuttua. Versio 2.0 esittää jäsennellymmän tavan organisoida arviointiprosesseja kampanjoiden ja haasteiden avulla, sekä mahdollistaa monipuolisemman kriteeristön ja käyttäjäroolien hallinnan.
 
-### 2.1. Olemassaolevat ominaisuudet (Muutokset/Poistot)
+### 2.1. Olemassaolevat ominaisuudet (muutokset/poistot)
 *   **Laajennus arvioinnista hakemusten hallintaan:** Järjestelmä ei ole enää pelkkä erillinen arviointityökalu, vaan sen on tarkoitus kattaa myös hakemusten (tai tarjousten, ehdotusten) vastaanottaminen ja hallinnointi osana kampanjoita ja haasteita (vaiheittainen toteutus).
 *   **Arviointikriteerien rakenne:** Aiemmasta mallista, jossa oli `KriteeriRyhmä`-objekteja (jotka saattoivat muodostaa monitasoisen hierarkian) ja niihin liitettyjä `Kriteeri`-objekteja, siirrytään malliin, jossa on ainoastaan hierarkkisesti järjestettyjä `Arviointikriteeri`-objekteja (`tyyppi='RYHMÄ'` tai `tyyppi='KRITEERI'`). Tämä mahdollistaa joustavamman ja monitasoisen kriteeristön luomisen.
 *   **Laskentalogiikan siirto:** Kaikki pisteiden laskenta (esim. painotukset, keskiarvot) siirretään käyttöliittymästä palvelinpäähän (backend), mikä parantaa suorituskykyä ja ylläpidettävyyttä.
-*   **Raportointinäkymien uudistus:** Vanhentuneet tai vaikeasti tulkittavat visualisoinnit (kuten v1.0:n mahdollinen tutkakaavio) korvataan selkeämmillä esitystavoilla (esim. pylväsdiagrammit).
+*   **Raportointinäkymien uudistus:** Vanhentuneet tai vaikeasti tulkittavat visualisoinnit (kuten v1.0:n tutkakaavio) korvataan selkeämmillä esitystavoilla (esim. pylväsdiagrammit).
 *   **Käyttöliittymän modernisointi:** Vanhentuneet käyttöliittymäkomponentit päivitetään moderneihin vastineisiin parantaen yleistä käyttökokemusta.
 
 ### 2.2. Uudet ominaisuudet
-*   **Kampanja- ja Haastehallinta:**
+*   **Kampanja- ja haastehallinta:**
     *   Mahdollisuus luoda ja hallinnoida ylätason Kampanjoita (Haastekierroksia), jotka kokoavat yhteen useita Haasteita.
     *   Kampanja- ja haastekohtaiset asetukset (nimet, kuvaukset, aikataulut, tilat, arvioijien näkyvyysasetukset).
     *   Haasteiden kloonaus kampanjan sisällä asetusten ja kriteeristön kopioimiseksi.
-*   **Hakemusten Hallinta:**
+*   **Hakemusten hallinta:**
     *   Hakemusten vastaanotto ja tallennus järjestelmään (perustiedot, sisältödata, liitetiedostot).
     *   Hakemusten tilan seuranta (esim. Luonnos, Lähetetty, Arvioinnissa, Hyväksytty, Hylätty).
     *   Mahdollisuus liittää hakemuksia tiettyihin haasteisiin.
-*   **Liitetiedostojen Käsittely:** Mahdollisuus liittää useita tiedostoja kuhunkin hakemukseen ja hallinnoida niitä.
-*   **Hierarkkinen Arviointikriteeristö:**
+*   **Liitetiedostojen käsittely:** Mahdollisuus liittää useita tiedostoja kuhunkin hakemukseen ja hallinnoida niitä.
+*   **Hierarkkinen arviointikriteeristö:**
     *   Monitasoisten kriteerien ja kriteeriryhmien määrittely haastekohtaisesti.
     *   Kriteerikohtaiset asetukset (painokerroin, maksimipisteet, kynnysarvo).
 *   **Arviointiprosessi:**
     *   Arvioijat voivat antaa pisteitä ja kommentteja spesifisille kriteereille hakemuskohtaisesti.
     *   Järjestelmä laskee painotetut kokonaispisteet automaattisesti.
-*   **Granulaarinen Käyttäjä- ja Roolihallinta:**
+*   **Granulaarinen käyttäjä- ja roolihallinta:**
     *   Useita käyttäjärooleja (esim. Ylläpitäjä, Kampanja-admin, Haaste-admin, Arvioija).
     *   Oikeuksien hallinta kampanja- ja haastetasolla (`KampanjaKayttaja`, `HaasteKayttaja`).
-*   **Hakemuskohtainen Keskustelu:** Mahdollisuus käydä ketjutettua keskustelua yksittäisten hakemusten yhteydessä (roolien ja asetusten mukaisesti).
-*   **Raportointi ja Seuranta:** Ylläpitäjän seurantanäkymä arviointiprosessin etenemiselle kampanjoittain, haasteittain ja arvioijoittain. Yhteenvedot tuloksista.
+*   **Raportointi ja seuranta:** Ylläpitäjän seurantanäkymä arviointiprosessin etenemiselle kampanjoittain, haasteittain ja arvioijoittain. Yhteenvedot tuloksista.
 *   **REST API:** Kattava ohjelmointirajapinta (API) järjestelmän toimintojen käyttämiseksi ja integroimiseksi muihin järjestelmiin.
-*   **Organisaatioiden Hallinta (Nice-to-have):** Mahdollisuus linkittää kampanjoita ja käyttäjiä organisaatioihin.
+*   **Hakemuskohtainen keskustelu (nice-to-have):** Mahdollisuus käydä ketjutettua keskustelua yksittäisten hakemusten yhteydessä (roolien ja asetusten mukaisesti).
+*   ~~**Organisaatioiden hallinta (nice-to-have):** Mahdollisuus linkittää kampanjoita ja käyttäjiä organisaatioihin.~~
 
 ## 3. Ei-toiminnalliset vaatimukset
 
@@ -84,20 +84,20 @@ Järjestelmään toteutetaan auditointiloki-toiminnallisuus, joka tallentaa tied
 
 Ehdotettu arkkitehtuuri perustuu moderneihin ja skaalautuviin teknologioihin, jotka tukevat järjestelmän joustavuutta, ylläpidettävyyttä ja laajennettavuutta.
 
-*   **Backend (Taustajärjestelmä):**
+*   **Backend (taustajärjestelmä):**
     *   Tarvitaan vankka **web-ohjelmistokehys (framework)**, joka tarjoaa hyvän tietokantatuen (ORM) ja mahdollisuuden toteuttaa ylläpitäjän käyttöliittymä tehokkaasti.
     *   Kehyksen päälle toteutetaan standardoitu **REST API -kerros**, joka toimii rajapintana frontendin ja mahdollisten ulkoisten integraatioiden kanssa.
     *   Tarvittaessa voidaan hyödyntää erillistä **asynkronisten tehtävien käsittelyjärjestelmää** pidempikestoisiin operaatioihin, kuten raportointiin tai ilmoitusten lähetykseen.
-    *   Mahdollisia teknologioita näiden toteuttamiseen ovat esimerkiksi Python-pohjaiset kehykset kuten Django (Django REST Frameworkin ja Celeryn kanssa) tai Flask (sopivilla laajennoksilla).
+    *   Mahdollisia teknologioita näiden toteuttamiseen ovat esimerkiksi Python-pohjaiset kehykset kuten Django (Django REST Frameworkin ja Celeryn kanssa).
 
-*   **Frontend (Käyttöliittymä):**
-    *   **Arvioijan Käyttöliittymä:** Moderni JavaScript-framework, kuten React, Vue tai Svelte. Nämä mahdollistavat interaktiivisen ja dynaamisen käyttökokemuksen arvioijille, joka kommunikoi backendin kanssa REST API:n kautta.
-    *   **Ylläpitäjän Käyttöliittymä:** Hyödynnetään ensisijaisesti valitun backend-kehyksen tarjoamia ylläpitotoimintoja, joita voidaan tarvittaessa laajentaa ja kustomoida.
+*   **Frontend (käyttöliittymä):**
+    *   **Arvioijan käyttöliittymä:** Moderni JavaScript-framework, kuten React, Vue tai Svelte. Nämä mahdollistavat interaktiivisen ja dynaamisen käyttökokemuksen arvioijille, joka kommunikoi backendin kanssa REST API:n kautta.
+    *   **Ylläpitäjän käyttöliittymä:** Hyödynnetään ensisijaisesti valitun backend-kehyksen tarjoamia ylläpitotoimintoja, joita voidaan tarvittaessa laajentaa ja kustomoida.
 
 *   **Tietokanta:**
     *   PostgreSQL. Tehokas, luotettava ja avoimen lähdekoodin relaatiotietokanta, jolla on erinomainen tuki yleisimmille backend-kehysille, JSON-tietotyypeille ja skaalautuvuudelle.
 
-*   **Tiedostojen Tallennus:**
+*   **Tiedostojen tallennus:**
     *   Hakemusten liitetiedostot tallennetaan erilliseen tallennusratkaisuun. Kehitysvaiheessa ja pienemmissä asennuksissa tämä voi olla paikallinen tiedostojärjestelmä. Suuremmissa tai SaaS-ympäristöissä suositellaan pilvitallennusta (esim. AWS S3, Google Cloud Storage) skaalautuvuuden ja luotettavuuden varmistamiseksi.
 
 *   **Auditointiloki:**
@@ -431,6 +431,7 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Haasteeseen ja 
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
 *   *(Nice-to-have):* Miten `KriteeriArvioija`-määritysten hallinta toteutetaan ylläpitäjän käyttöliittymässä?
 
+<harkittava poistettavaksi>
 ### Organisaatio (Organisation)
 
 Nice to have.
@@ -461,8 +462,10 @@ Organisaatio edustaa tahoa (yritys, julkinen toimija, projekti tms.), joka voi j
 
 *   Tarvitaanko tarkempia rooleja tai tietoja käyttäjän ja organisaation väliseen suhteeseen (`OrganisaatioKayttaja`)? (Tässä vaiheessa oletetaan pelkkä jäsenyys).
 *   Kuka hallinnoi organisaatiotietoja? (Todennäköisesti ylläpitäjät).
+</harkittava poistettavaksi>
 
-### Organisaation Käyttäjä (OrganisationUser)
+<harkittava poistettavaksi>
+### Organisaation käyttäjä (OrganisationUser)
 
 Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Organisaatioon.
 
@@ -489,11 +492,13 @@ Tämä välikappalemalli yhdistää Käyttäjän (User) tiettyyn Organisaatioon.
 
 *   Riittääkö pelkkä jäsenyys vai tarvitaanko rooleja tai muita tietoja? (Ks. `Organisaatio`-mallin avoimet kysymykset).
 
+</harkittava poistettavaksi>
+
 ## 6. Käyttöliittymä (UI) / Käyttäjäkokemus (UX)
 
 *Kuvaa merkittävät muutokset tai uudet suunnitelmat käyttöliittymälle.*
 
-### 6.1. Ylläpitäjän Käyttöliittymä (Admin UI)
+### 6.1. Ylläpitäjän käyttöliittymä (Admin UI)
 
 Tässä osiossa kuvaillaan ylläpitäjän (admin) käyttöliittymän suunnitelma, hyödyntäen valitun taustajärjestelmän tarjoamia sisäänrakennettuja ylläpitotoimintoja mahdollisimman pitkälle. Ylläpitäjät koulutetaan käyttämään näitä toimintoja.
 
@@ -579,7 +584,7 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
     *   Pikakuvakkeet/linkit siirtyä suoraan arvioimaan tietyn haasteen hakemuksia.
     *   Mahdollisesti ilmoitukset (esim. uudet viestit keskusteluissa, lähestyvät määräajat).
 
-**2. Haasteen Arviointinäkymä (Challenge Evaluation View):**
+**2. Haasteen arviointinäkymä (Challenge evaluation view):**
 
 *   **Tarkoitus:** Listata kaikki haasteeseen liittyvät hakemukset ja näyttää niiden arviointistatus.
 *   **Sisältö:**
@@ -592,7 +597,7 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
     *   **Suodatus ja Järjestely:** Mahdollisuus suodattaa hakemuksia oman arviointistatuksen mukaan (esim. näytä vain arvioimattomat) ja järjestää listaa (esim. hakijan nimen tai lähetysajan mukaan).
     *   Linkki siirtyä yksittäisen hakemuksen arviointinäkymään.
 
-**3. Hakemuksen Arviointinäkymä (Application Evaluation View):**
+**3. Hakemuksen arviointinäkymä (Application evaluation view):**
 
 *   **Tarkoitus:** Mahdollistaa yhden hakemuksen arviointi kriteerien perusteella. Tämä on arvioijan pääasiallinen työnäkymä.
 *   **Layout:** Usein kaksipalstainen:
@@ -615,7 +620,8 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   **Navigointi:** Helppo siirtyminen edelliseen/seuraavaan hakemukseen haasteen sisällä.
 *   **Keskustelu:** Jos sallittu, linkki tai upotettu näkymä hakemuksen keskusteluun (`HakemusViesti`).
 
-**4. Hakemuksen Keskustelunäkymä (Application Discussion View):**
+**4. Hakemuksen keskustelunäkymä (Application Discussion View):**
+Nice to have.
 
 *   **Tarkoitus:** Käydä keskustelua tietystä hakemuksesta (jos sallittu).
 *   **Sisältö:**
@@ -628,18 +634,18 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   **Selkeys:** Näkymien tulee olla selkeitä ja johdonmukaisia. Arvioijan tulee aina tietää, missä kohtaa prosessia hän on.
 *   **Tehokkuus:** Minimoidaan klikkausten määrä. Automaattinen tallennus ja sujuva navigointi hakemusten välillä ovat tärkeitä.
 *   **Konteksti:** Hakemuksen tiedot ja arviointilomake näkyvät samanaikaisesti, jotta tietoihin ei tarvitse jatkuvasti hyppiä edestakaisin.
-*   **Visuaalinen Palaute:** Selkeä indikaatio arviointien tilasta (aloittamatta, kesken, valmis). Värimerkkejä tai ikoneita voidaan hyödyntää.
+*   **Visuaalinen palaute:** Selkeä indikaatio arviointien tilasta (aloittamatta, kesken, valmis). Värimerkkejä tai ikoneita voidaan hyödyntää.
 *   **Ohjeistus:** Kriteerien kuvaukset ja mahdolliset lisäohjeet tulee olla helposti saatavilla arviointinäkymässä.
 
-### 6.3 Ylläpitäjän Seurantanäkymä (Admin Monitoring Dashboard)
+### 6.3 Ylläpitäjän seurantanäkymä (Admin monitoring dashboard)
 
 **Tarkoitus:** Tarjota ylläpitäjille (admin-tasoiset käyttäjät) reaaliaikainen yleiskuva arviointien etenemisestä kaikissa kampanjoissa ja haasteissa, joihin heillä on pääsy. Auttaa tunnistamaan pullonkauloja ja seuraamaan prosessin aikataulua.
 
 **Sijainti:** Voi olla oma pääsivunsa ylläpitäjän käyttöliittymässä tai osio yleisessä kojelaudassa.
 
-**Sisältö ja Toiminnallisuudet:**
+**Sisältö ja toiminnallisuudet:**
 
-1.  **Kampanja-tason Yleiskatsaus:**
+1.  **Kampanja-tason yleiskatsaus:**
     *   Lista aktiivisista kampanjoista (`Kampanja.tila` esim. 'Arvioinnissa', 'Avoinna hakemuksille').
     *   Kullekin kampanjalle näytetään:
         *   Nimi (`Kampanja.nimi`).
@@ -648,7 +654,7 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
         *   Yleinen arvioinnin eteneminen kampanjassa (esim. prosenttiosuus haasteista, joissa arviointi on valmis, tai keskimääräinen eteneminen haasteissa).
         *   Linkki kampanjan tarkempiin tietoihin (ylläpitonäkymä tai alla kuvattu haastetason näkymä).
 
-2.  **Haaste-tason Yleiskatsaus (voidaan näyttää kampanjakohtaisesti tai kaikki yhdessä listassa):**
+2.  **Haaste-tason yleiskatsaus (voidaan näyttää kampanjakohtaisesti tai kaikki yhdessä listassa):**
     *   Lista haasteista, joissa arviointi on käynnissä tai päättynyt (`Haaste.tila` esim. 'Hakemukset arvioitavana', 'Arviointi päättynyt').
     *   Kullekin haasteelle näytetään:
         *   Haasteen nimi (`Haaste.nimi`) ja linkki kampanjaan.
@@ -662,14 +668,14 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
         *   Arvioinnin määräaika (`Haaste.arvioinnin_paattymisaika`).
         *   Linkki haasteen tarkempiin tietoihin (ylläpitonäkymä tai alla kuvattu arvioijakohtainen näkymä).
 
-3.  **Arvioijakohtainen Eteneminen (Haasteen sisällä, valinnainen mutta hyödyllinen):**
-    *   Klikkaamalla haastetta voisi avautua näkymä, joka listaa haasteeseen liitetyt arvioijat (`HaasteKayttaja`, rooli='arvioija').
+3.  **Haasteen arvioijakohtainen eteneminen:**
+    *   Haastekohtaisesti tarjotaan näkymä, joka listaa haasteeseen liitetyt arvioijat (`HaasteKayttaja`, rooli='arvioija').
     *   Kullekin arvioijalle näytetään:
         *   Arvioijan nimi.
         *   Kuinka monta hakemusta kyseinen arvioija on arvioinut valmiiksi / aloittanut tässä haasteessa.
         *   Mahdollisesti viimeisimmän arvioinnin ajankohta.
 
-4.  **Suodatus ja Järjestely:**
+4.  **Suodatus ja järjestely:**
     *   Mahdollisuus suodattaa näkymää kampanjan tai haasteen tilan, määräaikojen tai nimen perusteella.
     *   Mahdollisuus järjestää listoja eri sarakkeiden mukaan (esim. eteneminen, määräaika).
 
@@ -716,10 +722,10 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   Tarvitaanko tarkempia pääsynhallintasääntöjä liitetiedostoille (esim. kuka voi ladata/poistaa)?
 *   Miten käsitellään tiedostojen versiointia, jos hakemusta päivitetään?
 
-**Kampanjan Käyttäjä (CampaignUser):**
+**Kampanjan käyttäjä (CampaignUser):**
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
 
-**Haasteen Käyttäjä (ChallengeUser):**
+**Haasteen käyttäjä (ChallengeUser):**
 *   Tarvitaanko tarkempia rooleja haastetasolla?
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
 
@@ -728,7 +734,7 @@ Tässä luonnos arvioijan näkymistä ja toiminnoista, tavoitteena tehdä arvioi
 *   Tarvitaanko viesteille muokkaus- tai poistotoimintoa? Jos kyllä, millä ehdoilla ja kenen toimesta?
 *   Miten uusista viesteistä ilmoitetaan käyttäjille (esim. sähköposti-ilmoitukset)?
 
-**Kampanjan Käyttäjä (CampaignUser):**
+**Kampanjan käyttäjä (CampaignUser):**
 *   Miten haastekohtaisten ja kampanjatason roolien vuorovaikutus ja oikeuksien periytyminen tarkalleen toteutetaan ja validoidaan? (Peruslogiikka kuvattu toiminnallisuudessa, mutta vaatii tarkempaa suunnittelua).
 
 **KriteeriArvioija (CriterionEvaluatorAssignment):**
