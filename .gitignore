@@ -1,17 +1,40 @@
+# IDE
 /.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# React/Node
 /react_ui/build/
 /react_ui/node_modules/
-.DS_Store
-__pycache__
 /react_ui/yarn-error.log
-/react_ui/build/
+/react_ui/src/settings.json
+
+# Django
 /django_server/application_evaluator_config/local_settings.py
-/Pipfile
-/Pipfile.lock
 /django_server/staticfiles/
 /django_server/media/
-/django_server/.coverage
+
+# Legacy (pipenv)
+/Pipfile
+/Pipfile.lock
+
+# Docker/Environment
 /docker-compose.yml
-/react_ui/src/settings.json
 /.env.prod
 /postgres_data/
