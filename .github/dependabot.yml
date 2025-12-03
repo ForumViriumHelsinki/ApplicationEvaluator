@@ -1,0 +1,58 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/react_ui"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "automated"
+    ignore:
+      # Ignore major version updates for now (React 16 -> 18 needs careful migration)
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+    groups:
+      patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+
+  - package-ecosystem: "pip"
+    directory: "/django_server"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "automated"
+    ignore:
+      # Django 3.x -> 4.x needs careful migration
+      - dependency-name: "django"
+        update-types: ["version-update:semver-major"]
+    groups:
+      patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
