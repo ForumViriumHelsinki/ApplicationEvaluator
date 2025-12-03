@@ -1,0 +1,25 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: "application-evaluator"
+build:
+  local:
+    useBuildkit: true
+    concurrency: 0
+  artifacts:
+    - image: "application-evaluator"
+      context: "../../containers/application-evaluator"
+deploy:
+  helm:
+    releases:
+      - name: "helm-application-evaluator"
+        chartPath: .
+        setValueTemplates:
+          # These make skaffold use the images it builds,
+          # overriding the default values
+            image.repository: "{{.IMAGE_REPO_application-evaluator}}"
+            image.tag: "{{.IMAGE_TAG_application-evaluator}}@{{.IMAGE_DIGEST_application-evaluator}}"
+        valuesFiles:
+          - values.yaml
+        setValues:
+          key: value

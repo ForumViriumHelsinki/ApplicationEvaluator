@@ -1,0 +1,10 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "application-evaluator"
+    }
+  },
+  "plugins": ["node-workspace"
+  ]
+}

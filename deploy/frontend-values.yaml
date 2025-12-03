@@ -1,0 +1,118 @@
+# Application Evaluator - React Frontend
+# Tech stack: React, TypeScript, Vite, Nginx
+
+image:
+  repository: ghcr.io/forumviriumhelsinki/application-evaluator-frontend
+  tag: "0.1.0" # Updated by ArgoCD Image Updater
+
+imagePullSecrets:
+- name: ghcr-login-secret
+
+replicaCount: 1
+
+# No service account needed for static frontend
+serviceAccount:
+  create: false
+
+# Security context for Kyverno policy compliance
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101 # nginx user
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 101 # nginx user
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+# Ingress for frontend
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+  - host: application-evaluator.dataportal.fi
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - application-evaluator.dataportal.fi
+    secretName: application-evaluator-frontend-tls # pragma: allowlist secret
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Resource allocation
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Volumes for writable directories (required with readOnlyRootFilesystem)
+volumes:
+- name: nginx-cache
+  emptyDir: {}
+- name: nginx-run
+  emptyDir: {}
+- name: nginx-tmp
+  emptyDir: {}
+- name: nginx-conf
+  emptyDir: {}
+
+volumeMounts:
+- name: nginx-cache
+  mountPath: /var/cache/nginx
+- name: nginx-run
+  mountPath: /var/run
+- name: nginx-tmp
+  mountPath: /tmp
+- name: nginx-conf
+  mountPath: /etc/nginx/conf.d
+
+# KEDA scaling configuration (office hours: Mon-Fri 7am-6pm Helsinki)
+keda:
+  enabled: true
+  minReplicaCount: 0
+  maxReplicaCount: 2
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+  - type: cron
+    metadata:
+      timezone: Europe/Helsinki
+      start: 0 7 * * 1-5
+      end: 0 18 * * 1-5
+      desiredReplicas: "1"
