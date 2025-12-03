@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "application-evaluator"
+version = "0.1.0"
+description = "FVH Application Evaluator - web app for collaboratively evaluating applications by weighted criteria"
+requires-python = ">=3.9"
+dependencies = [
+    "django>=3.0,<4.0",
+    "djangorestframework>=3.10",
+    "pyaml>=19.4",
+    "uritemplate>=3.0",
+    "coreapi>=2.3",
+    "django-cors-headers>=3.2",
+    "django-rest-auth>=0.9",
+    "jsonschema>=3.2",
+    "psycopg2-binary>2.8",
+    "gunicorn>=20.0",
+    "sentry-sdk>=0.14.1",
+    "elastic-apm>=5.5",
+    "dj-inmemorystorage",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8>=3.7",
+    "coverage>=5.0",
+]
+
+[tool.flake8]
+max-line-length = 120
+exclude = ["migrations", "__pycache__", "*.pyc"]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["*/migrations/*", "*/venv/*", "*/tests/*"]

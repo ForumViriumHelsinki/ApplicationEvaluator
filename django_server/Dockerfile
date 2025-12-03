@@ -5,18 +5,27 @@ FROM python:3.11
 WORKDIR /app
 
 # set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONPATH /app/
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/ \
+    UV_NO_CACHE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-# copy Pipfile
-COPY Pipfile /app/
-COPY Pipfile.lock /app/
+# Install uv and system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    netcat-openbsd \
+    curl \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && rm -rf /var/lib/apt/lists/*
 
-# install dependencies
-RUN apt-get update; apt-get install -y netcat
-RUN pip install pipenv
-RUN pipenv install --system --deploy
+ENV PATH="/root/.local/bin:$PATH"
+
+# Install dependencies
+COPY pyproject.toml ./
+RUN uv pip install --system -e .
 
 # run entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]

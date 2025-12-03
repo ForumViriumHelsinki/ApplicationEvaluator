@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   web:
     build: ./django_server
@@ -13,7 +11,7 @@ services:
 
   react:
     build: ./react_ui
-    command: yarn build
+    command: npm run build
     volumes:
       - ./react_ui:/app
       - /app/node_modules

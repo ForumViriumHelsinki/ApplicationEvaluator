@@ -10,14 +10,14 @@ It was developed and used for evaluating the applications in the AI4Cities proje
 
  * Definition of **Application rounds**, each round defining its own hierarchy of weighed **Evaluation criteria**, along with minimum average score thresholds for consideration
  * Batch import of **Applications** for consideration into each application round
- * Definition of **Evaluating organizations** with allocated evaluating users 
+ * Definition of **Evaluating organizations** with allocated evaluating users
  * Allocation of applications to organizations; each application may be allocated to one or more organizations for evaluation
  * Evaluation UI used by the evaluators, allowing:
    * live overview of the evaluation process and completeness for each evaluators own organization while scoring
    * live computation of each applications final score as the weighted average of given scores
    * comparison of the final scores by evaluating organization, once the final scores have been submitted
    * graphical and tabular presentation of the scores of each application by evaluating organization and criteria for quick comparisons and better understanding of the relative strengths and weaknesses of different applications
- 
+
 <img width="1047" alt="scoring view screenshot" src="https://user-images.githubusercontent.com/58427813/184098299-1d1d76e2-074e-41f7-9776-d662695abc34.png">
 
 ## Maturity and future work (status summer 2022)
@@ -30,16 +30,38 @@ Possible next steps include improvements to the application round definition int
 
 The application is based on a Django ReST Framework-based backend and a React/TypeScript/Bootstrap frontend. If you are interested in taking the tool into use and / or developing it further, feel free to contact johan.lindqvist(at)forumvirium.fi.
 
-To start development:
+## Prerequisites
 
-* Install Docker and Docker Compose
-* Run:
+* Python 3.9+ with uv
+* Node.js 18+ with npm
+* PostgreSQL
+* Docker (for containerized deployment)
+
+## Development Setup
+
+### Backend (Django)
+```bash
+cd django_server/
+uv pip install -e .
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
 ```
+
+### Frontend (React)
+```bash
+cd react_ui/
+npm install
+npm start
+```
+
+### Docker Development
+```bash
 sh configure_dev.sh
 docker-compose up
 ```
 
-This should start docker containers for the backend, frontend and database and install all needed dependencies in 
+This should start docker containers for the backend, frontend and database and install all needed dependencies in
 them. A react dev environment serving the UI app should then be available at localhost:3000 or a nearby available port,
 and the admin interface at http://127.0.0.1:8000/admin/ .
 

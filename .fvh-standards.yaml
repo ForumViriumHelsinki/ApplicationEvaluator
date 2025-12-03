@@ -1,0 +1,5 @@
+standards_version: "2025.1"
+project_type: "python"
+last_configured: "2025-12-03"
+components:
+  pre-commit: "2025.1"
