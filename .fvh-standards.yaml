@@ -3,3 +3,19 @@ project_type: "python"
 last_configured: "2025-12-03"
 components:
   pre-commit: "2025.1"
+  security: "2025.1"
+  security_dependency_audit: true
+  security_sast: true
+  security_secret_detection: true
+  security_policy: true
+  security_dependabot: true
+  sentry: "2025.1"
+  sentry_backend: true
+  sentry_frontend: true
+  sentry_tracing: true
+  sentry_environment: true
+  tests: "2025.1"
+  tests_backend_framework: "pytest"
+  tests_frontend_framework: "vitest"
+  tests_coverage_threshold: 80
+  tests_ci_integrated: true

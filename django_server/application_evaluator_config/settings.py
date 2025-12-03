@@ -190,7 +190,14 @@ DEFAULT_FROM_EMAIL = os.environ.get("EMAIL_HOST_USER", "webmaster@localhost")
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN", None)
 if SENTRY_DSN:
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], send_default_pii=True)
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=os.environ.get("SENTRY_ENVIRONMENT", "development"),
+        release=os.environ.get("SENTRY_RELEASE"),
+        traces_sample_rate=0.1 if not DEBUG else 1.0,
+        send_default_pii=False,  # Disabled for GDPR compliance
+    )
 
 ELASTIC_APM = {
     "SERVICE_NAME": os.environ.get("ELASTIC_SERVICE", "citylogistiikka_prod"),
@@ -208,6 +215,12 @@ except ImportError:
 if "test" in sys.argv:
     DEFAULT_FILE_STORAGE = "inmemorystorage.InMemoryStorage"
     TEST = True
-    # INMEMORYSTORAGE_PERSIST = True
+    # Use SQLite for faster local testing without PostgreSQL dependency
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
 else:
     TEST = False

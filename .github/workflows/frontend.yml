@@ -1,0 +1,54 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'react_ui/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'react_ui/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: react_ui
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: react_ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./react_ui/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: react_ui/junit.xml
+          retention-days: 30

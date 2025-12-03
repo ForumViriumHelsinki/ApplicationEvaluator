@@ -7,8 +7,16 @@ import styles from './index.scss';
 import ApplicationEvaluatorUI from "/ApplicationEvaluatorUI"; // eslint-disable-line
 import settings from './settings';
 
-if (settings.sentryDsn)
-  Sentry.init({dsn: settings.sentryDsn});
+// Sentry DSN from environment variable (set via VITE_SENTRY_DSN)
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: import.meta.env.MODE,
+    release: import.meta.env.VITE_SENTRY_RELEASE,
+    tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
+  });
+}
 
 ReactDOM.render(<ApplicationEvaluatorUI/>, document.getElementById('root'));
 

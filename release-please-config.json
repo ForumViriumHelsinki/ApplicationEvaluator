@@ -1,17 +1,13 @@
 {
+  "separate-pull-requests": true,
   "packages": {
     "django_server": {
-      "release-type": "python"
+      "release-type": "python",
+      "component": "application-evaluator-backend"
     },
     "react_ui": {
-      "release-type": "node"
+      "release-type": "node",
+      "component": "application-evaluator-frontend"
     }
-  },
-  "plugins": [
-    {
-      "type": "linked-versions",
-      "groupName": "applicationevaluator",
-      "components": ["django_server", "react_ui"]
-    }
-  ]
+  }
 }

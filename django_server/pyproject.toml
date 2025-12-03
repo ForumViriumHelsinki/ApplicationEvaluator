@@ -18,21 +18,61 @@ dependencies = [
     "jsonschema>=3.2",
     "psycopg2-binary>2.8",
     "gunicorn>=20.0",
-    "sentry-sdk>=0.14.1",
+    "sentry-sdk>=2.0.0",
     "elastic-apm>=5.5",
     "dj-inmemorystorage",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "flake8>=3.7",
+    "ruff>=0.8.0",
     "coverage>=5.0",
+    "pip-audit>=2.7.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-django>=4.5.0",
 ]
 
 [tool.flake8]
 max-line-length = 120
 exclude = ["migrations", "__pycache__", "*.pyc"]
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "application_evaluator_config.settings"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+testpaths = ["application_evaluator/tests"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=application_evaluator",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]
+
 [tool.coverage.run]
-source = ["."]
-omit = ["*/migrations/*", "*/venv/*", "*/tests/*"]
+source = ["application_evaluator"]
+omit = ["*/migrations/*", "*/venv/*", "*/tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+[tool.setuptools.packages.find]
+include = ["application_evaluator*", "application_evaluator_config*"]
+exclude = ["templates*"]
