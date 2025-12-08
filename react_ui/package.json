@@ -31,7 +31,7 @@
     "react-scripts": "^3.4.1",
     "react-svg-radar-chart": "^1.2.0",
     "reactstrap": "^8.9.0",
-    "sass": "^1.23.7",
+    "sass": "^1.94.2",
     "typescript": "^3.7.4",
     "vite": "^2.7.0",
     "xlsx": "^0.18.0"
