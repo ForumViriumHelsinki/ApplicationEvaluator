@@ -199,6 +199,35 @@ migrations:
   enabled: true
   command: ['python']
   args: ['manage.py', 'migrate', '--noinput']
+  # Use the same service account for IAM authentication to Cloud SQL
+  serviceAccountName: application-evaluator-backend
+  # Cloud SQL Proxy sidecar for the migration job
+  # This is required because the migration job runs in a separate pod
+  # and needs its own database connectivity
+  initContainers:
+  - name: cloud-sql-proxy
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.19.0
+    restartPolicy: Always # Makes it a sidecar in K8s 1.28+
+    args:
+    - "--structured-logs"
+    - "--port=5432"
+    - "--auto-iam-authn"
+    - "fvh-project-containers-etc:europe-north1:fvh-postgres"
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
   env:
     - name: SQL_ENGINE
       value: 'django.db.backends.postgresql'
