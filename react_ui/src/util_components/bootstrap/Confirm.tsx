@@ -1,50 +1,45 @@
-import React from "react";
+import React from 'react';
 
 // @ts-ignore
-import { Input } from "reactstrap";
+import { Input } from 'reactstrap';
 
-import Modal, { ModalActions } from "/util_components/bootstrap/Modal";
+import Modal, { ModalActions } from '/util_components/bootstrap/Modal';
 
 type ConfirmProps = {
-	title: string;
-	inputPlaceholder?: string;
-	onConfirm: (confirmText?: string) => any;
-	onClose: () => any;
+  title: string;
+  inputPlaceholder?: string;
+  onConfirm: (confirmText?: string) => any;
+  onClose: () => any;
 };
 
 export default class Confirm extends React.Component<ConfirmProps> {
-	render() {
-		const { title, onClose, inputPlaceholder } = this.props;
+  render() {
+    const { title, onClose, inputPlaceholder } = this.props;
 
-		return (
-			<Modal title={title} onClose={onClose}>
-				{inputPlaceholder && (
-					<Input
-						type="textarea"
-						name="confirm"
-						id="confirmText"
-						placeholder={inputPlaceholder}
-					/>
-				)}
-				<ModalActions
-					actions={[
-						{ label: "Cancel", color: "light", action: onClose },
-						{
-							label: "OK",
-							color: "secondary",
-							action: () => this.handleConfirm(),
-						},
-					]}
-				/>
-			</Modal>
-		);
-	}
+    return (
+      <Modal title={title} onClose={onClose}>
+        {inputPlaceholder && (
+          <Input type="textarea" name="confirm" id="confirmText" placeholder={inputPlaceholder} />
+        )}
+        <ModalActions
+          actions={[
+            { label: 'Cancel', color: 'light', action: onClose },
+            {
+              label: 'OK',
+              color: 'secondary',
+              action: () => this.handleConfirm(),
+            },
+          ]}
+        />
+      </Modal>
+    );
+  }
 
-	private handleConfirm() {
-		const { onConfirm, onClose } = this.props;
-		const input = document.getElementById("confirmText") as HTMLInputElement;
-		const value = input?.value;
-		onClose();
-		onConfirm(value);
-	}
+  private handleConfirm() {
+    const { onConfirm, onClose } = this.props;
+    const input = document.getElementById('confirmText') as HTMLInputElement;
+    const value = input?.value;
+    onClose();
+    onConfirm(value);
+  }
 }
