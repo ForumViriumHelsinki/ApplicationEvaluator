@@ -35,8 +35,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Prepare for non-root operation (nginx user is uid 101 in alpine)
-RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /usr/share/nginx/html && \
-    touch /tmp/nginx.pid && chown nginx:nginx /tmp/nginx.pid
+RUN chown -R nginx:nginx /var/cache/nginx /usr/share/nginx/html
 
 EXPOSE 80
 
