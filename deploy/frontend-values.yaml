@@ -89,8 +89,6 @@ volumes:
   emptyDir: {}
 - name: nginx-tmp
   emptyDir: {}
-- name: nginx-conf
-  emptyDir: {}
 
 volumeMounts:
 - name: nginx-cache
@@ -99,8 +97,6 @@ volumeMounts:
   mountPath: /var/run
 - name: nginx-tmp
   mountPath: /tmp
-- name: nginx-conf
-  mountPath: /etc/nginx/conf.d
 
 # KEDA scaling configuration (office hours: Mon-Fri 7am-6pm Helsinki)
 keda:

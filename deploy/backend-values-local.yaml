@@ -1,0 +1,103 @@
+# Application Evaluator - Django Backend (Local Development)
+# Simplified config with SQLite database
+
+image:
+  repository: application-evaluator-backend
+  tag: latest
+
+replicaCount: 1
+
+# No service account needed locally
+serviceAccount:
+  create: false
+
+# Security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+# No ingress - use port-forward
+ingress:
+  enabled: false
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health/
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Environment variables for SQLite
+env:
+  SQL_ENGINE:
+    value: "django.db.backends.sqlite3"
+  SQL_DATABASE:
+    value: "/app/data/db.sqlite3"
+  DEBUG:
+    value: "True"
+  DJANGO_ALLOWED_HOSTS:
+    value: "*"
+  DJANGO_CORS_ALLOWED_ORIGINS:
+    value: "http://localhost:3000,http://127.0.0.1:3000"
+  DJANGO_SECRET_KEY:
+    value: "local-dev-secret-key-not-for-production"
+
+# Resource allocation
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Volumes for SQLite persistence and temp
+volumes:
+- name: data
+  emptyDir: {}
+- name: tmp
+  emptyDir: {}
+
+volumeMounts:
+- name: data
+  mountPath: /app/data
+- name: tmp
+  mountPath: /tmp
+
+# Disable production features
+externalSecret:
+  enabled: false
+
+keda:
+  enabled: false
+
+migrations:
+  enabled: false

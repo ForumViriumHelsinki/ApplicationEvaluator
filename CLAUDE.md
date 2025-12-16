@@ -146,7 +146,7 @@ docker exec -it applicationevaluator-db-1 pg_dump -U application_evaluator appli
 ### Production Configuration
 - Uses `compose.yml` for container orchestration
 - Nginx configuration in `nginx.conf.sample`
-- Skaffold configuration for Kubernetes deployment in `application/skaffold.yaml`
+- Skaffold configuration for Kubernetes deployment in `skaffold.yaml`
 
 ## Common Tasks
 

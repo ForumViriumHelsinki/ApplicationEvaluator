@@ -11,15 +11,24 @@ repos:
       - id: check-json
       - id: check-merge-conflict
       - id: check-added-large-files
+        args: [--maxkb=1000]
       - id: debug-statements
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.4
     hooks:
       - id: ruff
-        args: [--line-length, "120", --fix]
+        args: [--fix]
+        files: ^django_server/
       - id: ruff-format
-        args: [--line-length, "120"]
+        files: ^django_server/
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.6.1
+    hooks:
+      - id: biome-format
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        files: ^react_ui/src/
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.0.0
