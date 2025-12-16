@@ -1,0 +1,87 @@
+# Application Evaluator - React Frontend (Local Development)
+# ⚠️ WARNING: This file is for LOCAL DEVELOPMENT ONLY
+# DO NOT use this configuration in production!
+
+image:
+  repository: application-evaluator-frontend
+  tag: latest
+
+replicaCount: 1
+
+# No service account needed
+serviceAccount:
+  create: false
+
+# Security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  fsGroup: 101
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 101
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+# No ingress - use port-forward
+ingress:
+  enabled: false
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Resource allocation
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Volumes for nginx writable directories (required for readOnlyRootFilesystem)
+volumes:
+- name: nginx-cache
+  emptyDir: {}
+- name: nginx-run
+  emptyDir: {}
+- name: nginx-tmp
+  emptyDir: {}
+
+volumeMounts:
+- name: nginx-cache
+  mountPath: /var/cache/nginx
+- name: nginx-run
+  mountPath: /var/run
+- name: nginx-tmp
+  mountPath: /tmp
+
+# Disable production features
+keda:
+  enabled: false

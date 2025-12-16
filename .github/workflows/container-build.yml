@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./django_server
-          file: ./django_server/Dockerfile.backend
+          file: ./django_server/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
@@ -124,3 +124,24 @@ jobs:
             type=gha,mode=max
           provenance: mode=max
           sbom: true
+
+  # Create Sentry release after successful builds
+  sentry-release:
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    if: github.event_name != 'pull_request' && vars.SENTRY_ORG != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+        with:
+          projects: ${{ vars.SENTRY_PROJECT_BACKEND }} ${{ vars.SENTRY_PROJECT_FRONTEND }}
+          version: ${{ github.sha }}
+          set_commits: auto

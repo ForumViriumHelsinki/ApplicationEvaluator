@@ -1,16 +1,30 @@
-# set the base image
-# n/b: for production, node is only used for building
-# the static Html and javascript files
-# as react creates static html and js files after build
-# these are what will be served by nginx
-# use alias build to be easier to refer this container elsewhere
-# e.g inside nginx container
-FROM node:19
-# set working directory
-# this is the working folder in the container
-# from which the app will be running from
+# Build stage
+# Pin to specific version for reproducible builds
+FROM oven/bun:1.3.4-alpine AS build
+
 WORKDIR /app
-# add the node_modules folder to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json yarn.lock /app/
-RUN yarn install --network-timeout=30000
+
+# Copy package files
+COPY package.json bun.lock* ./
+
+# Install dependencies
+RUN bun install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN bun run build
+
+# Production stage
+FROM nginx:1.27-alpine
+
+# Copy custom nginx config for SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy built assets from build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

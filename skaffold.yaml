@@ -1,0 +1,85 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: application-evaluator
+
+build:
+  local:
+    push: false
+    # useDockerCLI: true
+    useBuildkit: true
+    concurrency: 0
+  artifacts:
+    - image: application-evaluator-backend
+      context: django_server
+      docker:
+        dockerfile: Dockerfile
+    - image: application-evaluator-frontend
+      context: react_ui
+      docker:
+        dockerfile: Dockerfile
+
+manifests:
+  helm:
+    releases:
+      - name: application-evaluator-backend
+        remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
+        version: 0.16.0
+        valuesFiles:
+          - deploy/backend-values-local.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_application_evaluator_backend}}"
+          image.tag: "{{.IMAGE_TAG_application_evaluator_backend}}@{{.IMAGE_DIGEST_application_evaluator_backend}}"
+      - name: application-evaluator-frontend
+        remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
+        version: 0.16.0
+        valuesFiles:
+          - deploy/frontend-values-local.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_application_evaluator_frontend}}"
+          image.tag: "{{.IMAGE_TAG_application_evaluator_frontend}}@{{.IMAGE_DIGEST_application_evaluator_frontend}}"
+
+deploy:
+  helm: {}
+  statusCheck: true
+  statusCheckDeadlineSeconds: 180
+  tolerateFailuresUntilDeadline: true
+
+portForward:
+  - resourceType: service
+    resourceName: application-evaluator-backend-helm-webapp
+    port: 8000
+    localPort: 8000
+    address: 127.0.0.1
+  - resourceType: service
+    resourceName: application-evaluator-frontend-helm-webapp
+    port: 80
+    localPort: 3000
+    address: 127.0.0.1
+
+profiles:
+  # Backend services only - for frontend development with hot reload
+  - name: services-only
+    build:
+      artifacts:
+        - image: application-evaluator-backend
+          context: django_server
+          docker:
+            dockerfile: Dockerfile
+    manifests:
+      helm:
+        releases:
+          - name: application-evaluator-backend
+            remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
+            version: 0.16.0
+            valuesFiles:
+              - deploy/backend-values-local.yaml
+            setValueTemplates:
+              image.repository: "{{.IMAGE_REPO_application_evaluator_backend}}"
+              image.tag: "{{.IMAGE_TAG_application_evaluator_backend}}@{{.IMAGE_DIGEST_application_evaluator_backend}}"
+    portForward:
+      - resourceType: service
+        resourceName: application-evaluator-backend-helm-webapp
+        port: 8000
+        localPort: 8000
+        address: 127.0.0.1

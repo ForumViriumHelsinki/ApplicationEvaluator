@@ -1,6 +1,6 @@
 standards_version: "2025.1"
 project_type: "python"
-last_configured: "2025-12-03"
+last_configured: "2025-12-15"
 components:
   pre-commit: "2025.1"
   security: "2025.1"
@@ -11,11 +11,49 @@ components:
   security_dependabot: true
   sentry: "2025.1"
   sentry_backend: true
+  sentry_backend_sdk: "sentry-sdk"
+  sentry_backend_version: ">=2.0.0"
   sentry_frontend: true
+  sentry_frontend_sdk: "@sentry/react"
+  sentry_frontend_version: "^8.0.0"
   sentry_tracing: true
   sentry_environment: true
+  sentry_source_maps: true
+  sentry_vite_plugin: true
   tests: "2025.1"
   tests_backend_framework: "pytest"
   tests_frontend_framework: "vitest"
   tests_coverage_threshold: 80
   tests_ci_integrated: true
+  skaffold: "2025.1"
+  skaffold_api_version: "v4beta11"
+  skaffold_localhost_only: true
+  skaffold_status_check: true
+  skaffold_profiles:
+    - services-only
+    - compose-backend
+  linting: "2025.1"
+  linting_python_tool: "ruff"
+  linting_python_rules:
+    - E
+    - F
+    - I
+    - N
+    - UP
+    - B
+    - C4
+    - SIM
+    - PTH
+    - RUF
+    - DJ
+  linting_frontend_tool: "biome"
+  linting_pre_commit: true
+  linting_ci: true
+  formatting: "2025.1"
+  formatting_python_tool: "ruff"
+  formatting_python_line_length: 120
+  formatting_frontend_tool: "biome"
+  formatting_frontend_line_width: 100
+  formatting_pre_commit: true
+  formatting_ci: true
+  formatting_editor_config: true

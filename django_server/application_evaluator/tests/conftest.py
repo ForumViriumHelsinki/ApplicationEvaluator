@@ -1,7 +1,7 @@
 """Pytest configuration and fixtures for application_evaluator tests."""
 
-import pytest
 from django.contrib.auth.models import User
+import pytest
 
 
 @pytest.fixture
