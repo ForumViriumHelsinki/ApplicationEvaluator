@@ -1,6 +1,5 @@
-# Build stage
-# Pin to specific version for reproducible builds
-FROM oven/bun:1.3.4-alpine AS build
+# Dependencies stage - use Bun for fast dependency installation
+FROM oven/bun:1.3.4-alpine AS deps
 
 WORKDIR /app
 
@@ -10,11 +9,20 @@ COPY package.json bun.lock* ./
 # Install dependencies
 RUN bun install --frozen-lockfile
 
+# Build stage - use Node.js for reliable Vite builds
+# (Bun's baseline binary can crash without AVX CPU support in some environments)
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+# Copy node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
 # Copy source code
 COPY . .
 
-# Build the application
-RUN bun run build
+# Build the application using npm (which runs vite via package.json scripts)
+RUN npm run build
 
 # Production stage
 FROM nginx:1.27-alpine
