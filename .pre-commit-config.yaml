@@ -29,6 +29,7 @@ repos:
       - id: biome-format
         additional_dependencies: ["@biomejs/biome@1.9.4"]
         files: ^react_ui/src/
+        args: [--config-path=react_ui/biome.json]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.0.0

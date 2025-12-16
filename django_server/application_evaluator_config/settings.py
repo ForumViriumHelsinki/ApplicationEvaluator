@@ -10,14 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import contextlib
 import os
+from pathlib import Path
 import sys
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: BASE_DIR / "subdir"
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -72,7 +74,7 @@ ROOT_URLCONF = "application_evaluator_config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -138,10 +140,10 @@ CORS_ORIGIN_ALLOW_ALL = os.environ.get("DJANGO_CORS_ALLOW_ALL", "False").lower()
 CORS_ALLOWED_ORIGINS = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
 STATIC_URL = "/staticfiles/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
-MEDIA_ROOT = os.environ.get("MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", str(BASE_DIR / "media"))
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -207,10 +209,8 @@ ELASTIC_APM = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-try:
+with contextlib.suppress(ImportError):
     from .local_settings import *  # noqa
-except ImportError:
-    pass
 
 if "test" in sys.argv:
     DEFAULT_FILE_STORAGE = "inmemorystorage.InMemoryStorage"
