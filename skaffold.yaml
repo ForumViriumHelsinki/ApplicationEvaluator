@@ -25,6 +25,8 @@ manifests:
       - name: application-evaluator-backend
         remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
         version: 0.16.0
+        namespace: app-evaluator
+        createNamespace: true
         valuesFiles:
           - deploy/backend-values-local.yaml
         setValueTemplates:
@@ -33,6 +35,8 @@ manifests:
       - name: application-evaluator-frontend
         remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
         version: 0.16.0
+        namespace: app-evaluator
+        createNamespace: true
         valuesFiles:
           - deploy/frontend-values-local.yaml
         setValueTemplates:
@@ -48,11 +52,13 @@ deploy:
 portForward:
   - resourceType: service
     resourceName: application-evaluator-backend-helm-webapp
+    namespace: app-evaluator
     port: 8000
     localPort: 8000
     address: 127.0.0.1
   - resourceType: service
     resourceName: application-evaluator-frontend-helm-webapp
+    namespace: app-evaluator
     port: 80
     localPort: 3000
     address: 127.0.0.1
@@ -72,6 +78,8 @@ profiles:
           - name: application-evaluator-backend
             remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
             version: 0.16.0
+            namespace: app-evaluator
+            createNamespace: true
             valuesFiles:
               - deploy/backend-values-local.yaml
             setValueTemplates:
@@ -80,6 +88,7 @@ profiles:
     portForward:
       - resourceType: service
         resourceName: application-evaluator-backend-helm-webapp
+        namespace: app-evaluator
         port: 8000
         localPort: 8000
         address: 127.0.0.1

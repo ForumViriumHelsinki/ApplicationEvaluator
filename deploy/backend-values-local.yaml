@@ -83,19 +83,23 @@ resources:
     cpu: 500m
     memory: 512Mi
 
-# Volumes for SQLite persistence and temp
+# Volumes for SQLite persistence, staticfiles, and temp
 # Using hostPath for data persistence across pod restarts
 volumes:
 - name: data
   hostPath:
     path: /tmp/app-evaluator-data
     type: DirectoryOrCreate
+- name: staticfiles
+  emptyDir: {}
 - name: tmp
   emptyDir: {}
 
 volumeMounts:
 - name: data
   mountPath: /app/data
+- name: staticfiles
+  mountPath: /app/staticfiles
 - name: tmp
   mountPath: /tmp
 

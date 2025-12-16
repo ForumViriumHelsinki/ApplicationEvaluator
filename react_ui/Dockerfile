@@ -27,12 +27,19 @@ RUN npm run build
 # Production stage
 FROM nginx:1.27-alpine
 
-# Copy custom nginx config for SPA routing
+# Copy custom nginx configs for non-root operation
+COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets from build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Prepare for non-root operation (nginx user is uid 101 in alpine)
+RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /usr/share/nginx/html && \
+    touch /tmp/nginx.pid && chown nginx:nginx /tmp/nginx.pid
+
 EXPOSE 80
+
+USER nginx
 
 CMD ["nginx", "-g", "daemon off;"]
