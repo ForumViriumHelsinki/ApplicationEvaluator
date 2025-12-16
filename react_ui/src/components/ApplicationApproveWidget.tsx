@@ -1,8 +1,8 @@
 import React from "react";
 import type {
+	AppContextType,
 	Application,
 	ApplicationRound,
-	AppContextType,
 } from "/components/types";
 import { AppContext } from "/components/types";
 import sessionRequest from "/sessionRequest";

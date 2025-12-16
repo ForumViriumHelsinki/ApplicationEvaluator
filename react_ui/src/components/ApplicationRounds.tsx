@@ -1,6 +1,6 @@
-import type { Application } from "/components/types";
 import React from "react";
 import ApplicationRoundCard from "/components/ApplicationRoundCard";
+import type { Application } from "/components/types";
 import {
 	AppContext,
 	type ApplicationRound,
