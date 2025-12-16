@@ -1,4 +1,6 @@
 # Application Evaluator - React Frontend (Local Development)
+# ⚠️ WARNING: This file is for LOCAL DEVELOPMENT ONLY
+# DO NOT use this configuration in production!
 
 image:
   repository: application-evaluator-frontend

@@ -1,5 +1,6 @@
 # Build stage
-FROM oven/bun:1.3-alpine AS build
+# Pin to specific version for reproducible builds
+FROM oven/bun:1.3.4-alpine AS build
 
 WORKDIR /app
 

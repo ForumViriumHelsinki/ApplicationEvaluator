@@ -42,21 +42,23 @@ docker-compose up
 ### Backend (Django) - from `django_server/` directory:
 ```bash
 # Environment setup
-uv pip install -e .
+uv sync                   # Install dependencies from uv.lock
+uv sync --dev             # Include dev dependencies
 
 # Database operations
-python manage.py migrate
-python manage.py runserver
+uv run python manage.py migrate
+uv run python manage.py runserver
 
 # Code quality
-flake8
-python manage.py test
+uv run ruff check .       # Linting
+uv run ruff format .      # Formatting
+uv run pytest             # Run tests with coverage
 
 # Django shell
-python manage.py shell
+uv run python manage.py shell
 
 # Create superuser
-python manage.py createsuperuser
+uv run python manage.py createsuperuser
 
 # Docker container commands
 docker exec -it applicationevaluator-web-1 python manage.py runserver 0.0.0.0:8000
@@ -67,16 +69,17 @@ docker exec -it applicationevaluator-web-1 python manage.py migrate
 ### Frontend (React) - from `react_ui/` directory:
 ```bash
 # Environment setup
-npm install
+bun install               # Install dependencies from bun.lock
 
 # Development
-npm start
-npm run build
-npm test
+bun run dev               # Start development server
+bun run build             # Production build
+bun run check             # Lint and format with Biome
+bun test                  # Run tests
 
 # Docker container commands
-docker exec -it applicationevaluator-react-1 npm start
-docker exec -it applicationevaluator-react-1 npm run build
+docker exec -it applicationevaluator-react-1 bun run dev
+docker exec -it applicationevaluator-react-1 bun run build
 ```
 
 ### Database Operations
@@ -100,6 +103,9 @@ docker exec -it applicationevaluator-db-1 pg_dump -U application_evaluator appli
 - **URLs**: `django_server/application_evaluator_config/urls.py`
 - **Docker**: `docker-compose.{dev,prod}.yml`
 - **Frontend Build**: `react_ui/vite.config.js`
+- **Python Tooling**: `django_server/pyproject.toml` (ruff, pytest, dependencies)
+- **Frontend Tooling**: `react_ui/biome.json` (linting and formatting)
+- **Kubernetes Dev**: `skaffold.yaml`
 
 ## Development Workflow
 
@@ -111,8 +117,8 @@ docker exec -it applicationevaluator-db-1 pg_dump -U application_evaluator appli
 
 ### Testing Strategy
 - Django tests in `django_server/application_evaluator/tests/`
-- Run backend tests with `python manage.py test`
-- Frontend testing setup exists but minimal coverage
+- Run backend tests with `uv run pytest` (includes coverage)
+- Frontend testing with `bun test`
 - Integration testing via admin interface and evaluator UI
 
 ### Data Flow
