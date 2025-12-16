@@ -38,7 +38,7 @@ jobs:
         run: bun run test:ci
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./react_ui/coverage/lcov.info
