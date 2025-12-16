@@ -112,13 +112,15 @@ export default class ExportScoresWidget extends React.Component<
 		const rows = [columns.map((c) => c.name)];
 
 		applications.forEach((a) => {
-			// @ts-ignore
 			a.scores.forEach((s) =>
-				rows.push(columns.map((c) => c.value(s, a) as string)),
+				rows.push(
+					columns.map((c) => c.value(s as Score & Comment, a) as string),
+				),
 			);
-			// @ts-ignore
 			a.comments.forEach((s) =>
-				rows.push(columns.map((c) => c.value(s, a) as string)),
+				rows.push(
+					columns.map((c) => c.value(s as Score & Comment, a) as string),
+				),
 			);
 		});
 		const worksheet = XLSX.utils.aoa_to_sheet(rows);

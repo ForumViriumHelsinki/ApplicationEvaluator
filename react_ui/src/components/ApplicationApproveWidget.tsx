@@ -1,5 +1,9 @@
 import React from "react";
-import type { Application, ApplicationRound } from "/components/types";
+import type {
+	Application,
+	ApplicationRound,
+	AppContextType,
+} from "/components/types";
 import { AppContext } from "/components/types";
 import sessionRequest from "/sessionRequest";
 import { approveApplicationUrl, unapproveApplicationUrl } from "/urls";
@@ -20,6 +24,7 @@ export default class ApplicationApproveWidget extends React.Component<
 > {
 	state = initialState;
 	static contextType = AppContext;
+	declare context: AppContextType;
 	static defaultProps = {
 		className: "btn btn-sm",
 	};

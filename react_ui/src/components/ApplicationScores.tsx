@@ -11,6 +11,7 @@ import CriterionGroupComponent from "/components/CriterionGroup";
 import ExportScoresWidget from "/components/ExportScoresWidget";
 import {
 	AppContext,
+	type AppContextType,
 	type Application,
 	type ApplicationRound,
 } from "/components/types";
@@ -43,7 +44,8 @@ export default class ApplicationScores extends React.Component<
 > {
 	state = initialState;
 	static contextType = AppContext;
-	endHighlight: any = null;
+	declare context: AppContextType;
+	endHighlight: ReturnType<typeof setTimeout> | null = null;
 
 	render() {
 		const { application, applicationRound, showEvaluators, showScores } =
@@ -192,7 +194,21 @@ export default class ApplicationScores extends React.Component<
 								<h3 className="p-2 bg-primary text-white">
 									Application information
 								</h3>
-								<ReactMarkdown linkTarget="_blank" className="m-2">
+								<ReactMarkdown
+									className="m-2"
+									components={{
+										a: ({ children, href, ...props }) => (
+											<a
+												href={href}
+												target="_blank"
+												rel="noopener noreferrer"
+												{...props}
+											>
+												{children}
+											</a>
+										),
+									}}
+								>
 									{application.description}
 								</ReactMarkdown>
 							</>

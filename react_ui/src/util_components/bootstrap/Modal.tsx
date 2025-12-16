@@ -1,6 +1,11 @@
+import type { ReactNode } from "react";
 import React from "react";
 
-export class ModalBody extends React.Component {
+type ModalBodyProps = {
+	children?: ReactNode;
+};
+
+export class ModalBody extends React.Component<ModalBodyProps> {
 	render() {
 		return <div className="modal-body">{this.props.children}</div>;
 	}
@@ -8,7 +13,7 @@ export class ModalBody extends React.Component {
 
 type Action = {
 	label: string;
-	action: () => any;
+	action: () => void;
 	color:
 		| "primary"
 		| "secondary"
@@ -37,17 +42,17 @@ export class ModalActions extends React.Component<{ actions: Action[] }> {
 }
 
 type ModalProps = {
-	title: any;
-	onClose: () => any;
-	children?: any;
-	className: string;
-	headerContent?: any;
+	title: ReactNode;
+	onClose: () => void;
+	children?: ReactNode;
+	className?: string;
+	headerContent?: ReactNode;
 };
 
 export default class Modal extends React.Component<ModalProps> {
 	static defaultProps = { className: "" };
 
-	escFunction = (event: any) => {
+	escFunction = (event: KeyboardEvent) => {
 		if (event.keyCode === 27) this.props.onClose();
 	};
 

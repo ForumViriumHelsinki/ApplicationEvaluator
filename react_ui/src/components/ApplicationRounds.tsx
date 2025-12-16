@@ -1,4 +1,4 @@
-import type { Application } from "components/types";
+import type { Application } from "/components/types";
 import React from "react";
 import ApplicationRoundCard from "/components/ApplicationRoundCard";
 import {

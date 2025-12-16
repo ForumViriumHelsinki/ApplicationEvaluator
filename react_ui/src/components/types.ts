@@ -6,12 +6,19 @@ export type User = {
 	first_name: string;
 	last_name: string;
 	organization: string;
+	is_superuser?: boolean;
+};
+
+export type SessionRequestOptions = RequestInit & {
+	data?: unknown;
 };
 
 export type AppContextType = {
 	user?: User;
-	reloadApplication: (id: number) => any;
-	request: (url: string, options?: any) => Promise<Response>;
+	reloadApplication: (id: number) => void;
+	updateApplication: (app: Application) => void;
+	loadRounds: () => void;
+	request: (url: string, options?: SessionRequestOptions) => Promise<Response>;
 };
 
 export type Score = {
@@ -36,6 +43,7 @@ export type Attachment = {
 
 export type Application = {
 	id: number;
+	application_id?: string;
 	name: string;
 	description: string;
 	scores: Score[];
@@ -43,17 +51,18 @@ export type Application = {
 	attachments: Attachment[];
 	score: number;
 	scored: boolean;
-	groupScores: any;
+	approved?: boolean;
+	groupScores: Record<string, number>;
 	scoresByOrganization: {
 		[organization: string]: {
 			score: number;
-			groupScores: any;
+			groupScores: Record<string, number>;
 		};
 	};
 	scoresByEvaluator: {
 		[evaluator: string]: {
 			score: number;
-			groupScores: any;
+			groupScores: Record<string, number>;
 		};
 	};
 	evaluating_organizations: string[];
@@ -74,6 +83,12 @@ export type CriterionGroup = {
 	threshold: number;
 };
 
+export type ScoringModel =
+	| "Organizations average"
+	| "Evaluators average"
+	| "Simple average"
+	| string;
+
 export type ApplicationRound = {
 	id: number;
 	name: string;
@@ -83,8 +98,14 @@ export type ApplicationRound = {
 	criterion_groups: CriterionGroup[];
 	attachments: Attachment[];
 	submitted_organizations: string[];
+	scoring_completed?: boolean;
+	scoring_model?: ScoringModel;
 };
 
-export const AppContext = React.createContext({
+export const AppContext = React.createContext<AppContextType>({
 	user: undefined,
-} as AppContextType);
+	reloadApplication: () => {},
+	updateApplication: () => {},
+	loadRounds: () => {},
+	request: () => Promise.resolve(new Response()),
+});

@@ -1,7 +1,13 @@
+import type { ReactNode } from "react";
 import React from "react";
 import Icon from "/util_components/bootstrap/Icon";
 
-type NavBarProps = { icon: string; iconText: string; onIconClick?: () => any };
+type NavBarProps = {
+	icon: string;
+	iconText: string;
+	onIconClick?: () => void;
+	children?: ReactNode;
+};
 
 export default class NavBar extends React.Component<NavBarProps> {
 	render() {
@@ -21,6 +27,7 @@ export default class NavBar extends React.Component<NavBarProps> {
 					<img
 						style={{ maxHeight: 48 }}
 						src="images/CommuniCity-logo-blue.png"
+						alt="Logo"
 					/>
 				</div>
 			</nav>

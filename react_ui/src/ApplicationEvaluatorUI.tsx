@@ -1,10 +1,9 @@
 import React from "react";
-// @ts-ignore
 import {
-	Redirect,
+	Navigate,
 	Route,
 	HashRouter as Router,
-	Switch,
+	Routes,
 	useParams,
 } from "react-router-dom";
 
@@ -25,7 +24,12 @@ type UIState = {
 	sessionBroken?: boolean;
 };
 
-class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
+function ResetPassword() {
+	const params = useParams<{ uid: string; token: string }>();
+	return <ResetPasswordScreen uid={params.uid} token={params.token} />;
+}
+
+class ApplicationEvaluatorUI extends React.Component<object, UIState> {
 	state: UIState = {
 		user: undefined,
 		dataFetched: false,
@@ -48,7 +52,7 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
 
 	logout = () => logout().then(() => this.setState({ user: undefined }));
 
-	request = (url: string, options: any = {}) => {
+	request = (url: string, options: object = {}) => {
 		return sessionRequest(url, options).then((response) => {
 			if (response.status === 403) this.setState({ sessionBroken: true });
 			return response;
@@ -58,36 +62,38 @@ class ApplicationEvaluatorUI extends React.Component<{}, UIState> {
 	render() {
 		const { user, dataFetched } = this.state;
 
-		const ResetPassword = () => {
-			const params = useParams();
-			return <ResetPasswordScreen uid={params.uid} token={params.token} />;
-		};
-
 		return (
 			<Router>
-				<Switch>
-					<Route path="/login/">
-						{user ? (
-							<Redirect to="" />
-						) : (
-							<LoginScreen onLogin={() => this.refreshUser()} />
-						)}
-					</Route>
-					<Route path="/resetPassword/:uid/:token">
-						<ResetPassword />
-					</Route>
-					<Route exact path="">
-						{dataFetched ? (
+				<Routes>
+					<Route
+						path="/login/"
+						element={
 							user ? (
-								this.renderMain()
+								<Navigate to="/" replace />
 							) : (
-								<Redirect to="/login/" />
+								<LoginScreen onLogin={() => this.refreshUser()} />
 							)
-						) : (
-							<LoadScreen />
-						)}
-					</Route>
-				</Switch>
+						}
+					/>
+					<Route
+						path="/resetPassword/:uid/:token"
+						element={<ResetPassword />}
+					/>
+					<Route
+						path="/"
+						element={
+							dataFetched ? (
+								user ? (
+									this.renderMain()
+								) : (
+									<Navigate to="/login/" replace />
+								)
+							) : (
+								<LoadScreen />
+							)
+						}
+					/>
+				</Routes>
 			</Router>
 		);
 	}

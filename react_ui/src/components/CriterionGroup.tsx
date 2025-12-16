@@ -4,6 +4,7 @@ import React from "react";
 import CriterionScore from "/components/CriterionScore";
 import {
 	AppContext,
+	type AppContextType,
 	type Application,
 	type ApplicationRound,
 	type CriterionGroup,
@@ -37,6 +38,7 @@ export default class CriterionGroupComponent extends React.Component<
 > {
 	state = initialState;
 	static contextType = AppContext;
+	declare context: AppContextType;
 	savingComment = false;
 
 	render() {

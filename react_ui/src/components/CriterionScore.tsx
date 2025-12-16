@@ -2,6 +2,7 @@ import React, { type FocusEvent } from "react";
 
 import {
 	AppContext,
+	type AppContextType,
 	type Application,
 	type Criterion,
 	type Score,
@@ -33,6 +34,7 @@ export default class CriterionScore extends React.Component<
 > {
 	state = initialState;
 	static contextType = AppContext;
+	declare context: AppContextType;
 
 	render() {
 		const { criterion, application, readOnly, showScores } = this.props;

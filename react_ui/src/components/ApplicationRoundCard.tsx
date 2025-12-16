@@ -3,7 +3,11 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import ApplicationScores from "/components/ApplicationScores";
 import ExportScoresWidget from "/components/ExportScoresWidget";
-import { AppContext, type ApplicationRound } from "/components/types";
+import {
+	AppContext,
+	type AppContextType,
+	type ApplicationRound,
+} from "/components/types";
 import sessionRequest from "/sessionRequest";
 import settings from "/settings";
 import { submitApplicationRoundUrl } from "/urls";
@@ -35,6 +39,7 @@ export default class ApplicationRoundCard extends React.Component<
 > {
 	state = initialState;
 	static contextType = AppContext;
+	declare context: AppContextType;
 
 	render() {
 		const { applicationRound } = this.props;
@@ -91,7 +96,20 @@ export default class ApplicationRoundCard extends React.Component<
 						)}
 					</div>
 					{applicationRound.description && (
-						<ReactMarkdown linkTarget="_blank">
+						<ReactMarkdown
+							components={{
+								a: ({ children, href, ...props }) => (
+									<a
+										href={href}
+										target="_blank"
+										rel="noopener noreferrer"
+										{...props}
+									>
+										{children}
+									</a>
+								),
+							}}
+						>
 							{applicationRound.description}
 						</ReactMarkdown>
 					)}
