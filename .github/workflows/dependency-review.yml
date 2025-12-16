@@ -18,3 +18,8 @@ jobs:
         with:
           fail-on-severity: high
           allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, CC0-1.0, Unlicense
+          # TODO: Migrate from xlsx to exceljs to resolve these vulnerabilities
+          # See: https://github.com/ForumViriumHelsinki/ApplicationEvaluator/issues/29
+          # xlsx has known vulnerabilities but is only used for client-side export
+          # (no untrusted file parsing). Accepting risk until migration is complete.
+          allow-ghsas: GHSA-4r6h-8v6p-xvw6, GHSA-5pgg-2g8v-p4x9

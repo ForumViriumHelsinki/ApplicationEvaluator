@@ -178,33 +178,35 @@ export default class ApplicationRoundCard extends React.Component<
 								<OrderBtn label="Score" order="score" />
 								<OrderBtn label="Unevaluated" order="unevaluated" />
 							</div>
-							<div
-								className="form-check d-inline-block mr-3"
-								onClick={() =>
-									this.setState({ showEvaluators: !showEvaluators })
-								}
-							>
+							<div className="form-check d-inline-block mr-3">
 								<input
 									className="form-check-input"
 									type="checkbox"
+									id="showEvaluators"
 									checked={showEvaluators}
+									onChange={() =>
+										this.setState({ showEvaluators: !showEvaluators })
+									}
 								/>
-								<label className="form-check-label">Show evaluators</label>
+								<label className="form-check-label" htmlFor="showEvaluators">
+									Show evaluators
+								</label>
 							</div>
 							{settings.showScoresFromOtherUsers &&
 								!submitted &&
 								uniqueEvaluators.length > 1 &&
 								applicationRound.scoring_model !== "Evaluators average" && (
-									<div
-										className="form-check d-inline-block mr-3"
-										onClick={() => this.setState({ showScores: !showScores })}
-									>
+									<div className="form-check d-inline-block mr-3">
 										<input
 											className="form-check-input"
 											type="checkbox"
+											id="showScores"
 											checked={showScores}
+											onChange={() =>
+												this.setState({ showScores: !showScores })
+											}
 										/>
-										<label className="form-check-label">
+										<label className="form-check-label" htmlFor="showScores">
 											Show scores from other evaluators
 										</label>
 									</div>

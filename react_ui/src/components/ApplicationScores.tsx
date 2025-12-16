@@ -51,7 +51,6 @@ export default class ApplicationScores extends React.Component<
 		const { application, applicationRound, showEvaluators, showScores } =
 			this.props;
 		const { expanded, highlightOrganization } = this.state;
-		const { user } = this.context;
 
 		const rootGroups = applicationRound.criterion_groups.filter(
 			(g) => !g.parent,

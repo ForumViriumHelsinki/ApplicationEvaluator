@@ -14,7 +14,7 @@ type ApplicationApproveWidgetProps = {
 	className: string;
 };
 
-type ApplicationApproveWidgetState = {};
+type ApplicationApproveWidgetState = Record<string, never>;
 
 const initialState: ApplicationApproveWidgetState = {};
 
@@ -31,7 +31,6 @@ export default class ApplicationApproveWidget extends React.Component<
 
 	render() {
 		const { application, applicationRound, className } = this.props;
-		const {} = this.state;
 		const { user } = this.context;
 		const submitted =
 			applicationRound.scoring_completed ||
@@ -39,11 +38,16 @@ export default class ApplicationApproveWidget extends React.Component<
 		if (!(user.is_superuser && submitted)) return null;
 
 		return application.approved ? (
-			<button className={`${className} btn-success`} onClick={this.unapprove}>
+			<button
+				type="button"
+				className={`${className} btn-success`}
+				onClick={this.unapprove}
+			>
 				Approved
 			</button>
 		) : (
 			<button
+				type="button"
 				className={`${className} btn-outline-success`}
 				onClick={this.approve}
 			>

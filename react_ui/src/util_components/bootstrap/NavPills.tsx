@@ -1,7 +1,7 @@
 import React from "react";
 
 type NavPillProps = {
-	onSelect: (nav: string, i: number) => any;
+	onSelect: (nav: string, i: number) => void;
 	navs: string[];
 	active: string;
 	disabled: string[];
@@ -14,12 +14,13 @@ export default class NavPills extends React.Component<NavPillProps> {
 			<ul className="nav nav-pills nav-justified">
 				{navs.map((nav, i) => (
 					<li className="nav-item" key={nav}>
-						<a
+						<button
+							type="button"
 							className={this.getClassName(nav)}
 							onClick={() => onSelect(nav, i)}
 						>
 							{nav}
-						</a>
+						</button>
 					</li>
 				))}
 			</ul>

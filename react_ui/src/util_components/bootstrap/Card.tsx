@@ -23,8 +23,8 @@ export default class Card extends React.Component<CardProps> {
 			<div className={`card ${className}`}>
 				<div className="card-body">
 					<h5 className="card-title">{title}</h5>
-					{subtitles.map((subtitle, i) => (
-						<h6 key={i} className="card-subtitle mb-2 text-muted">
+					{subtitles.map((subtitle) => (
+						<h6 key={subtitle} className="card-subtitle mb-2 text-muted">
 							{subtitle}
 						</h6>
 					))}

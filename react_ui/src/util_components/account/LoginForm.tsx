@@ -130,7 +130,9 @@ export default class LoginForm extends React.Component<Props, State> {
 		const formData = new FormData(e.target);
 		const data = {};
 		// @ts-ignore
-		formData.forEach((value: any, key: string) => (data[key] = value));
+		formData.forEach((value: any, key: string) => {
+			data[key] = value;
+		});
 		this.setState({ error: false, ...data });
 		logout()
 			.then(() => sessionRequest(loginUrl, { method: "POST", data: data }))

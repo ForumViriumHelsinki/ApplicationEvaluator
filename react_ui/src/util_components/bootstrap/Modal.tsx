@@ -70,15 +70,14 @@ export default class Modal extends React.Component<ModalProps> {
 		return (
 			<>
 				<div className="modal-backdrop show"> </div>
-				<div
+				<dialog
 					className="modal show d-block"
 					tabIndex={-1}
-					role="dialog"
 					onClick={onClose}
+					open
 				>
 					<div
 						className={`modal-dialog ${className}`}
-						role="document"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="modal-content">
@@ -105,7 +104,7 @@ export default class Modal extends React.Component<ModalProps> {
 							</div>
 						</div>
 					</div>
-				</div>
+				</dialog>
 			</>
 		);
 	}

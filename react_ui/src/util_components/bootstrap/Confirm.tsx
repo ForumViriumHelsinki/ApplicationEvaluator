@@ -14,7 +14,7 @@ type ConfirmProps = {
 
 export default class Confirm extends React.Component<ConfirmProps> {
 	render() {
-		const { title, onConfirm, onClose, inputPlaceholder } = this.props;
+		const { title, onClose, inputPlaceholder } = this.props;
 
 		return (
 			<Modal title={title} onClose={onClose}>
@@ -29,14 +29,18 @@ export default class Confirm extends React.Component<ConfirmProps> {
 				<ModalActions
 					actions={[
 						{ label: "Cancel", color: "light", action: onClose },
-						{ label: "OK", color: "secondary", action: () => this.onConfirm() },
+						{
+							label: "OK",
+							color: "secondary",
+							action: () => this.handleConfirm(),
+						},
 					]}
 				/>
 			</Modal>
 		);
 	}
 
-	private onConfirm() {
+	private handleConfirm() {
 		const { onConfirm, onClose } = this.props;
 		const input = document.getElementById("confirmText") as HTMLInputElement;
 		const value = input?.value;
