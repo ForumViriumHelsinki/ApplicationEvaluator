@@ -24,7 +24,7 @@
   },
   "author": "Forum Virium Helsinki",
   "dependencies": {
-    "@sentry/react": "^8.0.0",
+    "@sentry/react": "^10.32.1",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
