@@ -37,7 +37,12 @@ def error_view(request):
     raise Exception("This is a test error to verify error reporting.")
 
 
-# Allow logging out when faced with the mysterious CSRF cookie corruption problem:
+# SECURITY NOTE: Allow logout without authentication to handle CSRF cookie corruption.
+# This is an intentional security trade-off:
+# - Risk: An attacker could potentially log out another user (denial of service)
+# - Benefit: Users can recover from corrupted auth state without manual intervention
+# - Mitigation: Rate limiting is applied globally via DRF throttling settings
+# The trade-off is acceptable because logout doesn't expose sensitive data.
 class LogoutView(LogoutView):
     authentication_classes = []
 
