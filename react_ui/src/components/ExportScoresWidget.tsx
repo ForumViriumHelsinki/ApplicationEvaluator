@@ -1,5 +1,6 @@
 import React from 'react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import type {
   Application,
   ApplicationRound,
@@ -57,7 +58,7 @@ export default class ExportScoresWidget extends React.Component<
   }
 
   // Export individual scores, one score per row:
-  export(format: string) {
+  async export(format: string) {
     const applicationRound = this.props.applicationRound;
     const { applications, name } = applicationRound;
     const criteria = Object.fromEntries(applicationRound.criteria.map((c) => [c.id, c]));
@@ -90,7 +91,7 @@ export default class ExportScoresWidget extends React.Component<
       { name: 'Comment', value: (s: Comment, _a: Application) => s.comment },
     ];
 
-    const rows = [columns.map((c) => c.name)];
+    const rows: (string | number | undefined)[][] = [columns.map((c) => c.name)];
 
     applications.forEach((a) => {
       a.scores.forEach((s) =>
@@ -100,14 +101,12 @@ export default class ExportScoresWidget extends React.Component<
         rows.push(columns.map((c) => c.value(s as Score & Comment, a) as string)),
       );
     });
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Scores');
-    XLSX.writeFile(workbook, name + format);
+
+    await this.writeFile(rows, name + format, format);
   }
 
   // Export score summary, one application per row:
-  exportSummary(format: string) {
+  async exportSummary(format: string) {
     const applicationRound = this.props.applicationRound;
     const { applications, name } = applicationRound;
     const groups = applicationRound.criterion_groups;
@@ -134,13 +133,30 @@ export default class ExportScoresWidget extends React.Component<
       },
     ];
 
-    const rows = [columns.map((c) => c.name)];
+    const rows: (string | number | boolean | undefined)[][] = [columns.map((c) => c.name)];
 
     applications.forEach((a: Application) => rows.push(columns.map((c) => c.value(a) as string)));
 
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Scores');
-    XLSX.writeFile(workbook, name + format);
+    await this.writeFile(rows, name + format, format);
+  }
+
+  private async writeFile(rows: (string | number | boolean | undefined)[][], filename: string, format: string) {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Scores');
+
+    // Add rows to worksheet
+    rows.forEach((row) => {
+      worksheet.addRow(row);
+    });
+
+    if (format === '.xlsx') {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, filename);
+    } else if (format === '.csv') {
+      const buffer = await workbook.csv.writeBuffer();
+      const blob = new Blob([buffer], { type: 'text/csv;charset=utf-8' });
+      saveAs(blob, filename);
+    }
   }
 }

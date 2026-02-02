@@ -7,7 +7,8 @@ ENV POSTGRES_PASSWORD="application_evaluator"
 ENV SQL_HOST="localhost"
 ENV SQL_PORT="5432"
 
-ENV SECRET_KEY="(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)p%vcizdc0%_qv"
+# SECURITY: SECRET_KEY must be provided at runtime via environment variable
+# Do not set a default here - the application will fail to start without it in production
 ENV DEBUG=False
 
 ENV ELASTIC_SERVICE="citylogistiikka_prod"

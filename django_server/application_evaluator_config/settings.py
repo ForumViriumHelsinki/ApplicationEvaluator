@@ -149,7 +149,16 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-    ]
+    ],
+    # Rate limiting to prevent brute-force and API abuse
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+    },
 }
 
 REST_AUTH_SERIALIZERS = {"USER_DETAILS_SERIALIZER": "application_evaluator.rest.UserSerializer"}
@@ -181,6 +190,29 @@ if LOG_DB_QUERIES:
     }
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Security headers - only enabled in production (when not DEBUG)
+if not DEBUG:
+    # HTTP Strict Transport Security - force HTTPS for 1 year
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Prevent content type sniffing
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Secure cookies - only sent over HTTPS
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+
+    # HttpOnly cookies - not accessible via JavaScript
+    SESSION_COOKIE_HTTPONLY = True
+
+    # Redirect HTTP to HTTPS
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() == "true"
+
+# X-Frame-Options to prevent clickjacking (works in both DEBUG and production)
+X_FRAME_OPTIONS = "DENY"
 
 ADMINS = [["FVH Django admins", "django-admins@forumvirium.fi"]]
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
