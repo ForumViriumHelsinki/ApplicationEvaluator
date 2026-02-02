@@ -2,7 +2,7 @@ name: "Build container: backend"
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
     tags:
       - 'containers-applicationevaluator-backend-v*.*.*'
 
