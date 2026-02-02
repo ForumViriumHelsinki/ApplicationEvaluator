@@ -3,7 +3,7 @@ name: Build and push container images
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
     tags:
       - 'application-evaluator-backend-v*.*.*'
       - 'application-evaluator-frontend-v*.*.*'
