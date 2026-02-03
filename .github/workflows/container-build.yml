@@ -20,7 +20,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Extract Docker metadata
         id: meta
@@ -76,7 +76,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Extract Docker metadata
         id: meta
@@ -132,7 +132,7 @@ jobs:
     if: github.event_name != 'pull_request' && vars.SENTRY_ORG != ''
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
