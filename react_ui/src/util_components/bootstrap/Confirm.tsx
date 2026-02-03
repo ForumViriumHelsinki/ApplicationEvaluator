@@ -1,6 +1,6 @@
 import React from 'react';
 
-// @ts-ignore
+// @ts-expect-error
 import { Input } from 'reactstrap';
 
 import Modal, { ModalActions } from '/util_components/bootstrap/Modal';

@@ -1,13 +1,11 @@
 import React from 'react';
 import { Navigate, Route, HashRouter as Router, Routes, useParams } from 'react-router-dom';
-
-import sessionRequest, { logout } from '/sessionRequest';
-
 import ApplicationRounds from '/components/ApplicationRounds';
 import LoadScreen from '/components/LoadScreen';
 import LoginScreen from '/components/LoginScreen';
 import ResetPasswordScreen from '/components/ResetPasswordScreen';
 import type { User } from '/components/types';
+import sessionRequest, { logout } from '/sessionRequest';
 import Confirm from '/util_components/bootstrap/Confirm';
 import NavBar from '/util_components/bootstrap/NavBar';
 

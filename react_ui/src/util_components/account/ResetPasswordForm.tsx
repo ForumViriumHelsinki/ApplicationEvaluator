@@ -72,7 +72,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {};
-    // @ts-ignore
+    // @ts-expect-error
     formData.forEach((value: any, key: string) => {
       data[key] = value;
     });

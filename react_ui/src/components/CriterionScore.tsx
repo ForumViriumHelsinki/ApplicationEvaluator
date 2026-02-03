@@ -9,7 +9,7 @@ import {
 } from '/components/types';
 import { username } from '/components/utils';
 import settings from '/settings';
-import { scoreUrl, scoresUrl } from '/urls';
+import { scoresUrl, scoreUrl } from '/urls';
 import ConfirmButton from '/util_components/bootstrap/ConfirmButton';
 import Icon from '/util_components/bootstrap/Icon';
 
@@ -83,13 +83,15 @@ export default class CriterionScore extends React.Component<
           </div>
         ))}
         {myOrgScore && !myScore && !addScore && !readOnly && (
-          <a
-            className="clickable text-success d-block"
+          <button
+            type="button"
+            className="btn btn-link clickable text-success d-block p-0 border-0"
             style={{ marginLeft: -4 }}
             onClick={() => this.setState({ addScore: true })}
+            aria-label="Add score"
           >
             <Icon icon="add" />
-          </a>
+          </button>
         )}
       </div>
     );

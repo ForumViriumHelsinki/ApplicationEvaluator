@@ -54,14 +54,27 @@ export default class Modal extends React.Component<ModalProps> {
     document.removeEventListener('keydown', this.escFunction, false);
   }
 
+  handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+    // Only close if clicking directly on the dialog backdrop, not its children
+    if (e.target === e.currentTarget) {
+      this.props.onClose();
+    }
+  };
+
   render() {
     const { title, onClose, children, className, headerContent } = this.props;
 
     return (
       <>
         <div className="modal-backdrop show"> </div>
-        <dialog className="modal show d-block" tabIndex={-1} onClick={onClose} open>
-          <div className={`modal-dialog ${className}`} onClick={(e) => e.stopPropagation()}>
+        <dialog
+          className="modal show d-block"
+          tabIndex={-1}
+          onClick={this.handleBackdropClick}
+          onKeyDown={(e) => e.key === 'Escape' && onClose()}
+          open
+        >
+          <div className={`modal-dialog ${className}`}>
             <div className="modal-content">
               {(title || headerContent) && (
                 <div className="modal-header">

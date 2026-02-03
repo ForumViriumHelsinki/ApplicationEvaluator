@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-// @ts-ignore
+// @ts-expect-error
 import RadarChart from 'react-svg-radar-chart';
 import 'react-svg-radar-chart/build/css/index.css';
 
@@ -89,9 +89,13 @@ export default class ApplicationScores extends React.Component<
           )}
 
           <div className={`flex-grow-1 flex-shrink-1 ${thresholdGroups.length < 2 ? 'ml-4' : ''}`}>
-            <a onClick={() => this.setState({ expanded: !this.state.expanded })}>
+            <button
+              type="button"
+              className="btn btn-link p-0 border-0 text-left"
+              onClick={() => this.setState({ expanded: !this.state.expanded })}
+            >
               <h5 className="text-primary mb-1">{application.name}</h5>
-            </a>
+            </button>
 
             {showEvaluators && (
               <div className="mb-1">

@@ -1,13 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false,
-    "root": ".."
+    "useIgnoreFile": false
   },
   "files": {
-    "includes": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"]
+    "includes": ["react_ui/src/**/*.ts", "react_ui/src/**/*.tsx", "react_ui/src/**/*.js", "react_ui/src/**/*.jsx"]
   },
   "formatter": {
     "enabled": true,

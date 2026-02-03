@@ -55,12 +55,13 @@ export default class LoginForm extends React.Component<Props, State> {
               defaultValue={this.state.password}
             />
 
-            <a
-              className="clickable text-primary"
+            <button
+              type="button"
+              className="btn btn-link p-0 border-0 clickable text-primary"
               onClick={() => this.setState({ showPasswordReset: true })}
             >
               Forgot password?
-            </a>
+            </button>
           </div>
           <button type="submit" className="btn btn-primary">
             Submit
@@ -116,7 +117,7 @@ export default class LoginForm extends React.Component<Props, State> {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {};
-    // @ts-ignore
+    // @ts-expect-error
     formData.forEach((value: any, key: string) => {
       data[key] = value;
     });
