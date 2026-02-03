@@ -1,21 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "files": {
-    "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"],
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      "coverage",
-      "*.config.js",
-      "*.config.ts",
-      "vite.config.js"
-    ]
+    "includes": ["react_ui/src/**/*.ts", "react_ui/src/**/*.tsx", "react_ui/src/**/*.js", "react_ui/src/**/*.jsx"]
   },
   "formatter": {
     "enabled": true,
@@ -30,12 +21,11 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "warn",
-        "noConsoleLog": "warn"
+        "noConsole": "warn"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "warn",
-        "noForEach": "off",
-        "noBannedTypes": "warn"
+        "noForEach": "off"
       },
       "style": {
         "useConst": "error",
@@ -56,8 +46,14 @@
       }
     }
   },
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on"
+        }
+      }
+    }
   },
   "javascript": {
     "formatter": {

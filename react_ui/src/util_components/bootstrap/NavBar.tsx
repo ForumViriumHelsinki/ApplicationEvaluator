@@ -18,9 +18,18 @@ export default class NavBar extends React.Component<NavBarProps> {
     return (
       <nav className="navbar text-white bg-primary p-0 flex-shrink-0">
         <div className="w-25">
-          <div className={iconCls} onClick={onIconClick}>
-            {icon && <Icon icon={icon} text={iconText} />}
-          </div>
+          {onIconClick ? (
+            <button
+              type="button"
+              className={`${iconCls} btn btn-link p-0 border-0`}
+              onClick={onIconClick}
+              aria-label={iconText}
+            >
+              {icon && <Icon icon={icon} text={iconText} />}
+            </button>
+          ) : (
+            <div className={iconCls}>{icon && <Icon icon={icon} text={iconText} />}</div>
+          )}
         </div>
         <div className="w-50 text-center">{children}</div>
         <div className="w-25 d-flex justify-content-end">

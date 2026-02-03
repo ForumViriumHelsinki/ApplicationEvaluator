@@ -10,7 +10,7 @@ import {
   type CriterionGroup,
 } from '/components/types';
 import { username } from '/components/utils';
-import { commentUrl, commentsUrl } from '/urls';
+import { commentsUrl, commentUrl } from '/urls';
 import ConfirmButton from '/util_components/bootstrap/ConfirmButton';
 import Icon from '/util_components/bootstrap/Icon';
 

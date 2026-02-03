@@ -24,12 +24,11 @@ repos:
         files: ^django_server/
 
   - repo: https://github.com/biomejs/pre-commit
-    rev: v0.6.1
+    rev: v2.3.10
     hooks:
       - id: biome-format
-        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        additional_dependencies: ["@biomejs/biome@2.3.10"]
         files: ^react_ui/src/
-        args: [--config-path=react_ui/biome.json]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.0.0

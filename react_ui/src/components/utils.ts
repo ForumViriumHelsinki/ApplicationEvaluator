@@ -27,7 +27,7 @@ const allCriteria = (
 ): Criterion[] => {
   return _.flatten([
     childCriteria(applicationRound, criterionGroup),
-    // @ts-ignore
+    // @ts-expect-error
     childGroups(applicationRound, criterionGroup).map((g) => allCriteria(applicationRound, g)),
   ]);
 };
@@ -90,7 +90,9 @@ export const addApplicationScores = (round: ApplicationRound, applications: Appl
 };
 
 export const addScores = (rounds: ApplicationRound[]) => {
-  rounds.forEach((round) => addApplicationScores(round, round.applications));
+  for (const round of rounds) {
+    addApplicationScores(round, round.applications);
+  }
   return rounds;
 };
 

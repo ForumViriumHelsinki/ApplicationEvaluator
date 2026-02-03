@@ -1,20 +1,10 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { resolve } from 'path';
 
-// Custom plugin to resolve absolute imports starting with '/' to src directory
-const resolveAbsoluteImports = () => ({
-  name: 'resolve-absolute-imports',
-  resolveId(source: string) {
-    if (source.startsWith('/') && !source.startsWith('//')) {
-      return resolve(__dirname, 'src', source.slice(1));
-    }
-    return null;
-  },
-});
-
 export default defineConfig({
-  plugins: [react(), resolveAbsoluteImports()],
+  plugins: [react(), tsconfigPaths()],
   test: {
     // Enable globals for compatibility with Jest-style tests
     globals: true,

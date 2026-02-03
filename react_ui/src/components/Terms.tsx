@@ -16,12 +16,13 @@ export default class Terms extends React.Component<TermsProps, TermsState> {
       <>
         <p>
           By using this website, you agree to our{' '}
-          <a
+          <button
+            type="button"
             onClick={() => this.setState({ showTerms: 'terms' })}
-            className="clickable text-primary"
+            className="btn btn-link p-0 border-0 clickable text-primary align-baseline"
           >
             Usage terms & privacy policy
-          </a>
+          </button>
           .
         </p>
         {showTerms && (

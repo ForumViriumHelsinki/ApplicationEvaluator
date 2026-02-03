@@ -1,6 +1,6 @@
-import React from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import React from 'react';
 import type {
   Application,
   ApplicationRound,
@@ -93,14 +93,14 @@ export default class ExportScoresWidget extends React.Component<
 
     const rows: (string | number | undefined)[][] = [columns.map((c) => c.name)];
 
-    applications.forEach((a) => {
-      a.scores.forEach((s) =>
-        rows.push(columns.map((c) => c.value(s as Score & Comment, a) as string)),
-      );
-      a.comments.forEach((s) =>
-        rows.push(columns.map((c) => c.value(s as Score & Comment, a) as string)),
-      );
-    });
+    for (const a of applications) {
+      for (const s of a.scores) {
+        rows.push(columns.map((c) => c.value(s as Score & Comment, a) as string));
+      }
+      for (const s of a.comments) {
+        rows.push(columns.map((c) => c.value(s as Score & Comment, a) as string));
+      }
+    }
 
     await this.writeFile(rows, name + format, format);
   }
@@ -135,12 +135,18 @@ export default class ExportScoresWidget extends React.Component<
 
     const rows: (string | number | boolean | undefined)[][] = [columns.map((c) => c.name)];
 
-    applications.forEach((a: Application) => rows.push(columns.map((c) => c.value(a) as string)));
+    for (const a of applications) {
+      rows.push(columns.map((c) => c.value(a) as string));
+    }
 
     await this.writeFile(rows, name + format, format);
   }
 
-  private async writeFile(rows: (string | number | boolean | undefined)[][], filename: string, format: string) {
+  private async writeFile(
+    rows: (string | number | boolean | undefined)[][],
+    filename: string,
+    format: string,
+  ) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Scores');
 
@@ -151,7 +157,9 @@ export default class ExportScoresWidget extends React.Component<
 
     if (format === '.xlsx') {
       const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
       saveAs(blob, filename);
     } else if (format === '.csv') {
       const buffer = await workbook.csv.writeBuffer();
