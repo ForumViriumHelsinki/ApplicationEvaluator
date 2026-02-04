@@ -8,11 +8,14 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: forumviriumhelsinki/applicationevaluator-frontend
+  IMAGE_NAME: forumviriumhelsinki/application-evaluator-frontend
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -65,7 +68,7 @@ jobs:
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
             type=gha
           cache-to: |
-            type=registry,ref=${{ env.REGISTRY }}/${{ inputs.IMAGE_NAME }}:buildcache,mode=max
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
             type=gha,mode=max
           provenance: mode=max
           sbom: true
