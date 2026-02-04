@@ -1,4 +1,4 @@
-django<4.0
+django<5.0
 djangorestframework>=3.10
 pyaml>=19.4
 uritemplate>=3.0
