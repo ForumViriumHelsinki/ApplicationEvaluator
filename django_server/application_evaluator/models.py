@@ -104,7 +104,7 @@ class ApplicationRound(NamedModel):
                 name=group.name, threshold=group.threshold, order=group.order, abbr=group.abbr
             )
         for group in self.criterion_groups.all():
-            groupCopies[group.id].parent = groupCopies.get(group.parent_id, None)
+            groupCopies[group.id].parent = groupCopies.get(group.parent_id)
             groupCopies[group.id].save()
         for criterion in self.criteria.all():
             copy.criteria.create(
