@@ -9,7 +9,24 @@ COPY package.json bun.lock* ./
 # Install dependencies
 RUN bun install --frozen-lockfile
 
-# Build stage - use Node.js for reliable Vite builds
+# ============================================================================
+# DEV STAGE - Development with Vite HMR
+# ============================================================================
+FROM deps AS dev
+
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+EXPOSE 5173
+
+CMD ["bun", "run", "dev", "--host", "0.0.0.0"]
+
+# ============================================================================
+# BUILD STAGE - Build for production
+# ============================================================================
+# Use Node.js for reliable Vite builds
 # (Bun's baseline binary can crash without AVX CPU support in some environments)
 FROM node:22-alpine AS build
 
@@ -24,8 +41,10 @@ COPY . .
 # Build the application using npm (which runs vite via package.json scripts)
 RUN npm run build
 
-# Production stage
-FROM nginx:1.27-alpine
+# ============================================================================
+# RUNTIME STAGE - Production with nginx (default)
+# ============================================================================
+FROM nginx:1.27-alpine AS runtime
 
 # Copy custom nginx configs for non-root operation
 COPY nginx-main.conf /etc/nginx/nginx.conf

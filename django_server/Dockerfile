@@ -38,9 +38,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-dev --no-editable
 
 # ============================================================================
-# RUNTIME STAGE - Minimal production image
+# RUNTIME BASE - Common runtime configuration
 # ============================================================================
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim AS runtime-base
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -71,15 +71,27 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 8000
 
+# ============================================================================
+# DEV STAGE - Development with auto-reload
+# ============================================================================
+FROM runtime-base AS dev
+
+USER django
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# ============================================================================
+# RUNTIME STAGE - Production image (default)
+# ============================================================================
+FROM runtime-base AS runtime
+
 # Switch to non-root user
 USER django
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-CMD ["gunicorn", "application_evaluator_config.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
+CMD ["uvicorn", "application_evaluator_config.asgi:application", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
      "--workers", "2", \
-     "--threads", "2", \
-     "--worker-class", "gthread", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+     "--access-log"]

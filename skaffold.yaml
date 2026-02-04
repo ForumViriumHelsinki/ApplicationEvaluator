@@ -64,6 +64,75 @@ portForward:
     address: 127.0.0.1
 
 profiles:
+  # Development profile with file sync for hot reload
+  - name: dev
+    build:
+      artifacts:
+        - image: application-evaluator-backend
+          context: django_server
+          docker:
+            dockerfile: Dockerfile
+            target: dev
+          sync:
+            manual:
+              # Sync Python source files to container
+              - src: "application_evaluator/**/*.py"
+                dest: /app
+              - src: "application_evaluator_config/**/*.py"
+                dest: /app
+              - src: "manage.py"
+                dest: /app
+        - image: application-evaluator-frontend
+          context: react_ui
+          docker:
+            dockerfile: Dockerfile
+            target: dev
+          sync:
+            manual:
+              # Sync frontend source files for Vite HMR
+              - src: "src/**/*"
+                dest: /app
+              - src: "public/**/*"
+                dest: /app
+              - src: "index.html"
+                dest: /app
+    manifests:
+      helm:
+        releases:
+          - name: application-evaluator-backend
+            remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
+            version: 0.16.0
+            namespace: app-evaluator
+            createNamespace: true
+            valuesFiles:
+              - deploy/backend-values-local.yaml
+            setValueTemplates:
+              image.repository: "{{.IMAGE_REPO_application_evaluator_backend}}"
+              image.tag: "{{.IMAGE_TAG_application_evaluator_backend}}@{{.IMAGE_DIGEST_application_evaluator_backend}}"
+          - name: application-evaluator-frontend
+            remoteChart: oci://ghcr.io/forumviriumhelsinki/helm-webapp
+            version: 0.16.0
+            namespace: app-evaluator
+            createNamespace: true
+            valuesFiles:
+              - deploy/frontend-values-dev.yaml
+            setValueTemplates:
+              image.repository: "{{.IMAGE_REPO_application_evaluator_frontend}}"
+              image.tag: "{{.IMAGE_TAG_application_evaluator_frontend}}@{{.IMAGE_DIGEST_application_evaluator_frontend}}"
+    portForward:
+      - resourceType: service
+        resourceName: application-evaluator-backend-helm-webapp
+        namespace: app-evaluator
+        port: 8000
+        localPort: 8000
+        address: 127.0.0.1
+      - resourceType: service
+        resourceName: application-evaluator-frontend-helm-webapp
+        namespace: app-evaluator
+        port: 5173
+        localPort: 3000
+        address: 127.0.0.1
+
   # Backend services only - for frontend development with hot reload
   - name: services-only
     build:
