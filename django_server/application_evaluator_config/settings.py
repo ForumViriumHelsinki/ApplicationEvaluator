@@ -88,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "application_evaluator_config.wsgi.application"
+ASGI_APPLICATION = "application_evaluator_config.asgi.application"
 
 
 # Database

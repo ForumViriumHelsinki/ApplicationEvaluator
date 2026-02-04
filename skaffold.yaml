@@ -94,8 +94,6 @@ profiles:
                 dest: /app
               - src: "public/**/*"
                 dest: /app
-              - src: "index.html"
-                dest: /app
     manifests:
       helm:
         releases:
