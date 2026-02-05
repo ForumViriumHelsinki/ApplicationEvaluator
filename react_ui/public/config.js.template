@@ -1,0 +1,8 @@
+// Runtime configuration - values injected from environment variables at container startup
+window.__CONFIG__ = {
+  serverRoot: "${SERVER_ROOT:-}",
+  maxScore: ${MAX_SCORE:-5},
+  finalScoreMultiplier: ${FINAL_SCORE_MULTIPLIER:-4},
+  showScoresFromOtherUsers: ${SHOW_SCORES_FROM_OTHER_USERS:-true},
+  allowSubmit: ${ALLOW_SUBMIT:-false},
+};

@@ -10,6 +10,20 @@ imagePullSecrets:
 
 replicaCount: 1
 
+# Runtime configuration (12-factor app approach)
+# These environment variables are injected into config.js at container startup
+env:
+  SERVER_ROOT:
+    value: "https://api.application-evaluator.dataportal.fi"
+  MAX_SCORE:
+    value: "5"
+  FINAL_SCORE_MULTIPLIER:
+    value: "4"
+  SHOW_SCORES_FROM_OTHER_USERS:
+    value: "true"
+  ALLOW_SUBMIT:
+    value: "false"
+
 # No service account needed for static frontend
 serviceAccount:
   create: false

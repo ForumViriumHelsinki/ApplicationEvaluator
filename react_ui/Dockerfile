@@ -46,6 +46,9 @@ RUN npm run build
 # ============================================================================
 FROM nginx:1.27-alpine AS runtime
 
+# Install envsubst (part of gettext)
+RUN apk add --no-cache gettext
+
 # Copy custom nginx configs for non-root operation
 COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -53,11 +56,26 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built assets from build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
+# Copy config template for runtime environment variable substitution
+COPY public/config.js.template /usr/share/nginx/html/config.js.template
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Prepare for non-root operation (nginx user is uid 101 in alpine)
+# Note: config.js must be writable by nginx user for envsubst
 RUN chown -R nginx:nginx /var/cache/nginx /usr/share/nginx/html
 
 EXPOSE 80
 
 USER nginx
 
-CMD ["nginx", "-g", "daemon off;"]
+# Environment variables with defaults (can be overridden at runtime)
+ENV SERVER_ROOT="" \
+    MAX_SCORE=5 \
+    FINAL_SCORE_MULTIPLIER=4 \
+    SHOW_SCORES_FROM_OTHER_USERS=true \
+    ALLOW_SUBMIT=false
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
