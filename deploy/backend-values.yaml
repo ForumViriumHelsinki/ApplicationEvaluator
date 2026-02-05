@@ -3,7 +3,7 @@
 
 image:
   repository: ghcr.io/forumviriumhelsinki/application-evaluator-backend
-  tag: "0.1.0" # Updated by ArgoCD Image Updater
+  tag: "0.3.0" # Updated by ArgoCD Image Updater
 
 imagePullSecrets:
 - name: ghcr-login-secret
