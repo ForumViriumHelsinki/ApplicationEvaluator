@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/compare/application-evaluator-frontend-v0.3.0...application-evaluator-frontend-v0.4.0) (2026-02-05)
+
+
+### Features
+
+* **frontend:** implement 12-factor runtime configuration ([#60](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/issues/60)) ([d06c808](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/commit/d06c808e25e917f0281edf0c1bdc6107336d1add))
+
 ## [0.3.0](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/compare/application-evaluator-frontend-v0.2.0...application-evaluator-frontend-v0.3.0) (2026-02-05)
 
 
