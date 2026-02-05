@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
-    "rest_auth",
+    "dj_rest_auth",
     "application_evaluator_config.apps.AdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -88,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "application_evaluator_config.wsgi.application"
+ASGI_APPLICATION = "application_evaluator_config.asgi.application"
 
 
 # Database

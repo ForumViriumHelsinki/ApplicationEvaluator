@@ -3,6 +3,7 @@ import secrets
 import zipfile
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.db import models
 from django.utils.safestring import mark_safe
@@ -103,7 +104,7 @@ class ApplicationRound(NamedModel):
                 name=group.name, threshold=group.threshold, order=group.order, abbr=group.abbr
             )
         for group in self.criterion_groups.all():
-            groupCopies[group.id].parent = groupCopies.get(group.parent_id, None)
+            groupCopies[group.id].parent = groupCopies.get(group.parent_id)
             groupCopies[group.id].save()
         for criterion in self.criteria.all():
             copy.criteria.create(
@@ -177,6 +178,11 @@ class Criterion(NamedModel):
 
     class Meta:
         ordering = ["group_id", "order"]
+
+    def clean(self):
+        super().clean()
+        if self.weight <= 0:
+            raise ValidationError({"weight": "Weight must be a positive number."})
 
 
 class Organization(NamedModel):

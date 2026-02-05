@@ -1,0 +1,70 @@
+# Application Evaluator - React Frontend (Development with Vite)
+# For use with Skaffold dev profile and file sync
+
+image:
+  repository: application-evaluator-frontend
+  tag: latest
+
+replicaCount: 1
+
+# No service account needed
+serviceAccount:
+  create: false
+
+# Run as bun user (uid 1000 in bun alpine image)
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  # Vite needs write access for HMR
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration - Vite dev server port
+service:
+  type: ClusterIP
+  port: 5173
+  targetPort: 5173
+
+# No ingress - use port-forward
+ingress:
+  enabled: false
+
+# Health checks for Vite dev server
+livenessProbe:
+  httpGet:
+    path: /
+    port: 5173
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 5
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 5173
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  failureThreshold: 5
+
+# More resources for dev server
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Disable production features
+keda:
+  enabled: false

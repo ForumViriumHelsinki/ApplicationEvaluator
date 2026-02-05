@@ -64,7 +64,7 @@ class ApplicationRoundForm(forms.ModelForm):
                 continue
             app = self.instance.applications.create(name=name)
             for org_name in parts:
-                org = orgs.get(org_name.strip(), None)
+                org = orgs.get(org_name.strip())
                 if org:
                     app.evaluating_organizations.add(org)
 

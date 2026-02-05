@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.test import TestCase
 
@@ -96,3 +97,27 @@ class ModelTests(TestCase):
 
         # And the attachments are imported and associated with the applications
         self.assertEqual(app.attachments.count(), 1)
+
+    def test_criterion_weight_must_be_positive(self):
+        app_round = models.ApplicationRound.objects.create(name="AI4Cities")
+
+        # Given a criterion with weight > 0
+        # When creating the criterion
+        # Then it should be valid
+        criterion = app_round.criteria.create(name="Goodness", weight=1)
+        criterion.full_clean()  # Should not raise ValidationError
+        self.assertEqual(criterion.weight, 1)
+
+        # Given a criterion with weight = 0
+        # When trying to validate the criterion
+        # Then it should raise a ValidationError
+        criterion_zero = app_round.criteria.create(name="BadCriterion", weight=0)
+        with self.assertRaises(ValidationError):
+            criterion_zero.full_clean()
+
+        # Given a criterion with weight < 0
+        # When trying to validate the criterion
+        # Then it should raise a ValidationError
+        criterion_negative = app_round.criteria.create(name="NegativeCriterion", weight=-1)
+        with self.assertRaises(ValidationError):
+            criterion_negative.full_clean()
