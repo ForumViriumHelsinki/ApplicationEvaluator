@@ -23,7 +23,6 @@ htmlcov/
 /react_ui/build/
 /react_ui/node_modules/
 /react_ui/yarn-error.log
-/react_ui/src/settings.json
 
 # Django
 /django_server/application_evaluator_config/local_settings.py
