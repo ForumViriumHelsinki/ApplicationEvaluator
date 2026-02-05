@@ -27,9 +27,9 @@ source = { editable = "." }
 dependencies = [
     { name = "coreapi" },
     { name = "dj-inmemorystorage" },
+    { name = "dj-rest-auth" },
     { name = "django" },
     { name = "django-cors-headers" },
-    { name = "django-rest-auth" },
     { name = "djangorestframework" },
     { name = "elastic-apm" },
     { name = "jsonschema" },
@@ -59,9 +59,9 @@ requires-dist = [
     { name = "coreapi", specifier = ">=2.3" },
     { name = "coverage", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "dj-inmemorystorage" },
+    { name = "dj-rest-auth", specifier = ">=2.2.0" },
     { name = "django", specifier = ">=3.0,<5.0" },
     { name = "django-cors-headers", specifier = ">=3.2" },
-    { name = "django-rest-auth", specifier = ">=0.9" },
     { name = "djangorestframework", specifier = ">=3.10" },
     { name = "elastic-apm", specifier = ">=5.5" },
     { name = "jsonschema", specifier = ">=3.2" },
@@ -613,6 +613,16 @@ wheels = [
 ]
 
 [[package]]
+name = "dj-rest-auth"
+version = "7.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "djangorestframework" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d1/07/3727a003d06251d2fe3694c4bcce9d0f22413453964018f387d878f9a00a/dj_rest_auth-7.0.2.tar.gz", hash = "sha256:e0ccbca6bcde9dd68fd1d8e868fdfb9d65d60b669f381b74feac2a3e7815466c", size = 169086, upload-time = "2026-01-09T10:37:27.671Z" }
+
+[[package]]
 name = "django"
 version = "4.2.28"
 source = { registry = "https://pypi.org/simple" }
@@ -638,17 +648,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/81/6f/587a21407d6bf752e
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/3e/76449025605d5cb04ce855f6cf8eb3f9064419956a32316bf8b01f0f77da/django_cors_headers-4.5.0-py3-none-any.whl", hash = "sha256:28c1ded847aa70208798de3e42422a782f427b8b720e8d7319d34b654b5978e6", size = 12800, upload-time = "2024-10-12T07:37:31.44Z" },
 ]
-
-[[package]]
-name = "django-rest-auth"
-version = "0.9.5"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "djangorestframework" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/47/72500eb37ea3c61e712cb9583b5e59ee2ad70dd7c97d09adcdd9d62958e9/django-rest-auth-0.9.5.tar.gz", hash = "sha256:f11e12175dafeed772f50d740d22caeab27e99a3caca24ec65e66a8d6de16571", size = 53661, upload-time = "2019-04-01T07:53:58.327Z" }
 
 [[package]]
 name = "djangorestframework"
@@ -1407,15 +1406,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f0/26/19cadc79a718c5edbec86fd4919a6b6d3f681039a2f6d66d14be94e75fb9/python_dotenv-1.2.1.tar.gz", hash = "sha256:42667e897e16ab0d66954af0e60a9caa94f0fd4ecf3aaf6d2d260eec1aa36ad6", size = 44221, upload-time = "2025-10-26T15:12:10.434Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/1b/a298b06749107c305e1fe0f814c6c74aea7b2f1e10989cb30f544a1b3253/python_dotenv-1.2.1-py3-none-any.whl", hash = "sha256:b81ee9561e9ca4004139c6cbba3a238c32b03e4894671e181b671e8cb8425d61", size = 21230, upload-time = "2025-10-26T15:12:09.109Z" },
-]
-
-[[package]]
-name = "pytz"
-version = "2025.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884, upload-time = "2025-03-25T02:25:00.538Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225, upload-time = "2025-03-25T02:24:58.468Z" },
 ]
 
 [[package]]
