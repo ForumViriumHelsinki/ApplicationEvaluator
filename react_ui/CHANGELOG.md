@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/compare/application-evaluator-frontend-v0.2.0...application-evaluator-frontend-v0.3.0) (2026-02-05)
+
+
+### Features
+
+* add Skaffold dev profile with file sync for hot reload ([#53](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/issues/53)) ([ed9f3fc](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/commit/ed9f3fc1a8b7046c1ebeb374f63f490480e207e2))
+
 ## [0.2.0](https://github.com/ForumViriumHelsinki/ApplicationEvaluator/compare/application-evaluator-frontend-v0.1.0...application-evaluator-frontend-v0.2.0) (2026-02-03)
 
 
