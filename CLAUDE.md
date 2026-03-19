@@ -17,7 +17,7 @@ The FVH Application Evaluator is a Django REST Framework + React/TypeScript web 
 - **Admin**: Custom Django admin interface for managing application rounds and criteria
 
 ### Frontend (React)
-- **Framework**: React 16 with TypeScript
+- **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite (migrated from Create React App)
 - **UI**: Bootstrap 4 + Reactstrap
 - **State Management**: Local component state (no Redux/Context)
