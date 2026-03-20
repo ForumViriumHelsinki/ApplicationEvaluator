@@ -66,21 +66,15 @@ service:
   port: 8000
   targetPort: 8000
 
-# Ingress for API (optional - can be internal only if frontend proxies)
-ingress:
+# Gateway API (Envoy Gateway) - replaces ingress-nginx
+# Creates an HTTPRoute pointing to the shared dataportal-gateway
+# TLS is managed at the shared Gateway level (not per-application)
+gateway:
   enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-  - host: api.application-evaluator.dataportal.fi
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - api.application-evaluator.dataportal.fi
-    secretName: application-evaluator-backend-tls # pragma: allowlist secret
+
+# Ingress disabled - using Gateway API instead (mutually exclusive with gateway)
+ingress:
+  enabled: false
 
 # Health checks
 livenessProbe:
