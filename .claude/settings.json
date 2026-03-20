@@ -1,4 +1,17 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(bun test *)",
+      "Bash(skaffold *)",
+      "Bash(uv pip install *)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run python *)",
+      "Bash(uv run ruff *)",
+      "Bash(uv sync *)",
+      "WebFetch(domain:docs.astral.sh)"
+    ]
+  },
   "enabledPlugins": {
     "accessibility-plugin@laurigates-claude-plugins": true,
     "agent-patterns-plugin@laurigates-claude-plugins": true,
