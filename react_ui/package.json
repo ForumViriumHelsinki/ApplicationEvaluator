@@ -52,7 +52,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",
-    "jsdom": "^25.0.1",
+    "jsdom": "^29.0.1",
     "sass": "^1.82.0",
     "typescript": "^5.7.2",
     "vite": "^7.3.0",
