@@ -28,7 +28,7 @@ CMD ["bun", "run", "dev", "--host", "0.0.0.0"]
 # ============================================================================
 # Use Node.js for reliable Vite builds
 # (Bun's baseline binary can crash without AVX CPU support in some environments)
-FROM node:22-alpine AS build
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
