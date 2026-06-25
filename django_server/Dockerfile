@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy uv from official image (faster and more secure than curl | sh)
-COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /usr/local/bin/uv
 
 # Set uv environment variables for optimal build
 ENV UV_LINK_MODE=copy \
