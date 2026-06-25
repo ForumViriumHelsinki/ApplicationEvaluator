@@ -1,5 +1,5 @@
 # Dependencies stage - use Bun for fast dependency installation
-FROM oven/bun:1.3.4-alpine AS deps
+FROM oven/bun:1.3.10-alpine AS deps
 
 WORKDIR /app
 
