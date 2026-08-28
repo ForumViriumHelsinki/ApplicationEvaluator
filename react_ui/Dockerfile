@@ -44,7 +44,7 @@ RUN npm run build
 # ============================================================================
 # RUNTIME STAGE - Production with nginx (default)
 # ============================================================================
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.29-alpine AS runtime
 
 # Install envsubst (part of gettext)
 RUN apk add --no-cache gettext
