@@ -56,7 +56,7 @@ We take the security of the FVH Application Evaluator seriously. If you believe 
 
 This project uses:
 
-- **Dependabot**: Automated dependency updates
+- **Renovate**: Automated dependency and security updates, run centrally from the `infrastructure` repository against this repo's `renovate.json`
 - **CodeQL**: Static application security testing (SAST)
 - **detect-secrets**: Pre-commit secret scanning
 - **Dependency Review**: PR-level vulnerability checks
