@@ -8,7 +8,7 @@ components:
   security_sast: true
   security_secret_detection: true
   security_policy: true
-  security_dependabot: true
+  security_renovate: true
   sentry: "2025.1"
   sentry_backend: true
   sentry_backend_sdk: "sentry-sdk"
