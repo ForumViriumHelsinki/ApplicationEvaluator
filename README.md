@@ -1,3 +1,7 @@
+# ARCHIVED
+
+This project has been archived as obsolete 2026-10-27.
+
 # FVH Application Evaluator
 
 The application evaluator is an open source web app for collaboratively evaluating applications (e.g. funding applications) by a set of weighted criteria, with support for multiple evaluating organizations.
